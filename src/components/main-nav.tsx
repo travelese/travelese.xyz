@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 
 export function MainNav() {
   return (
-    <div className="bg-white dark:bg-gray-950 shadow">
+    <div className="bg-white dark:bg-gray-950 shadow border-b">
       <div className="container mx-auto px-4 py-4 md:py-5">
         <nav className="flex items-center justify-between">
           <Link

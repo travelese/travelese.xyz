@@ -6,6 +6,7 @@ import { MainNav } from "@/components/main-nav";
 import "@/styles/globals.css";
 
 import { cn } from "@/lib/utils";
+import { Footer } from "@/components/footer";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <MainNav />
             {children}
           </ThemeProvider>
+          <Footer />
         </body>
       </html>
     </>
