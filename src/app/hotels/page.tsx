@@ -26,13 +26,16 @@ export default function Component() {
               <form className="flex w-full md:w-auto gap-4 bg-white dark:bg-gray-950 shadow rounded-lg p-6">
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="destination">Destination</Label>
-                  <Input id="destination" placeholder="Enter destination" />
+                  <Input name="destination" placeholder="Enter destination" />
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="check-in">Check-in</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Input id="check-in" placeholder="Select check-in date" />
+                      <Input
+                        name="check-in"
+                        placeholder="Select check-in date"
+                      />
                     </PopoverTrigger>
                     <PopoverContent className="p-0">
                       <Calendar />
@@ -44,7 +47,7 @@ export default function Component() {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Input
-                        id="check-out"
+                        name="check-out"
                         placeholder="Select check-out date"
                       />
                     </PopoverTrigger>
@@ -55,7 +58,7 @@ export default function Component() {
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="guests">Guests</Label>
-                  <Select id="guests">
+                  <Select name="guests">
                     <SelectTrigger>
                       <SelectValue placeholder="Select guests" />
                     </SelectTrigger>
@@ -199,7 +202,7 @@ export default function Component() {
   );
 }
 
-function StarIcon(props) {
+function StarIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -218,7 +221,7 @@ function StarIcon(props) {
   );
 }
 
-function MinusIcon(props) {
+function MinusIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -237,7 +240,7 @@ function MinusIcon(props) {
   );
 }
 
-function PlusIcon(props) {
+function PlusIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

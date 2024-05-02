@@ -26,18 +26,18 @@ export default function Flight() {
               <form className="flex w-full md:w-auto gap-4 bg-white dark:bg-gray-950 shadow rounded-lg p-6">
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="departure">Departure</Label>
-                  <Input id="departure" placeholder="Leaving from" />
+                  <Input name="departure" placeholder="Leaving from" />
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="arrival">Arrival</Label>
-                  <Input id="arrival" placeholder="Going to" />
+                  <Input name="arrival" placeholder="Going to" />
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="departure-date">Departure Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Input
-                        id="departure-date"
+                        name="departure-date"
                         placeholder="Select departure date"
                       />
                     </PopoverTrigger>
@@ -51,7 +51,7 @@ export default function Flight() {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Input
-                        id="return-date"
+                        name="return-date"
                         placeholder="Select return date"
                       />
                     </PopoverTrigger>
@@ -62,7 +62,7 @@ export default function Flight() {
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="passengers">Passengers</Label>
-                  <Select id="passengers">
+                  <Select name="passengers">
                     <SelectTrigger>
                       <SelectValue placeholder="Passengers" />
                     </SelectTrigger>
@@ -110,7 +110,7 @@ export default function Flight() {
                 </div>
                 <div className="flex-1 space-y-2">
                   <Label htmlFor="trip-type">Trip Type</Label>
-                  <Select defaultValue="roundtrip" id="trip-type">
+                  <Select defaultValue="roundtrip" name="trip-type">
                     <SelectTrigger>
                       <SelectValue placeholder="Select trip type" />
                     </SelectTrigger>
@@ -121,9 +121,7 @@ export default function Flight() {
                   </Select>
                 </div>
                 <div className="flex-1 flex items-center justify-center">
-                  <Button type="submit">
-                    Search Flights
-                  </Button>
+                  <Button type="submit">Search Flights</Button>
                 </div>
               </form>
             </div>
@@ -199,7 +197,7 @@ export default function Flight() {
   );
 }
 
-function ArrowRightIcon(props) {
+function ArrowRightIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -219,7 +217,7 @@ function ArrowRightIcon(props) {
   );
 }
 
-function PlaneIcon(props) {
+function PlaneIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -238,7 +236,7 @@ function PlaneIcon(props) {
   );
 }
 
-function MinusIcon(props) {
+function MinusIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -257,7 +255,7 @@ function MinusIcon(props) {
   );
 }
 
-function PlusIcon(props) {
+function PlusIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
