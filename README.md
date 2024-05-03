@@ -1,2 +1,1 @@
 # Travelese
-# Armin Babaei Studio
