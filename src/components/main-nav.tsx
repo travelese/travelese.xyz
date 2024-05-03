@@ -20,16 +20,22 @@ export function MainNav() {
           </Link>
           <div className="flex items-center space-x-4">
             <Link
-              className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              className="text-sm font-medium hover:underline underline-offset-4"
               href="/flights"
             >
               Flights
             </Link>
             <Link
-              className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+              className="text-sm font-medium hover:underline underline-offset-4"
               href="/hotels"
             >
               Hotels
+            </Link>
+            <Link
+              className="text-sm font-medium hover:underline underline-offset-4"
+              href="/#contact"
+            >
+              Get in Touch
             </Link>
             <Popover>
               <PopoverTrigger asChild>

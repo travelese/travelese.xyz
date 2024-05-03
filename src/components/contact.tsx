@@ -8,12 +8,11 @@ export function Contact() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">
               Get in touch
             </h2>
             <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-              Have a project in mind? Let&apos;s discuss how we can bring your
-              vision to life.
+              Let&apos;s discuss how we can bring your vision to life.
             </p>
           </div>
           <div className="w-full max-w-sm space-y-2">

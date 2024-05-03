@@ -1,9 +1,10 @@
+import { Contact } from "@/components/contact";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12 md:py-16">
-      <div className="grid gap-8">
+    <div className="flex flex-col min-h-[100dvh] bg-white dark:bg-gray-950">
+      <main className="grid gap-8">
         <section className="w-full h-screen py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 items-center">
@@ -36,6 +37,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+      </main>
+      <div id="contact">
+        <Contact />
       </div>
     </div>
   );

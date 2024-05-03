@@ -40,8 +40,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <MainNav />
             {children}
           </ThemeProvider>
-          <Analytics />
           <Footer />
+          <Analytics />
         </body>
       </html>
     </>
