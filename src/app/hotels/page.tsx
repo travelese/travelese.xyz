@@ -15,6 +15,7 @@ import {
   SelectContent,
   Select,
 } from "@/components/ui/select";
+import { BuildingIcon } from "lucide-react";
 
 export default function Component() {
   return (
@@ -25,16 +26,14 @@ export default function Component() {
             <div className="flex-1">
               <form className="flex w-full md:w-auto gap-4 bg-white dark:bg-gray-950 shadow rounded-lg p-6">
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="destination">Destination</Label>
-                  <Input name="destination" placeholder="Enter destination" />
+                  <Input name="destination" placeholder="Destination" />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="check-in">Check-in</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Input
                         name="check-in"
-                        placeholder="Select check-in date"
+                        placeholder="Check-in date"
                       />
                     </PopoverTrigger>
                     <PopoverContent className="p-0">
@@ -43,7 +42,6 @@ export default function Component() {
                   </Popover>
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="check-out">Check-out</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Input
@@ -57,10 +55,9 @@ export default function Component() {
                   </Popover>
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="guests">Guests</Label>
                   <Select name="guests">
                     <SelectTrigger>
-                      <SelectValue placeholder="Select guests" />
+                      <SelectValue placeholder="Guests" />
                     </SelectTrigger>
                     <SelectContent>
                       <div className="grid gap-2">
@@ -114,7 +111,8 @@ export default function Component() {
             <Card>
               <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-3">
+                    <BuildingIcon className="w-5 h-5" />
                     <div>
                       <div className="font-semibold">The Ritz-Carlton</div>
                       <div className="text-gray-500 dark:text-gray-400">
@@ -142,7 +140,8 @@ export default function Component() {
             <Card>
               <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-3">
+                    <BuildingIcon className="w-5 h-5" />
                     <div>
                       <div className="font-semibold">The Ritz-Carlton</div>
                       <div className="text-gray-500 dark:text-gray-400">
@@ -170,7 +169,66 @@ export default function Component() {
             <Card>
               <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-3">
+                    <BuildingIcon className="w-5 h-5" />
+                    <div>
+                      <div className="font-semibold">The Ritz-Carlton</div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        New York, NY
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <span>4.9 (1,234 reviews)</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">$399/night</div>
+                  <Button size="sm" variant="outline">
+                    Select
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 mt-3">
+                    <BuildingIcon className="w-5 h-5" />
+                    <div>
+                      <div className="font-semibold">The Ritz-Carlton</div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        New York, NY
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <StarIcon className="w-4 h-4 fill-primary" />
+                    <span>4.9 (1,234 reviews)</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">$399/night</div>
+                  <Button size="sm" variant="outline">
+                    Select
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 mt-3">
+                    <BuildingIcon className="w-5 h-5" />
                     <div>
                       <div className="font-semibold">The Ritz-Carlton</div>
                       <div className="text-gray-500 dark:text-gray-400">

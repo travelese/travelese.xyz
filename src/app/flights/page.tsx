@@ -21,19 +21,16 @@ export default function Flight() {
     <div>
       <div className="max-w-5xl mx-auto px-4 py-12 md:py-16">
         <div className="grid gap-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <section className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex-1">
               <form className="flex w-full md:w-auto gap-4 bg-white dark:bg-gray-950 shadow rounded-lg p-6">
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="departure">Departure</Label>
                   <Input name="departure" placeholder="Leaving from" />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="arrival">Arrival</Label>
                   <Input name="arrival" placeholder="Going to" />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="departure-date">Departure Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Input
@@ -47,7 +44,6 @@ export default function Flight() {
                   </Popover>
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="return-date">Return Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Input
@@ -61,7 +57,6 @@ export default function Flight() {
                   </Popover>
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="passengers">Passengers</Label>
                   <Select name="passengers">
                     <SelectTrigger>
                       <SelectValue placeholder="Passengers" />
@@ -109,7 +104,6 @@ export default function Flight() {
                   </Select>
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="trip-type">Trip Type</Label>
                   <Select defaultValue="roundtrip" name="trip-type">
                     <SelectTrigger>
                       <SelectValue placeholder="Select trip type" />
@@ -125,12 +119,12 @@ export default function Flight() {
                 </div>
               </form>
             </div>
-          </div>
-          <div className="grid gap-4">
+          </section>
+          <section className="grid gap-4">
             <Card>
               <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-4">
                     <PlaneIcon className="w-5 h-5" />
                     <span className="font-semibold">American Airlines</span>
                   </div>
@@ -140,7 +134,7 @@ export default function Flight() {
                     <span>11:30 AM</span>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right mt-4">
                   <div className="font-semibold">$399</div>
                   <Button size="sm" variant="outline">
                     Select
@@ -190,7 +184,49 @@ export default function Flight() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+            <Card>
+              <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <PlaneIcon className="w-5 h-5" />
+                    <span className="font-semibold">United Airlines</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <span>9:00 AM</span>
+                    <ArrowRightIcon className="w-4 h-4" />
+                    <span>12:30 PM</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">$449</div>
+                  <Button size="sm" variant="outline">
+                    Select
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <PlaneIcon className="w-5 h-5" />
+                    <span className="font-semibold">United Airlines</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <span>9:00 AM</span>
+                    <ArrowRightIcon className="w-4 h-4" />
+                    <span>12:30 PM</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">$449</div>
+                  <Button size="sm" variant="outline">
+                    Select
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
         </div>
       </div>
     </div>
