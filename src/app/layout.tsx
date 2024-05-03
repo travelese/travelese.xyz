@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
-
+import { Analytics } from "@vercel/analytics/react";
 import "@/styles/globals.css";
-
-import { Inter as FontSans } from "next/font/google";
-
 import { cn } from "@/lib/utils";
-
+import { Inter as FontSans } from "next/font/google";
 import { MainNav } from "@/components/main-nav";
 import { Footer } from "@/components/footer";
 
@@ -43,6 +40,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <MainNav />
             {children}
           </ThemeProvider>
+          <Analytics />
           <Footer />
         </body>
       </html>
