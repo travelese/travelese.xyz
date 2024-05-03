@@ -145,18 +145,18 @@ export default function Flight() {
             <Card>
               <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-4">
                     <PlaneIcon className="w-5 h-5" />
-                    <span className="font-semibold">Delta Airlines</span>
+                    <span className="font-semibold">American Airlines</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                    <span>6:00 AM</span>
+                    <span>8:00 AM</span>
                     <ArrowRightIcon className="w-4 h-4" />
-                    <span>10:00 AM</span>
+                    <span>11:30 AM</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-semibold">$499</div>
+                <div className="text-right mt-4">
+                  <div className="font-semibold">$399</div>
                   <Button size="sm" variant="outline">
                     Select
                   </Button>
@@ -166,18 +166,18 @@ export default function Flight() {
             <Card>
               <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-4">
                     <PlaneIcon className="w-5 h-5" />
-                    <span className="font-semibold">United Airlines</span>
+                    <span className="font-semibold">American Airlines</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                    <span>9:00 AM</span>
+                    <span>8:00 AM</span>
                     <ArrowRightIcon className="w-4 h-4" />
-                    <span>12:30 PM</span>
+                    <span>11:30 AM</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-semibold">$449</div>
+                <div className="text-right mt-4">
+                  <div className="font-semibold">$399</div>
                   <Button size="sm" variant="outline">
                     Select
                   </Button>
@@ -187,18 +187,18 @@ export default function Flight() {
             <Card>
               <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-4">
                     <PlaneIcon className="w-5 h-5" />
-                    <span className="font-semibold">United Airlines</span>
+                    <span className="font-semibold">American Airlines</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                    <span>9:00 AM</span>
+                    <span>8:00 AM</span>
                     <ArrowRightIcon className="w-4 h-4" />
-                    <span>12:30 PM</span>
+                    <span>11:30 AM</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-semibold">$449</div>
+                <div className="text-right mt-4">
+                  <div className="font-semibold">$399</div>
                   <Button size="sm" variant="outline">
                     Select
                   </Button>
@@ -208,18 +208,18 @@ export default function Flight() {
             <Card>
               <CardContent className="grid grid-cols-[1fr_auto] items-center gap-4">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-4">
                     <PlaneIcon className="w-5 h-5" />
-                    <span className="font-semibold">United Airlines</span>
+                    <span className="font-semibold">American Airlines</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                    <span>9:00 AM</span>
+                    <span>8:00 AM</span>
                     <ArrowRightIcon className="w-4 h-4" />
-                    <span>12:30 PM</span>
+                    <span>11:30 AM</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-semibold">$449</div>
+                <div className="text-right mt-4">
+                  <div className="font-semibold">$399</div>
                   <Button size="sm" variant="outline">
                     Select
                   </Button>
