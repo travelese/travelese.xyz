@@ -17,8 +17,8 @@ import {
 export async function MainNav() {
   const session = await auth();
 
-  const userName = session.user.name;
-  const userImage = session.user.image;
+  const userName = session?.user?.name;
+  const userImage = session?.user?.image;
 
   return (
     <div className="bg-white dark:bg-gray-950 shadow border-b">
@@ -73,7 +73,7 @@ export async function MainNav() {
                         alt="Avatar"
                         className="rounded-full"
                         height="32"
-                        src={userImage}
+                        src={userImage ?? "/placeholder-user.jpg"}
                         style={{
                           aspectRatio: "32/32",
                           objectFit: "cover",
