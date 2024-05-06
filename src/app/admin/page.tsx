@@ -177,7 +177,7 @@ export default function Dashboard() {
                       <TableCell>John Doe</TableCell>
                       <TableCell>2023-05-01</TableCell>
                       <TableCell>
-                        <Badge variant="success">Confirmed</Badge>
+                        <Badge variant="secondary">Confirmed</Badge>
                       </TableCell>
                       <TableCell>$1,200</TableCell>
                       <TableCell>
@@ -204,7 +204,7 @@ export default function Dashboard() {
                       <TableCell>Jane Smith</TableCell>
                       <TableCell>2023-04-28</TableCell>
                       <TableCell>
-                        <Badge variant="warning">Pending</Badge>
+                        <Badge variant="secondary">Pending</Badge>
                       </TableCell>
                       <TableCell>$800</TableCell>
                       <TableCell>
@@ -231,7 +231,7 @@ export default function Dashboard() {
                       <TableCell>Bob Johnson</TableCell>
                       <TableCell>2023-04-22</TableCell>
                       <TableCell>
-                        <Badge variant="danger">Cancelled</Badge>
+                        <Badge variant="secondary">Cancelled</Badge>
                       </TableCell>
                       <TableCell>$1,500</TableCell>
                       <TableCell>
