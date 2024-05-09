@@ -13,6 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenu,
 } from "@/components/ui/dropdown-menu";
+import { SettingsIcon, CircleHelpIcon } from "lucide-react";
 
 export async function MainNav() {
   const session = await auth();
@@ -21,57 +22,30 @@ export async function MainNav() {
   const userImage = session?.user?.image;
 
   return (
-    <div className="bg-white dark:bg-gray-950 shadow border-b">
+    <div className="shadow border-b">
       <div className="container mx-auto px-4 py-4 md:py-5">
         <nav className="flex items-center justify-between">
-          {session ? (
-            <Link
-              className="text-3xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white
-              to-gray-500"
-              href="/"
-            >
-              Travelese for Business
-            </Link>
-          ) : (
-            <Link
-              className="text-3xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white
-              to-gray-500"
-              href="/"
-            >
-              Travelese
-            </Link>
-          )}
-          <div className="flex items-center space-x-4">
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              href="/flights"
-            >
-              Flights
-            </Link>
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              href="/hotels"
-            >
-              Hotels
-            </Link>
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              href="/#contact"
-            >
-              Get in Touch
-            </Link>
+          <Link
+            className="text-3xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-200
+              to-blue-950"
+            href="/"
+          >
+            <h2>{session ? "Travelese for Business" : "Travelese"}</h2>
+          </Link>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="icon">
+              <CircleHelpIcon />
+            </Button>
             {session ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon">
+                  <SettingsIcon />
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      className="rounded-full"
-                      size="icon"
-                      variant="ghost"
-                    >
+                    <Button size="icon" variant="outline">
                       <Image
                         alt="Avatar"
-                        className="rounded-full"
                         height="32"
                         src={userImage ?? "/placeholder-user.jpg"}
                         style={{
@@ -86,7 +60,6 @@ export async function MainNav() {
                     <DropdownMenuLabel>{userName}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Settings</DropdownMenuItem>
                     <DropdownMenuItem>
                       <LogoutButton />
                     </DropdownMenuItem>
