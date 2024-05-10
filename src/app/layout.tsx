@@ -1,49 +1,36 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Analytics } from "@vercel/analytics/react";
-import "@/styles/globals.css";
-import { cn } from "@/lib/utils";
-import { Inter as FontSans } from "next/font/google";
+import { Inter } from "next/font/google";
+import "../styles/globals.css";
+import { ThemeProvider } from "next-themes";
 import { MainNav } from "@/components/main-nav";
 import { Footer } from "@/components/footer";
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Travelese",
-  description: "Discover the World with Travelese",
+  description: "",
 };
 
-interface RootLayoutProps {
+export default function RootLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+}>) {
   return (
-    <>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={cn(
-            "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable
-          )}
+    <html lang="en">
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <MainNav />
-            {children}
-          </ThemeProvider>
+          <MainNav />
+          {children}
           <Footer />
-          <Analytics />
-        </body>
-      </html>
-    </>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

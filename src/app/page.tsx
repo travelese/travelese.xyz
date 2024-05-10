@@ -1,39 +1,329 @@
+import Image from "next/image";
 import { Contact } from "@/components/contact";
-import Link from "next/link";
+import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  CardTitle,
+  CardHeader,
+  CardContent,
+  Card,
+  CardFooter,
+} from "@/components/ui/card";
+import {
+  PlaneIcon,
+  HotelIcon,
+  CarIcon,
+  TicketIcon,
+} from "lucide-react";
+import FlightSearchForm from "@/components/flight-search-form";
+import HotelSearchForm from "@/components/hotel-search-form";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-[100dvh] bg-white dark:bg-gray-950">
-      <main className="grid gap-8">
-        <section className="w-full h-screen py-12 md:py-24 lg:py-32 xl:py-48">
+    <div className="flex flex-col min-h-[100dvh]">
+      <main className="flex-1">
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container px-4 md:px-6">
-            <div className="grid gap-6 items-center">
-              <div className="flex flex-col justify-center space-y-4 text-center">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">
-                    Discover the World with Travelese
-                  </h1>
-                  <p className="max-w-[600px] text-zinc-200 md:text-xl dark:text-zinc-100 mx-auto">
-                    Plan your next travel with us.
-                  </p>
-                </div>
-                <div className="w-full max-w-sm space-y-2 mx-auto">
-                  <div className="flex space-x-2">
-                    <Link
-                      className="flex-1 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200 dark:focus:ring-gray-300 dark:focus:ring-offset-gray-950"
-                      href="/flights"
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <h1
+                  className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
+              to-blue-950"
+                >
+                  Discover the World with Travelese
+                </h1>
+                <p className="mx-auto max-w-[700px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Smartest way to book your next trip.
+                </p>
+              </div>
+              <div className="w-full max-w-5xl mx-auto">
+                <Tabs className="w-full" defaultValue="flights">
+                  <TabsList className="grid w-full grid-cols-2 gap-6 p-0">
+                    <TabsTrigger
+                      className="inline-flex h-10 items-center justify-center rounded-md border px-8 text-sm font-medium shadow-sm transition-colorsocus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+                      value="flights"
                     >
                       Flights
-                    </Link>
-                    <Link
-                      className="flex-1 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200 dark:focus:ring-gray-300 dark:focus:ring-offset-gray-950"
-                      href="/hotels"
+                    </TabsTrigger>
+                    <TabsTrigger
+                      className="inline-flex h-10 items-center justify-center rounded-md border px-8 text-sm font-medium shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+                      value="hotels"
                     >
                       Hotels
-                    </Link>
-                  </div>
-                </div>
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="flights">
+                    <FlightSearchForm />
+                  </TabsContent>
+                  <TabsContent value="hotels">
+                    <HotelSearchForm />
+                  </TabsContent>
+                </Tabs>
               </div>
+            </div>
+          </div>
+        </section>
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <div className="inline-block rounded-lg px-3 py-1 text-sm">
+                  Featured Destinations
+                </div>
+                <h2
+                  className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
+              to-blue-950"
+                >
+                  Explore the World
+                </h2>
+                <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Discover Tours
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Tokyo, Japan</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Image
+                    alt="Paris"
+                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full dark:brightness-[0.2] dark:grayscale"
+                    height="310"
+                    src="/placeholder.svg"
+                    width="550"
+                  />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Paris, France</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Image
+                    alt="Tokyo"
+                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full dark:brightness-[0.2] dark:grayscale"
+                    height="310"
+                    src="/placeholder.svg"
+                    width="550"
+                  />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Milan, Italy</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Image
+                    alt="Sydney"
+                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full dark:brightness-[0.2] dark:grayscale"
+                    height="310"
+                    src="/placeholder.svg"
+                    width="550"
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <div className="inline-block rounded-lg px-3 py-1 text-sm">
+                  Fashion Week Packages
+                </div>
+                <h2
+                  className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
+              to-blue-950"
+                >
+                  Fashion Week 2024
+                </h2>
+                <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Book your Fashion Week package now.
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    $666
+                    <span className="text-sm font-normal">/ package</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2">
+                      <PlaneIcon className="w-5 h-5" />
+                      <span>Round-trip flight</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <HotelIcon className="w-5 h-5" />
+                      <span>5-night hotel stay</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CarIcon className="w-5 h-5" />
+                      <span>Rental car included</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TicketIcon className="w-5 h-5" />
+                      <span>10 Runway tickets</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full h-12" size="lg">
+                    Book Now
+                  </Button>
+                </CardFooter>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    $666
+                    <span className="text-sm font-normal">/ package</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2">
+                      <PlaneIcon className="w-5 h-5" />
+                      <span>Round-trip flight</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <HotelIcon className="w-5 h-5" />
+                      <span>7-night hotel stay</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CarIcon className="w-5 h-5" />
+                      <span>Rental car included</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TicketIcon className="w-5 h-5" />
+                      <span>7 Runway tickets</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full h-12" size="lg">
+                    Book Now
+                  </Button>
+                </CardFooter>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    $666
+                    <span className="text-sm font-normal">/ package</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2">
+                      <PlaneIcon className="w-5 h-5" />
+                      <span>Round-trip flight</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <HotelIcon className="w-5 h-5" />
+                      <span>10-night hotel stay</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CarIcon className="w-5 h-5" />
+                      <span>Rental car included</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TicketIcon className="w-5 h-5" />
+                      <span>10 Runway tickets</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full h-12" size="lg">
+                    Book Now
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+        </section>
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
+                  Featured Hotels
+                </div>
+                <h2
+                  className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
+              to-blue-950"
+                >
+                  Luxury Stays
+                </h2>
+                <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Discover our featured hotels for an unforgettable experience.
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Tuba Club, Marseille</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Image
+                    alt="Tuba Club, Marseille"
+                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full dark:brightness-[0.2] dark:grayscale"
+                    height="310"
+                    src="/placeholder.svg"
+                    width="550"
+                  />
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full h-12" size="lg">
+                    Book Now
+                  </Button>
+                </CardFooter>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Giulia, Milan</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Image
+                    alt="Giulia, Milan"
+                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full dark:brightness-[0.2] dark:grayscale"
+                    height="310"
+                    src="/placeholder.svg"
+                    width="550"
+                  />
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full h-12" size="lg">
+                    Book Now
+                  </Button>
+                </CardFooter>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Drei Berge, Mürren</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Image
+                    alt="Drei Berge, Mürren"
+                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full dark:brightness-[0.2] dark:grayscale"
+                    height="310"
+                    src="/placeholder.svg"
+                    width="550"
+                  />
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full h-12" size="lg">
+                    Book Now
+                  </Button>
+                </CardFooter>
+              </Card>
             </div>
           </div>
         </section>
