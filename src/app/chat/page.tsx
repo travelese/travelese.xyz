@@ -23,7 +23,7 @@ export default function Chat() {
   console.log("messages:", messages);
 
   return (
-    <div className="flex flex-col min-h-[90dvh] w-full max-w-md py-24 mx-auto stretch relative">
+    <div className="flex flex-col min-h-screen w-full max-w-md py-24 mx-auto stretch relative">
       <div className="overflow-auto mb-4 flex-grow">
         {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
         {messages.map((m) => {
