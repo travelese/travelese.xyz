@@ -5,7 +5,6 @@ export async function POST(request: Request) {
   try {
     // Get the form data from the request body
     const { data } = await request.json();
-    console.log("Form data:", data);
 
     // Destructure the necessary properties from the form data
     const { slices, passengers, cabin_class } = data;
@@ -16,7 +15,6 @@ export async function POST(request: Request) {
     // Extract the return date from the second slice, if it exists
     const return_date = slices[1]?.departure_date;
 
-    console.log("Form data:", data);
     // Perform the flight search using the Duffel API
     const flightSearch = await duffel.offerRequests.create({
       passengers,
@@ -41,7 +39,6 @@ export async function POST(request: Request) {
       // Add any other required parameters here
     });
 
-    console.log("Flight search results:", flightSearch);
     // Return the flight search results
     return NextResponse.json(flightSearch);
   } catch (error) {

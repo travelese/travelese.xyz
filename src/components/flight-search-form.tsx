@@ -75,7 +75,6 @@ export default function FlightSearchForm() {
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    console.log("Submitted form data:", data);
     const { origin, destination, dates, passengers, cabin } = data;
 
     const slices = [
@@ -101,8 +100,6 @@ export default function FlightSearchForm() {
       cabin_class: cabin,
     };
 
-    console.log("API data:", apiData);
-
     try {
       const response = await fetch("/api/flights/search", {
         method: "POST",
@@ -114,7 +111,6 @@ export default function FlightSearchForm() {
 
       if (response.ok) {
         const offer = await response.json();
-        console.log("Cheapest offer:", offer);
         // Do something with the cheapest offer
       } else {
         console.error("Error:", response.status);
