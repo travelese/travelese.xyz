@@ -26,7 +26,9 @@ import {
 import { ListOrderedIcon, FilterIcon, ArrowRightIcon } from "lucide-react";
 import FlightSearchForm from "@/components/flight-search-form";
 
-export default function Component() {
+
+
+export default function FlightSearchResults() {
   return (
     <div>
       <div className="w-full max-w-5xl mx-auto">

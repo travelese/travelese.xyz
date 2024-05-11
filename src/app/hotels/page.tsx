@@ -27,7 +27,7 @@ import {
 import { FilterIcon, ListOrderedIcon, StarIcon } from "lucide-react";
 import HotelSearchForm from "@/components/hotel-search-form";
 
-export default function Component() {
+export default function HotelSearchResults() {
   return (
     <div>
       <div className="w-full max-w-5xl mx-auto">
