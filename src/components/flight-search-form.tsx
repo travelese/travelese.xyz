@@ -1,21 +1,22 @@
 "use client";
 
 import * as React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { addDays, format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
+import {
+  Calendar as CalendarIcon,
+  PlusIcon,
+  MinusIcon,
+  UserIcon,
+  BabyIcon,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -23,41 +24,64 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const Passenger = [
+  { type: "adult", name: "Adults", count: 1, icon: UserIcon },
+  { type: "child", name: "Children", count: 0, icon: BabyIcon },
+  { type: "infant_without_seat", name: "Infants", count: 0, icon: BabyIcon },
+];
 
 const FormSchema = z.object({
-  origin: z.string().min(3, {
-    message: "Origin must be at least 3 characters long",
-  }),
-  destination: z.string().min(3, {
-    message: "Destination must be at least 3 characters long",
-  }),
-  passengers: z.number().min(1, {
-    message: "Passengers must be at least 1",
-  }),
+  origin: z.string().min(3),
+  destination: z.string().min(3),
   dates: z.object({
-    from: z.date({
-      required_error: "Start date is required.",
-    }),
-    to: z.date({
-      required_error: "End date is required.",
-    }),
+    from: z.date(),
+    to: z.date(),
   }),
+  passengers: z.number().min(1),
   cabin: z.string(),
-  currency: z.string().min(3, {
-    message: "Currency is required",
-  }),
+  currency: z.string().min(3),
   sort: z.enum(["total_amount", "total_duration"]).default("total_amount"),
 });
 
 export default function FlightSearchForm() {
+  const [counter, setCounter] = React.useState(0);
+  const [passengers, setPassengers] = React.useState(Passenger);
+
+  const handleIncrement = (index: number) => {
+    console.log("Incrementing");
+    const updatedPassengers = [...passengers];
+    updatedPassengers[index].count++;
+    setPassengers(updatedPassengers);
+    setCounter((prev) => prev + 1);
+  };
+
+  const handleDecrement = (index: number) => {
+    console.log("Decrementing");
+    if (passengers[index].count > 0) {
+      if (passengers[index].type === "adult" && passengers[index].count === 1) {
+        return; // do nothing if adult count is 1
+      }
+      const updatedPassengers = [...passengers];
+      updatedPassengers[index].count--;
+      setPassengers(updatedPassengers);
+      setCounter((prev) => prev - 1);
+    }
+  };
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -65,11 +89,11 @@ export default function FlightSearchForm() {
       destination: "",
       passengers: 1,
       dates: {
-        from: new Date(), // Set a default start date
-        to: addDays(new Date(), 7), // Set a default end date (e.g., 7 days from the start date)
+        from: new Date(),
+        to: addDays(new Date(), 7),
       },
-      cabin: "",
-      currency: "",
+      cabin: "economy",
+      currency: "CAD",
       sort: "total_amount",
     },
   });
@@ -81,12 +105,12 @@ export default function FlightSearchForm() {
       {
         origin,
         destination,
-        departure_date: dates.from.toISOString().split("T")[0],
+        departure_date: format(dates.from, "yyyy-MM-dd"),
       },
       {
         origin: destination,
         destination: origin,
-        departure_date: dates.to.toISOString().split("T")[0],
+        departure_date: format(dates.to, "yyyy-MM-dd"),
       },
     ];
 
@@ -117,6 +141,7 @@ export default function FlightSearchForm() {
       }
     } catch (error) {
       console.error("Error:", error);
+      // Display error message to user or send error report to server
     }
   };
 
@@ -126,8 +151,7 @@ export default function FlightSearchForm() {
   });
 
   return (
-    <div>
-      <div className="grid gap-4 py-4">
+    <>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -168,7 +192,7 @@ export default function FlightSearchForm() {
                           id="date"
                           variant={"outline"}
                           className={cn(
-                            "w-[300px] justify-start text-left font-normal",
+                            "w-mx justify-start text-left font-normal",
                             !date && "text-muted-foreground"
                           )}
                         >
@@ -208,91 +232,54 @@ export default function FlightSearchForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Select
-                      onValueChange={(value) => field.onChange(parseInt(value))}
-                      defaultValue={field.value?.toString()}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Passengers" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1</SelectItem>
-                        <SelectItem value="2">2</SelectItem>
-                        <SelectItem value="3">3</SelectItem>
-                        <SelectItem value="4">4</SelectItem>
-                        <SelectItem value="5">5</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="cabin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select cabin class" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="economy">Economy</SelectItem>
-                        <SelectItem value="business">Business</SelectItem>
-                        <SelectItem value="first">First</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="currency"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select currency" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="USD">USD</SelectItem>
-                        <SelectItem value="CAD">CAD</SelectItem>
-                        <SelectItem value="EUR">EUR</SelectItem>
-                        <SelectItem value="GBP">GBP</SelectItem>
-                        <SelectItem value="JPY">JPY</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="trip-type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select trip type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="roundtrip">Roundtrip</SelectItem>
-                        <SelectItem value="oneway">One-way</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="flex items-center justify-between w-full"
+                        >
+                          {Passenger.map((p, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center space-x-2"
+                            >
+                              <p.icon className="h-5 w-5" />
+                              <span className="p-2 font-medium">{p.count}</span>
+                            </div>
+                          ))}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="grid grid-cols-1 gap-4 p-2 border">
+                        {Passenger.map((p, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between gap-2"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <p.icon className="h-5 w-5" />
+                              <span>{p.name}</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <Button size="icon" variant="outline">
+                                <MinusIcon
+                                  className="h-5 w-5"
+                                  onClick={() => handleDecrement(index)}
+                                />
+                              </Button>
+                              <span className="p-1 w-4 justify-center font-medium">
+                                {p.count}
+                              </span>
+                              <Button size="icon" variant="outline">
+                                <PlusIcon
+                                  className="h-5 w-5"
+                                  onClick={() => handleIncrement(index)}
+                                />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -301,7 +288,6 @@ export default function FlightSearchForm() {
             <Button type="submit">Search</Button>
           </form>
         </Form>
-      </div>
-    </div>
+    </>
   );
 }

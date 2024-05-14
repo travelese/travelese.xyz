@@ -6,6 +6,14 @@ export async function POST(request: Request) {
     // Get the form data from the request body
     const { data } = await request.json();
 
+    // Check if the request body is valid
+    if (!data || !data.slices || !data.passengers || !data.cabin_class) {
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 }
+      );
+    }
+
     // Destructure the necessary properties from the form data
     const { slices, passengers, cabin_class } = data;
 
@@ -39,11 +47,13 @@ export async function POST(request: Request) {
       // Add any other required parameters here
     });
 
+    // Log the response from the Duffel API
+    console.log(flightSearch);
     // Return the flight search results
     return NextResponse.json(flightSearch);
   } catch (error) {
     // Handle any errors that occurred during the flight search
-    console.error("Error searching for flights:", error);
+    console.error("Error handling request:", error);
     return NextResponse.json(
       { error: "Failed to search for flights" },
       { status: 500 }
