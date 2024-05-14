@@ -18,17 +18,11 @@ import {
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit, data } = useChat();
 
-  // Log the state variables
-  console.log("data:", data);
-  console.log("messages:", messages);
-
   return (
     <div className="flex flex-col min-h-screen w-full max-w-md py-24 mx-auto stretch relative">
       <div className="overflow-auto mb-4 flex-grow">
         {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
         {messages.map((m) => {
-          // Log each message
-          console.log("message:", m);
           return (
             <div key={m.id} className="whitespace-pre-wrap">
               {m.role === "user" ? "User: " : "AI: "}

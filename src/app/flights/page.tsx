@@ -1,3 +1,7 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+
 import {
   AccordionTrigger,
   AccordionContent,
@@ -17,21 +21,78 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   DialogTrigger,
-  DialogTitle,
   DialogHeader,
-  DialogFooter,
   DialogContent,
   Dialog,
 } from "@/components/ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ListOrderedIcon, FilterIcon, ArrowRightIcon } from "lucide-react";
 import FlightSearchForm from "@/components/flight-search-form";
 
-export default function Component() {
+export default function FlightSearchResults({ flightSearch }: { flightSearch: any }) {
+  const [flights, setFlights] = useState(flightSearch);
+
+ interface Segment {
+   departure_date: string;
+   departure_time: string;
+   arrival_date: string;
+   arrival_time: string;
+   origin: string;
+   destination: string;
+ }
+
+ interface Slice {
+   duration: string;
+   segments: Segment[];
+ }
+
+ interface Passenger {
+   id: string;
+   type: string;
+ }
+
+ interface Flight {
+   id: string;
+   type: string;
+   total_amount: string;
+   total_taxes: string;
+   currency: string;
+   passengers: Passenger[];
+   slices: Slice[];
+ }
+
+  useEffect(() => {
+    fetch("/api/flights/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data: flightSearch,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => setFlights(data))
+      .catch((error) => console.error("Error:", error));
+  }, [flightSearch]);
+
   return (
     <div>
-      <div className="w-full max-w-5xl mx-auto">
-        <FlightSearchForm />
-      </div>
+      {/* <div className="w-full max-w-5xl mx-auto">
+        <FlightSearchForm  />
+      </div> */}
       <div>
         <div className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">
           <div className="space-y-6">
@@ -192,160 +253,100 @@ export default function Component() {
               </div>
             </div>
             <div className="grid gap-4">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <div className="flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800">
-                    <div className="w-2/3 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg font-bold">YTO</div>
-                        <ArrowRightIcon className="w-4 h-4" />
-                        <div className="text-lg font-bold">TYO</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Toronto to Tokyo</div>
-                        <div>1 Stop</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Apr 2, 2024 - 8:00 AM</div>
-                        <div>Apr 2, 2024 - 5:30 PM</div>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        1 Carry-on, 1 Checked Bag
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center justify-center w-1/3 space-y-2 border-l border-dashed pl-4">
-                      <div className="text-lg font-bold">Total: $666</div>
-                      <Button>Book</Button>
-                    </div>
-                  </div>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Flight Details</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="text-lg font-bold">Departure</h3>
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg font-bold">YTO</div>
-                        <ArrowRightIcon className="w-4 h-4" />
-                        <div className="text-lg font-bold">TYO</div>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Toronto to Tokyo
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Apr 2, 2024 - 8:00 AM
-                      </div>
-                      <div className="text-sm text-gray-500">1 Stop</div>
-                      <div className="text-sm text-gray-500">
-                        1 Carry-on, 1 Checked Bag
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold">Return</h3>
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg font-bold">TYO</div>
-                        <ArrowRightIcon className="w-4 h-4" />
-                        <div className="text-lg font-bold">YTO</div>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Tokyo to Toronto
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Apr 9, 2024 - 6:00 PM
-                      </div>
-                      <div className="text-sm text-gray-500">Nonstop</div>
-                      <div className="text-sm text-gray-500">
-                        1 Carry-on, 1 Checked Bag
-                      </div>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <div className="flex items-center justify-between w-full">
-                      <div className="text-lg font-bold">Total: $666</div>
-                      <Button>Book Now</Button>
-                    </div>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <div className="flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800">
-                    <div className="w-2/3 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg font-bold">YTO</div>
-                        <ArrowRightIcon className="w-4 h-4" />
-                        <div className="text-lg font-bold">MIL</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Toronto to Milan</div>
-                        <div>Nonstop</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Apr 2, 2024 - 6:00 AM</div>
-                        <div>Apr 2, 2024 - 11:30 AM</div>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        1 Carry-on, 1 Checked Bag
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center justify-center w-1/3 space-y-2 border-l border-dashed border-gray-200 dark:border-gray-800 pl-4">
-                      <div className="text-lg font-bold">Total: $666</div>
-                      <Button>Book</Button>
-                    </div>
-                  </div>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Flight Details</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="text-lg font-bold">Departure</h3>
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg font-bold">YTO</div>
-                        <ArrowRightIcon className="w-4 h-4" />
-                        <div className="text-lg font-bold">MIL</div>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Toronto to Milan
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Apr 2, 2024 - 6:00 AM
-                      </div>
-                      <div className="text-sm text-gray-500">Nonstop</div>
-                      <div className="text-sm text-gray-500">
-                        1 Carry-on, 1 Checked Bag
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold">Return</h3>
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg font-bold">MIL</div>
-                        <ArrowRightIcon className="w-4 h-4" />
-                        <div className="text-lg font-bold">YTO</div>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Toronto to Milan
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Apr 9, 2024 - 8:00 AM
-                      </div>
-                      <div className="text-sm text-gray-500">Nonstop</div>
-                      <div className="text-sm text-gray-500">
-                        1 Carry-on, 1 Checked Bag
-                      </div>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <div className="flex items-center justify-between w-full">
-                      <div className="text-lg font-bold">Total: $666</div>
-                      <Button>Book Now</Button>
-                    </div>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              {flights && flights.map((flight: Flight) => (
+                <Dialog key={flight.id}>
+                  <DialogTrigger asChild>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>
+                          {flight.slices[0].segments[0].origin} to{" "}
+                          {flight.slices[0].segments[0].destination}
+                        </CardTitle>
+                        <CardDescription>
+                          {flight.slices[0].segments.length} Stop
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div>
+                            {flight.slices[0].segments[0].departure_date} -{" "}
+                            {flight.slices[0].segments[0].departure_time}
+                          </div>
+                          <div>
+                            {flight.slices[0].segments[0].arrival_date} -{" "}
+                            {flight.slices[0].segments[0].arrival_time}
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter>
+                        <div className="flex items-center justify-between w-full">
+                          <div className="text-lg font-bold">
+                            Total: {flight.total_amount}
+                          </div>
+                          <Button>Book</Button>
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Flight Details</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <h3 className="text-lg font-bold">Departure</h3>
+                              <div className="flex items-center gap-2">
+                                <div className="text-lg font-bold">
+                                  {flight.slices[0].segments[0].origin}
+                                </div>
+                                <ArrowRightIcon className="w-4 h-4" />
+                                <div className="text-lg font-bold">
+                                  {flight.slices[0].segments[0].destination}
+                                </div>
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {flight.slices[0].segments[0].departure_date}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {flight.slices[0].segments.length}
+                              </div>
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-bold">Return</h3>
+                              <div className="flex items-center gap-2">
+                                <div className="text-lg font-bold">
+                                  {flight.slices[1]?.segments[0].origin}
+                                </div>
+                                <ArrowRightIcon className="w-4 h-4" />
+                                <div className="text-lg font-bold">
+                                  {flight.slices[1]?.segments[0].destination}
+                                </div>
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {flight.slices[1]?.segments[0].departure_date}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {flight.slices[1]?.segments.length}
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter>
+                          <div className="flex items-center justify-between w-full">
+                            <div className="text-lg font-bold">
+                              Total: {flight.total_amount}
+                            </div>
+                            <Button>Book Now</Button>
+                          </div>
+                        </CardFooter>
+                      </Card>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              ))}
               <Dialog />
             </div>
           </div>

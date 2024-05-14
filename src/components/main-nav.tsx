@@ -33,9 +33,6 @@ export async function MainNav() {
             <h2>{session ? "Travelese for Business" : "Travelese"}</h2>
           </Link>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="icon">
-              <CircleHelpIcon />
-            </Button>
             {session ? (
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="icon">
@@ -69,6 +66,9 @@ export async function MainNav() {
             ) : (
               <Auth />
             )}
+            <Button variant="outline" size="icon">
+              <CircleHelpIcon />
+            </Button>
             <ModeToggle />
           </div>
         </nav>
