@@ -12,6 +12,7 @@ import {
   MinusIcon,
   UserIcon,
   BabyIcon,
+  MapPinIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -30,76 +31,100 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-const Passenger = [
-  { type: "adult", name: "Adults", count: 1, icon: UserIcon },
-  { type: "child", name: "Children", count: 0, icon: BabyIcon },
-  { type: "infant_without_seat", name: "Infants", count: 0, icon: BabyIcon },
+const passengerTypes = [
+  { type: "adult", name: "Adult", icon: UserIcon },
+  { type: "child", name: "Child", icon: BabyIcon },
+  { type: "infant_without_seat", name: "Infant", icon: BabyIcon },
 ];
 
 const FormSchema = z.object({
-  origin: z.string().min(3),
-  destination: z.string().min(3),
+  origin: z.string().min(3, "Origin must be at least 3 characters"),
+  destination: z.string().min(3, "Destination must be at least 3 characters"),
   dates: z.object({
     from: z.date(),
     to: z.date(),
   }),
-  passengers: z.number().min(1),
-  cabin: z.string(),
-  currency: z.string().min(3),
+  passengers: z.array(
+    z.object({
+      type: z.string(),
+      count: z.number().min(0),
+    })
+  ),
+  cabin: z.enum(["first", "business", "premium_economy", "economy"]),
+  currency: z.string().min(3, "Currency code must be at least 3 characters"),
   sort: z.enum(["total_amount", "total_duration"]).default("total_amount"),
 });
 
 export default function FlightSearchForm() {
-  const [counter, setCounter] = React.useState(0);
-  const [passengers, setPassengers] = React.useState(Passenger);
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: new Date(),
+    to: addDays(new Date(), 7),
+  });
 
-  const handleIncrement = (index: number) => {
-    console.log("Incrementing");
-    const updatedPassengers = [...passengers];
-    updatedPassengers[index].count++;
-    setPassengers(updatedPassengers);
-    setCounter((prev) => prev + 1);
-  };
-
-  const handleDecrement = (index: number) => {
-    console.log("Decrementing");
-    if (passengers[index].count > 0) {
-      if (passengers[index].type === "adult" && passengers[index].count === 1) {
-        return; // do nothing if adult count is 1
-      }
-      const updatedPassengers = [...passengers];
-      updatedPassengers[index].count--;
-      setPassengers(updatedPassengers);
-      setCounter((prev) => prev - 1);
-    }
-  };
+  const [passengers, setPassengers] = React.useState(
+    passengerTypes.map((type) => ({
+      ...type,
+      count: type.type === "adult" ? 1 : 0,
+    }))
+  );
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       origin: "",
       destination: "",
-      passengers: 1,
+      passengers: passengerTypes.map((type) => ({
+        type: type.type,
+        count: type.type === "adult" ? 1 : 0,
+      })),
       dates: {
         from: new Date(),
         to: addDays(new Date(), 7),
       },
       cabin: "economy",
-      currency: "CAD",
+      currency: "USD",
       sort: "total_amount",
     },
   });
 
+  const handlePassengerChange = (index: number, change: number) => {
+    const updatedPassengers = [...passengers];
+    const passenger = updatedPassengers[index];
+
+    if (passenger.type === "adult" && passenger.count === 1 && change < 0) {
+      return; // Prevent decreasing adult count below 1
+    }
+
+    updatedPassengers[index] = {
+      ...passenger,
+      count: Math.max(passenger.count + change, 0),
+    };
+
+    setPassengers(updatedPassengers);
+    // Sync form values
+    form.setValue("passengers", updatedPassengers);
+  };
+
+  const pluralize = (
+    count: number,
+    singular: string,
+    plural: string = `${singular}s`
+  ) => {
+    if (singular === "Child") {
+      return count === 1 ? "Child" : "Children";
+    }
+    return count === 1 ? singular : plural;
+  };
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    const { origin, destination, dates, passengers, cabin } = data;
+    const { origin, destination, dates, cabin, passengers } = data;
+
+    const meta = {
+      limit: 1,
+    };
+
+    console.log(dates.from, dates.to, passengers, cabin, origin, destination);
 
     const slices = [
       {
@@ -114,15 +139,21 @@ export default function FlightSearchForm() {
       },
     ];
 
-    const passengerTypes = Array.from({ length: passengers }, () => ({
-      type: "adult",
-    }));
+    const cleanedPassengers = passengers
+      .filter((p) => p.count > 0)
+      .map((p) => ({
+        type: p.type,
+        count: p.count,
+      }));
 
     const apiData = {
+      meta,
       slices,
-      passengers: passengerTypes,
+      passengers: cleanedPassengers,
       cabin_class: cabin,
     };
+
+    console.log(apiData);
 
     try {
       const response = await fetch("/api/flights/search", {
@@ -135,6 +166,7 @@ export default function FlightSearchForm() {
 
       if (response.ok) {
         const offer = await response.json();
+        console.log(offer);
         // Do something with the cheapest offer
       } else {
         console.error("Error:", response.status);
@@ -145,149 +177,173 @@ export default function FlightSearchForm() {
     }
   };
 
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 20),
-  });
-
   return (
-    <>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col sm:flex-row gap-2"
-          >
-            <FormField
-              control={form.control}
-              name="origin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="destination"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="dates"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          id="date"
-                          variant={"outline"}
-                          className={cn(
-                            "w-mx justify-start text-left font-normal",
-                            !date && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {date?.from ? (
-                            date.to ? (
-                              <>
-                                {format(date.from, "LLL dd, y")} -{" "}
-                                {format(date.to, "LLL dd, y")}
-                              </>
-                            ) : (
-                              format(date.from, "LLL dd, y")
-                            )
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={date?.from}
-                        selected={date}
-                        onSelect={setDate}
-                        numberOfMonths={2}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="passengers"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="flex items-center justify-between w-full"
-                        >
-                          {Passenger.map((p, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center space-x-2"
-                            >
-                              <p.icon className="h-5 w-5" />
-                              <span className="p-2 font-medium">{p.count}</span>
-                            </div>
-                          ))}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="grid grid-cols-1 gap-4 p-2 border">
-                        {Passenger.map((p, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between gap-2"
+    <div className="grid gap-4 py-4">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col sm:flex-row lg:flex-row xl:flex-row gap-2"
+        >
+          <FormField
+            control={form.control}
+            name="origin"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="relative flex items-center">
+                    <MapPinIcon className="absolute left-3 h-4 w-4" />
+                    <Input
+                      className="pl-10"
+                      placeholder="Origin"
+                      {...field}
+                      value={field.value as string}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="destination"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="relative flex items-center">
+                    <MapPinIcon className="absolute left-3 h-4 w-4" />
+                    <Input
+                      className="pl-10"
+                      placeholder="Destination"
+                      {...field}
+                      value={field.value as string}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dates"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        id="date"
+                        variant={"outline"}
+                        className={cn(
+                          "w-mx justify-start text-left font-normal",
+                          !date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date?.from ? (date.to ? (
+                          <>
+                            {format(date.from, "LLL dd, y")} -{" "}
+                            {format(date.to, "LLL dd, y")}
+                          </>
+                        ) : (
+                          format(date.from, "LLL dd, y")
+                        )) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      initialFocus
+                      mode="range"
+                      defaultMonth={field.value?.from}
+                      selected={date}
+                      onSelect={(selected) => {
+                        setDate(selected);
+                        field.onChange(selected as DateRange);
+                      }}
+                      numberOfMonths={2}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="passengers"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-mx justify-start text-left font-normal"
+                      )}
+                    >
+                      {passengers.map((p, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <span key={index} className="flex items-center space-x-2 mx-2">
+                            <p.icon className="mr-2 h-4 w-4" />
+                            {p.count}
+                          </span>
+                        </div>
+                      ))}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="grid grid-cols-1 gap-4 p-2 border font-medium rounded-lg shadow-sm"
+                    align="start"
+                  >
+                    {passengers.map((p, index) => (
+                      <div key={index} className="flex items-center justify-between gap-2">
+                        <div className="flex items-center space-x-3">
+                          <p.icon className="h-5 w-5" />
+                          <span>{pluralize(p.count, p.name)}</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            disabled={p.count === 0}
+                            className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+                            onClick={() => {
+                              handlePassengerChange(index, -1);
+                              field.onChange(passengers);
+                            }}
                           >
-                            <div className="flex items-center space-x-3">
-                              <p.icon className="h-5 w-5" />
-                              <span>{p.name}</span>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <Button size="icon" variant="outline">
-                                <MinusIcon
-                                  className="h-5 w-5"
-                                  onClick={() => handleDecrement(index)}
-                                />
-                              </Button>
-                              <span className="p-1 w-4 justify-center font-medium">
-                                {p.count}
-                              </span>
-                              <Button size="icon" variant="outline">
-                                <PlusIcon
-                                  className="h-5 w-5"
-                                  onClick={() => handleIncrement(index)}
-                                />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Search</Button>
-          </form>
-        </Form>
-    </>
+                            <MinusIcon className="h-5 w-5" />
+                          </Button>
+                          <span className="p-1 w-4 justify-center font-small">
+                            {p.count}
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+                            onClick={() => {
+                              handlePassengerChange(index, 1);
+                              field.onChange(passengers);
+                            }}
+                          >
+                            <PlusIcon className="h-5 w-5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Search</Button>
+        </form>
+      </Form>
+    </div>
   );
 }

@@ -1,3 +1,4 @@
+// lib/duffel.ts
 import { Duffel } from "@duffel/api";
 
 const duffelAccessToken = process.env.DUFFEL_ACCESS_TOKEN;
