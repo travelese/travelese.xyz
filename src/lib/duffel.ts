@@ -1,4 +1,6 @@
-// lib/duffel.ts
+// File: /src/lib/duffel.ts
+// Description: This file contains the Duffel API client configuration.
+
 import { Duffel } from "@duffel/api";
 
 const duffelAccessToken = process.env.DUFFEL_ACCESS_TOKEN;

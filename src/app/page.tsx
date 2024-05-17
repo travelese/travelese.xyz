@@ -1,3 +1,4 @@
+// app/page.tsx
 import Head from "next/head";
 import Image from "next/image";
 import { Contact } from "@/components/contact";
@@ -10,9 +11,9 @@ import {
   Card,
   CardFooter,
 } from "@/components/ui/card";
-import { PlaneIcon, HotelIcon, CarIcon, TicketIcon } from "lucide-react";
-import FlightSearchForm from "@/components/flight-search-form";
-import HotelSearchForm from "@/components/hotel-search-form";
+import { PlaneIcon, stayIcon, CarIcon, TicketIcon } from "lucide-react";
+import FlightSearchForm from "@/components/flight/flight-search-form";
+import StaySearchForm from "@/components/stay/stay-search-form";
 
 export const metadata = {
   title: "Travelese",
@@ -26,11 +27,11 @@ export default function Home() {
         <title>Travelese - Smartest way to book your next trip</title>
         <meta
           name="description"
-          content="Discover and book your next travel with Travelese. We offer flights, hotels, and fashion week packages to top destinations like Tokyo, Paris, Milan, and more."
+          content="Discover and book your next travel with Travelese. We offer flights, stays, and fashion week packages to top destinations like Tokyo, Paris, Milan, and more."
         />
         <meta
           name="keywords"
-          content="travel, flights, hotels, booking, travel booking, fashion week, Tokyo, Paris, Milan"
+          content="travel, flights, Stays, booking, travel booking, fashion week, Tokyo, Paris, Milan"
         />
         <meta name="author" content="Travelese" />
 
@@ -41,10 +42,10 @@ export default function Home() {
         />
         <meta
           property="og:description"
-          content="Discover and book your next travel with Travelese. We offer flights, hotels, and fashion week packages to top destinations like Tokyo, Paris, Milan, and more."
+          content="Discover and book your next travel with Travelese. We offer flights, stays, and fashion week packages to top destinations like Tokyo, Paris, Milan, and more."
         />
         <meta property="og:image" content="/path-to-your-image.jpg" />
-        <meta property="og:url" content="https://yourwebsite.com" />
+        <meta property="og:url" content="https://travelese.xyz" />
         <meta property="og:type" content="website" />
       </Head>
       <main className="flex-1">
@@ -77,16 +78,16 @@ export default function Home() {
                     </TabsTrigger>
                     <TabsTrigger
                       className="inline-flex h-10 items-center justify-center rounded-md border px-8 text-sm font-medium shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-                      value="hotels"
+                      value="stays"
                     >
-                      Hotels
+                      Stays
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="flights">
                     <FlightSearchForm />
                   </TabsContent>
-                  <TabsContent value="hotels">
-                    <HotelSearchForm />
+                  <TabsContent value="stays">
+                    <StaySearchForm />
                   </TabsContent>
                 </Tabs>
               </div>
@@ -189,8 +190,8 @@ export default function Home() {
                         <span>Round-trip flight</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <HotelIcon className="w-5 h-5" />
-                        <span>{pkg.duration} hotel stay</span>
+                        <stayIcon className="w-5 h-5" />
+                        <span>{pkg.duration} stay</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CarIcon className="w-5 h-5" />
@@ -213,13 +214,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Hotels */}
+        {/* Featured stays */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
-                  Featured Hotels
+                  Featured stays
                 </div>
                 <h2
                   className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
@@ -228,7 +229,7 @@ export default function Home() {
                   Luxury Stays
                 </h2>
                 <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Discover our featured hotels for an unforgettable experience.
+                  Discover our featured stays for an unforgettable experience.
                 </p>
               </div>
             </div>
@@ -237,17 +238,17 @@ export default function Home() {
                 "Tuba Club, Marseille",
                 "Giulia, Milan",
                 "Drei Berge, Mürren",
-              ].map((hotel) => (
-                <Card key={hotel}>
+              ].map((stay) => (
+                <Card key={stay}>
                   <CardHeader>
-                    <CardTitle>{hotel}</CardTitle>
+                    <CardTitle>{stay}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Image
-                      alt={hotel}
+                      alt={stay}
                       className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full dark:brightness-[0.2] dark:grayscale"
                       height="310"
-                      src={`/images/${hotel.replace(" ", "_")}.jpg`}
+                      src={`/images/${stay.replace(" ", "_")}.jpg`}
                       width="550"
                     />
                   </CardContent>
