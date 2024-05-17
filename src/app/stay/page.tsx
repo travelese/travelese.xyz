@@ -25,7 +25,7 @@ import {
   Dialog,
 } from "@/components/ui/dialog";
 import { FilterIcon, ListOrderedIcon, StarIcon } from "lucide-react";
-import HotelSearchForm from "@/components/hotel-search-form";
+import HotelSearchForm from "@/components/stay/stay-search-form";
 
 export default function HotelSearchResults() {
   return (

@@ -9,7 +9,7 @@ import {
 import { DatePickerWithRange } from "@/components/date-picker";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
-export default function HotelSearchForm() {
+export default function StaySearchForm() {
   return (
     <div>
       <div className="grid gap-4 py-4">

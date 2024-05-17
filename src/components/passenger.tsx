@@ -1,3 +1,6 @@
+// File: /src/components/passenger.tsx
+// Description: This file contains the component for selecting the number of passengers.
+
 "use client";
 
 import React from "react";

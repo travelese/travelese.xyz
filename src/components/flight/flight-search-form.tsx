@@ -1,3 +1,6 @@
+// File: /src/components/flight/flight-search-form.tsx
+// Description: This file contains the form for searching for flights.
+
 "use client";
 
 import * as React from "react";
@@ -14,7 +17,6 @@ import {
   BabyIcon,
   MapPinIcon,
 } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -31,13 +33,33 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import useNavigation from "@/hooks/navigation";
+import {
+  PassengerType as PassengerTypeEnum,
+  CabinClass as CabinClassEnum,
+} from "@/types/api";
+
+// Define the object mappings for types as values
+const PassengerType = {
+  ADULT: "adult" as PassengerTypeEnum,
+  CHILD: "child" as PassengerTypeEnum,
+  INFANT_WITHOUT_SEAT: "infant_without_seat" as PassengerTypeEnum,
+};
+
+const CabinClass = {
+  FIRST: "first" as CabinClassEnum,
+  BUSINESS: "business" as CabinClassEnum,
+  PREMIUM_ECONOMY: "premium_economy" as CabinClassEnum,
+  ECONOMY: "economy" as CabinClassEnum,
+};
 
 const passengerTypes = [
-  { type: "adult", name: "Adult", icon: UserIcon },
-  { type: "child", name: "Child", icon: BabyIcon },
-  { type: "infant_without_seat", name: "Infant", icon: BabyIcon },
+  { type: PassengerType.ADULT, name: "Adult", icon: UserIcon },
+  { type: PassengerType.CHILD, name: "Child", icon: BabyIcon },
+  { type: PassengerType.INFANT_WITHOUT_SEAT, name: "Infant", icon: BabyIcon },
 ];
 
+// Define the schema for form validation using zod
 const FormSchema = z.object({
   origin: z.string().min(3, "Origin must be at least 3 characters"),
   destination: z.string().min(3, "Destination must be at least 3 characters"),
@@ -47,16 +69,26 @@ const FormSchema = z.object({
   }),
   passengers: z.array(
     z.object({
-      type: z.string(),
+      type: z.enum([
+        PassengerType.ADULT,
+        PassengerType.CHILD,
+        PassengerType.INFANT_WITHOUT_SEAT,
+      ]),
       count: z.number().min(0),
     })
   ),
-  cabin: z.enum(["first", "business", "premium_economy", "economy"]),
+  cabin: z.enum([
+    CabinClass.FIRST,
+    CabinClass.BUSINESS,
+    CabinClass.PREMIUM_ECONOMY,
+    CabinClass.ECONOMY,
+  ]),
   currency: z.string().min(3, "Currency code must be at least 3 characters"),
   sort: z.enum(["total_amount", "total_duration"]).default("total_amount"),
 });
 
 export default function FlightSearchForm() {
+  const { navigateToFlightsPage } = useNavigation();
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 7),
@@ -65,7 +97,7 @@ export default function FlightSearchForm() {
   const [passengers, setPassengers] = React.useState(
     passengerTypes.map((type) => ({
       ...type,
-      count: type.type === "adult" ? 1 : 0,
+      count: type.type === PassengerType.ADULT ? 1 : 0,
     }))
   );
 
@@ -76,13 +108,13 @@ export default function FlightSearchForm() {
       destination: "",
       passengers: passengerTypes.map((type) => ({
         type: type.type,
-        count: type.type === "adult" ? 1 : 0,
+        count: type.type === PassengerType.ADULT ? 1 : 0,
       })),
       dates: {
         from: new Date(),
         to: addDays(new Date(), 7),
       },
-      cabin: "economy",
+      cabin: CabinClass.ECONOMY,
       currency: "USD",
       sort: "total_amount",
     },
@@ -92,7 +124,11 @@ export default function FlightSearchForm() {
     const updatedPassengers = [...passengers];
     const passenger = updatedPassengers[index];
 
-    if (passenger.type === "adult" && passenger.count === 1 && change < 0) {
+    if (
+      passenger.type === PassengerType.ADULT &&
+      passenger.count === 1 &&
+      change < 0
+    ) {
       return; // Prevent decreasing adult count below 1
     }
 
@@ -120,12 +156,6 @@ export default function FlightSearchForm() {
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const { origin, destination, dates, cabin, passengers } = data;
 
-    const meta = {
-      limit: 1,
-    };
-
-    console.log(dates.from, dates.to, passengers, cabin, origin, destination);
-
     const slices = [
       {
         origin,
@@ -147,16 +177,13 @@ export default function FlightSearchForm() {
       }));
 
     const apiData = {
-      meta,
       slices,
       passengers: cleanedPassengers,
       cabin_class: cabin,
     };
 
-    console.log(apiData);
-
     try {
-      const response = await fetch("/api/flights/search", {
+      const response = await fetch("/api/duffel/flight/search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -166,14 +193,21 @@ export default function FlightSearchForm() {
 
       if (response.ok) {
         const offer = await response.json();
-        console.log(offer);
-        // Do something with the cheapest offer
+        console.log("offer:", offer);
+
+        navigateToFlightsPage({
+          origin,
+          destination,
+          from: format(dates.from, "yyyy-MM-dd"),
+          to: format(dates.to, "yyyy-MM-dd"),
+          passengers: JSON.stringify(cleanedPassengers),
+          cabin,
+        });
       } else {
         console.error("Error:", response.status);
       }
     } catch (error) {
       console.error("Error:", error);
-      // Display error message to user or send error report to server
     }
   };
 
@@ -241,14 +275,16 @@ export default function FlightSearchForm() {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date?.from ? (date.to ? (
-                          <>
-                            {format(date.from, "LLL dd, y")} -{" "}
-                            {format(date.to, "LLL dd, y")}
-                          </>
+                        {date?.from ? (
+                          date.to ? (
+                            <>
+                              {format(date.from, "LLL dd, y")} -{" "}
+                              {format(date.to, "LLL dd, y")}
+                            </>
+                          ) : (
+                            format(date.from, "LLL dd, y")
+                          )
                         ) : (
-                          format(date.from, "LLL dd, y")
-                        )) : (
                           <span>Pick a date</span>
                         )}
                       </Button>
@@ -281,13 +317,14 @@ export default function FlightSearchForm() {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className={cn(
-                        "w-mx justify-start text-left font-normal"
-                      )}
+                      className={cn("w-mx justify-start text-left font-normal")}
                     >
                       {passengers.map((p, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <span key={index} className="flex items-center space-x-2 mx-2">
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2"
+                        >
+                          <span className="flex items-center space-x-2 mx-2">
                             <p.icon className="mr-2 h-4 w-4" />
                             {p.count}
                           </span>
@@ -300,7 +337,10 @@ export default function FlightSearchForm() {
                     align="start"
                   >
                     {passengers.map((p, index) => (
-                      <div key={index} className="flex items-center justify-between gap-2">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between gap-2"
+                      >
                         <div className="flex items-center space-x-3">
                           <p.icon className="h-5 w-5" />
                           <span>{pluralize(p.count, p.name)}</span>
@@ -341,7 +381,11 @@ export default function FlightSearchForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Search</Button>
+          <div className="flex-1 w-full">
+            <Button type="submit" className="w-full h-full">
+              Search
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
