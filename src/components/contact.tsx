@@ -1,8 +1,11 @@
+// File: /src/lib/action.ts
+// Description: This file contains the actions for handling authentication.
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
-export function Contact() {
+const Contact = () => {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
@@ -32,3 +35,5 @@ export function Contact() {
     </section>
   );
 }
+
+export default Contact;

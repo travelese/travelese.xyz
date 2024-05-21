@@ -14,12 +14,11 @@ const Passenger = [
   { type: "infant_without_seat", name: "Infants", count: 0, icon: BabyIcon },
 ];
 
-export default function Passengers() {
+const Passengers = () => {
   const [counter, setCounter] = React.useState(0);
   const [passengers, setPassengers] = React.useState(Passenger);
 
   const handleIncrement = (index: number) => {
-    console.log("Incrementing");
     const updatedPassengers = [...passengers];
     updatedPassengers[index].count++;
     setPassengers(updatedPassengers);
@@ -27,7 +26,6 @@ export default function Passengers() {
   };
 
   const handleDecrement = (index: number) => {
-    console.log("Decrementing");
     if (passengers[index].count > 0) {
       if (passengers[index].type === "adult" && passengers[index].count === 1) {
         return; // do nothing if adult count is 1
@@ -91,3 +89,5 @@ export default function Passengers() {
     </div>
   );
 }
+
+export default Passengers;

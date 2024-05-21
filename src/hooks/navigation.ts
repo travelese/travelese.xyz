@@ -7,7 +7,7 @@ const useNavigation = () => {
   const router = useRouter();
 
   const navigateToFlightsPage = (queryParams: Record<string, any>) => {
-    const path = '/flight?' + new URLSearchParams(queryParams).toString();
+    const path = '/fly?' + new URLSearchParams(queryParams).toString();
     console.log("Navigating to:", path);
     router.push(path);
   };

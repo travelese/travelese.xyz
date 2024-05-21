@@ -1,36 +1,35 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "../styles/globals.css";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import "@/styles/globals.css";
 import { ThemeProvider } from "next-themes";
-import { MainNav } from "@/components/main-nav";
-import { Footer } from "@/components/footer";
+import Footer from "@/components/footer";
 
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Travelese",
   description: "",
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body className={inter.className}>
+      <body className={GeistSans.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <MainNav />
-          {children}
-          <Footer />
+          <main>{children}</main>
         </ThemeProvider>
       </body>
     </html>
   );
 }
+
+export default RootLayout;

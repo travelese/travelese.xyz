@@ -27,7 +27,7 @@ import {
 import { FilterIcon, ListOrderedIcon, StarIcon } from "lucide-react";
 import HotelSearchForm from "@/components/stay/stay-search-form";
 
-export default function HotelSearchResults() {
+const HotelSearchResults = () =>{
   return (
     <div>
       <div className="w-full max-w-5xl mx-auto">
@@ -386,3 +386,5 @@ export default function HotelSearchResults() {
     </div>
   );
 }
+
+export default HotelSearchResults;

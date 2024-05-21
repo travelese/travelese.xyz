@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { handleGithubLogin, handleGoogleLogin, handleLogout } from "@/lib/action";
 
-export function LoginButtonGithub() {
+const LoginButtonGithub = () => {
     return (
       <Button
         className="w-full"
@@ -15,8 +15,7 @@ export function LoginButtonGithub() {
     );
 }
 
-
-export function LoginButtonGoogle() {
+const LoginButtonGoogle = () => {
   return (
     <Button
       className="w-full"
@@ -28,7 +27,7 @@ export function LoginButtonGoogle() {
   );
 }
 
-export function LogoutButton() {
+const LogoutButton = () => {
   return (
     <Button
       className="w-full"
@@ -39,4 +38,5 @@ export function LogoutButton() {
     </Button>
   );
 }
-                
+              
+export { LoginButtonGithub, LoginButtonGoogle, LogoutButton };

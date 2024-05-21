@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-export function Footer() {
+const Footer = () => {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 shadow border-t">
+    <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 shadow border-t">
       <Link
         className="text-xs"
         href="https://arminbabaeistudio.com"
@@ -17,6 +17,8 @@ export function Footer() {
           Privacy
         </Link>
       </nav>
-    </div>
+    </footer>
   );
 }
+
+export default Footer;
