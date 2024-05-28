@@ -1,6 +1,3 @@
-// File: /src/app/flight/page.tsx
-// Description: This file contains the flight search results page.
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -14,16 +11,19 @@ import {
   DropdownMenu,
 } from "@/components/ui/dropdown-menu";
 import { ListOrderedIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonCard } from "@/components/fly/flight-skeleton";
 import Filters from "@/components/fly/filters";
 import FlightCard from "@/components/fly/flight-card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { SkeletonCard } from "@/components/skeleton";
+import useNavigation from "@/hooks/navigation"; 
+import { Offer } from "@/types/api";
 
-const FlightSearchResults = () => {
-  const [offers, setOffers] = useState<any[]>([]);
+const FlightSearch = () => {
+  const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<null | Error>(null);
   const searchParams = useSearchParams();
+  const { navigateToBookPage } = useNavigation(); 
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -55,7 +55,8 @@ const FlightSearchResults = () => {
     fetchOffers();
   }, [searchParams]);
 
-  if (loading)
+  if (loading) {
+    const skeletonCount = 4;
     return (
       <div className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">
         <div className="space-y-6">
@@ -80,18 +81,19 @@ const FlightSearchResults = () => {
             </div>
           </div>
           <div className="grid gap-4">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
+            {Array.from({ length: skeletonCount }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
           </div>
         </div>
       </div>
     );
-  if (error) return <div>Error: {error.message}</div>;
+  }
 
+  if (error) return <div>Error: {error.message}</div>;
+  
   return (
-    <div className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">
+    <main className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">
       <div className="space-y-6">
         <div className="grid gap-4">
           <h2 className="text-2xl font-bold">Filters</h2>
@@ -132,43 +134,14 @@ const FlightSearchResults = () => {
           {offers.map((offer) => (
             <FlightCard
               key={offer.id}
-              outbound={{
-                origin: offer.slices[0]?.origin || "",
-                destination: offer.slices[0]?.destination || "",
-                departureTime: offer.slices[0]?.departure_at || "",
-                arrivalTime: offer.slices[0]?.arrival_at || "",
-                duration: "N/A", // Calculate the duration
-                stops: offer.slices[0]?.segments.length - 1 || 0,
-                airline:
-                  offer.slices[0]?.segments[0]?.operating_carrier?.name ||
-                  "Unknown",
-              }}
-              inbound={{
-                origin: offer.slices[1]?.origin || "",
-                destination: offer.slices[1]?.destination || "",
-                departureTime: offer.slices[1]?.departure_at || "",
-                arrivalTime: offer.slices[1]?.arrival_at || "",
-                duration: "N/A", // Calculate the duration
-                stops: offer.slices[1]?.segments.length - 1 || 0,
-                airline:
-                  offer.slices[1]?.segments[0]?.operating_carrier?.name ||
-                  "Unknown",
-              }}
-              price={{
-                amount: offer.total_amount,
-                currency: offer.total_currency,
-              }}
-              remainingSeats={
-                offer.available_services
-                  ? offer.available_services[0].total_amount
-                  : 0
-              }
+              offer={offer}
+              onSelect={() => navigateToBookPage(offer.id)}
             />
           ))}
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
-export default FlightSearchResults;
+export default FlightSearch;

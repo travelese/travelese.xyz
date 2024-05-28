@@ -1,6 +1,3 @@
-// File: /src/components/flight/filters.tsx
-// Description: This file contains the component for displaying flight search filters.
-
 import React from "react";
 import {
   Accordion,
