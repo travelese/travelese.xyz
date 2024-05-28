@@ -1,6 +1,3 @@
-// File: /src/lib/action.ts
-// Description: This file contains the actions for handling authentication.
-
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
