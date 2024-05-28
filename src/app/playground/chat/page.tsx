@@ -1,6 +1,3 @@
-// File: /src/app/playground/chat/page.tsx
-// Description: This file contains the chat playground page component.
-
 import { Button } from "@/components/ui/button";
 import {
   TooltipTrigger,
