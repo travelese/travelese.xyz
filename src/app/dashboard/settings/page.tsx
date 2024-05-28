@@ -1,6 +1,3 @@
-// File: /src/app/playground/settings/page.tsx
-// Description: Settings page for the application
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -1,6 +1,3 @@
-// File: /src/app/playground/products/page.tsx
-// Description: Products page component
-
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
