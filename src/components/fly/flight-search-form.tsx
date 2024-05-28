@@ -1,6 +1,3 @@
-// File: /src/components/flight/flight-search-form.tsx
-// Description: This file contains the form for searching for flights.
-
 "use client";
 
 import * as React from "react";
@@ -9,15 +6,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { addDays, format } from "date-fns";
 import { DateRange } from "react-day-picker";
-import {
-  Calendar as CalendarIcon,
-  PlusIcon,
-  MinusIcon,
-  UserIcon,
-  BabyIcon,
-  MapPinIcon,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
+import useNavigation from "@/hooks/navigation";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -27,19 +17,52 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import useNavigation from "@/hooks/navigation"; 
+import {
+  CommandInput,
+  CommandEmpty,
+  CommandItem,
+  CommandGroup,
+  CommandList,
+  Command,
+} from "@/components/ui/command";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Calendar as CalendarIcon,
+  PlusIcon,
+  MinusIcon,
+  MapPinIcon,
+  SearchIcon,
+  BuildingIcon,
+  PlaneLandingIcon,
+  PlaneTakeoffIcon,
+  CircleIcon,
+  LocateIcon,
+  HotelIcon,
+} from "lucide-react";
+
+import { Passenger, Child, Infant } from "@kiwicom/orbit-components/icons";
 
 const passengerTypes = [
-  { type: "adult", name: "Adult", icon: UserIcon },
-  { type: "child", name: "Child", icon: BabyIcon },
-  { type: "infant_without_seat", name: "Infant", icon: BabyIcon },
+  { type: "adult", name: "Adult", icon: Passenger },
+  { type: "child", name: "Child", icon: Child },
+  { type: "infant_without_seat", name: "Infant", icon: Infant },
 ];
+
+const currencies = ["CAD", "USD", "EUR"];
+const sortOptions = ["total_amount", "total_duration"];
 
 const FormSchema = z.object({
   origin: z.string().min(3, "Origin must be at least 3 characters"),
@@ -59,7 +82,8 @@ const FormSchema = z.object({
   sort: z.enum(["total_amount", "total_duration"]).default("total_amount"),
 });
 
-const FlightSearchForm = () => {// This line should be outside the onSubmit function
+const FlightSearchForm = () => {
+  const { toast } = useToast();
   const { navigateToFlightsPage } = useNavigation();
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(),
@@ -72,6 +96,8 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
       count: type.type === "adult" ? 1 : 0,
     }))
   );
+
+  const [cabin, setCabin] = React.useState("");
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -86,8 +112,8 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
         from: new Date(),
         to: addDays(new Date(), 7),
       },
-      cabin: "economy",
-      currency: "USD",
+      cabin: cabin || "economy",
+      currency: "CAD",
       sort: "total_amount",
     },
   });
@@ -125,7 +151,7 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
     data: z.infer<typeof FormSchema>,
     event: React.FormEvent
   ) => {
-    event.preventDefault(); // Prevent default form submission behavior
+    event.preventDefault();
 
     const { origin, destination, dates, cabin, passengers } = data;
 
@@ -148,11 +174,13 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
         type: p.type,
       }));
 
-    const apiData = {
+    const formData = {
       slices,
       passengers: cleanedPassengers,
       cabin_class: cabin,
     };
+
+    console.log("Search form data:", formData);
 
     try {
       const response = await fetch("/api/fly/search", {
@@ -160,7 +188,7 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(apiData),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -178,6 +206,10 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
       }
 
       if (offer) {
+        toast({
+          title: "Offer fetched successfully",
+          description: "Rendering the offers...",
+        });
         navigateToFlightsPage({
           origin,
           destination,
@@ -192,7 +224,6 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
     }
   };
 
-
   return (
     <div className="grid gap-4 py-4">
       <Form {...form}>
@@ -204,18 +235,68 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
             control={form.control}
             name="origin"
             render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <div className="relative flex items-center">
-                    <MapPinIcon className="absolute left-3 h-4 w-4" />
-                    <Input
-                      className="pl-10"
-                      placeholder="Origin"
-                      {...field}
-                      value={field.value as string}
-                    />
-                  </div>
-                </FormControl>
+              <FormItem className="flex flex-col">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-mx justify-start text-left font-normal"
+                        )}
+                      >
+                        <MapPinIcon className="mr-2 h-4 w-4" />
+                        {field.value ? field.value : <span>Origin</span>}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Command>
+                      <CommandInput
+                        className="w-full p-2 m-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="Search for a city or airport"
+                      />
+                      <CommandList>
+                        <CommandEmpty>No results found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem>
+                            <div className="flex items-center space-x-2">
+                              <HotelIcon className="h-6 w-6" />
+                              <span className="font-medium">
+                                Toronto, Canada
+                              </span>
+                            </div>
+                          </CommandItem>
+                          <CommandItem>
+                            <div className="flex items-center space-x-2">
+                              <MapPinIcon className="h-6 w-6" />
+                              <span className="text-sm">
+                                250 km around Toronto
+                              </span>
+                            </div>
+                          </CommandItem>
+                          <CommandItem>
+                            <div className="flex items-center space-x-2">
+                              <PlaneTakeoffIcon className="h-6 w-6" />
+                              <span className="text-sm">
+                                YYZ Toronto Pearson International
+                              </span>
+                            </div>
+                          </CommandItem>
+                          <CommandItem>
+                            <div className="flex items-center space-x-2">
+                              <PlaneTakeoffIcon className="h-6 w-6" />
+                              <span className="text-sm">
+                                YTZ Billy Bishop Toronto City
+                              </span>
+                            </div>
+                          </CommandItem>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+
                 <FormMessage />
               </FormItem>
             )}
@@ -257,14 +338,16 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date?.from ? (date.to ? (
-                          <>
-                            {format(date.from, "LLL dd, y")} -{" "}
-                            {format(date.to, "LLL dd, y")}
-                          </>
+                        {date?.from ? (
+                          date.to ? (
+                            <>
+                              {format(date.from, "LLL dd, y")} -{" "}
+                              {format(date.to, "LLL dd, y")}
+                            </>
+                          ) : (
+                            format(date.from, "LLL dd, y")
+                          )
                         ) : (
-                          format(date.from, "LLL dd, y")
-                        )) : (
                           <span>Pick a date</span>
                         )}
                       </Button>
@@ -297,13 +380,17 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className={cn(
-                        "w-mx justify-start text-left font-normal"
-                      )}
+                      className={cn("w-mx justify-start text-left font-normal")}
                     >
                       {passengers.map((p, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <span key={index} className="flex items-center space-x-2 mx-2">
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2"
+                        >
+                          <span
+                            key={index}
+                            className="flex items-center space-x-2 mx-2"
+                          >
                             <p.icon className="mr-2 h-4 w-4" />
                             {p.count}
                           </span>
@@ -316,7 +403,10 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
                     align="start"
                   >
                     {passengers.map((p, index) => (
-                      <div key={index} className="flex items-center justify-between gap-2">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between gap-2"
+                      >
                         <div className="flex items-center space-x-3">
                           <p.icon className="h-5 w-5" />
                           <span>{pluralize(p.count, p.name)}</span>
@@ -357,6 +447,33 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="cabin"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Cabin" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="economy">Economy</SelectItem>
+                    <SelectItem value="premium_economy">
+                      Premium Economy
+                    </SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                    <SelectItem value="first">First</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="flex-1 w-full">
             <Button type="submit" className="w-full h-full">
               Search
@@ -366,6 +483,6 @@ const FlightSearchForm = () => {// This line should be outside the onSubmit func
       </Form>
     </div>
   );
-}
+};
 
 export default FlightSearchForm;
