@@ -1094,3 +1094,208 @@ export interface GetFullOfferFaresParams {
   id: string; // required, Duffel's unique identifier for the partial offer request
   selected_partial_offer: string[]; // required, selected partial offer IDs for each slice in the journey
 }
+
+// Airline interface
+export interface Airline {
+  conditions_of_carriage_url?: string | null; // nullable
+  iata_code?: string | null; // nullable
+  id: string; // required
+  logo_lockup_url?: string | null; // nullable
+  logo_symbol_url?: string | null; // nullable
+  name: string; // required
+}
+
+// Get Single Airline Params interface
+export interface GetSingleAirlineParams {
+  id: string; // required
+}
+
+// Main Get Single Airline Response interface
+export interface GetSingleAirlineResponse {
+  data: Airline; // required
+}
+
+// Query parameters for listing airlines
+export interface ListAirlinesParams {
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+  limit?: number; // pagination limit (defaults to 50, between 1 and 200)
+}
+
+// Main List Airlines Response interface
+export interface ListAirlinesResponse {
+  data: Airline[]; // required
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+}
+
+// Aircraft related interfaces
+export interface Aircraft {
+  iata_code: string; // required
+  id: string; // required
+  name: string; // required
+}
+
+// Get Single Aircraft Params interface
+export interface GetSingleAircraftParams {
+  id: string; // required
+}
+
+// Main Get Single Aircraft Response interface
+export interface GetSingleAircraftResponse {
+  data: Aircraft; // required
+}
+
+// Query parameters for listing aircraft
+export interface ListAircraftParams {
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+  limit?: number; // pagination limit (defaults to 50, between 1 and 200)
+}
+
+// Main List Aircraft Response interface
+export interface ListAircraftResponse {
+  data: Aircraft[]; // required
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+}
+
+// Airport related interfaces
+export interface Airport {
+  city?: City | null; // nullable
+  city_name: string; // required
+  iata_city_code: string; // required
+  iata_code: string; // required
+  iata_country_code: string; // required
+  icao_code?: string | null; // nullable
+  id: string; // required
+  latitude: number; // required
+  longitude: number; // required
+  name: string; // required
+  time_zone: string; // required
+}
+
+// Get Single Airport Params interface
+export interface GetSingleAirportParams {
+  id: string; // required
+}
+
+// Main Get Single Airport Response interface
+export interface GetSingleAirportResponse {
+  data: Airport; // required
+}
+
+// Query parameters for listing airports
+export interface ListAirportsParams {
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+  limit?: number; // pagination limit (defaults to 50, between 1 and 200)
+  iata_country_code?: string; // optional filter by country code
+}
+
+// Main List Airports Response interface
+export interface ListAirportsResponse {
+  data: Airport[]; // required
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+}
+
+// City related interfaces
+export interface City {
+  iata_code: string; // required
+  iata_country_code: string; // required
+  id: string; // required
+  name: string; // required
+}
+
+// Get Single City Params interface
+export interface GetSingleCityParams {
+  id: string; // required
+}
+
+// Main Get Single City Response interface
+export interface GetSingleCityResponse {
+  data: City; // required
+}
+
+// Query parameters for listing cities
+export interface ListCitiesParams {
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+  limit?: number; // pagination limit (defaults to 50, between 1 and 200)
+}
+
+// Main List Cities Response interface
+export interface ListCitiesResponse {
+  data: City[]; // required
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+}
+
+// Customer User related interfaces
+export interface CustomerUser {
+  created_at: string; // required
+  email: string; // required
+  family_name: string; // required
+  given_name: string; // required
+  id: string; // required
+  phone_number?: string | null; // nullable
+}
+
+// Get Single Customer User Params interface
+export interface GetSingleCustomerUserParams {
+  id: string; // required
+}
+
+// Main Get Single Customer User Response interface
+export interface GetSingleCustomerUserResponse {
+  data: CustomerUser; // required
+}
+
+// Body parameters to update a customer user
+export interface UpdateCustomerUserBody {
+  email: string; // required
+  family_name: string; // required
+  given_name: string; // required
+  phone_number?: string; // optional
+}
+
+// Create a Customer User body parameters
+export interface CreateCustomerUserBody {
+  email: string; // required
+  family_name: string; // required
+  given_name: string; // required
+  phone_number?: string; // optional
+}
+
+// Loyalty Programme related interfaces
+export interface LoyaltyProgramme {
+  alliance?: string | null; // nullable
+  id: string; // required
+  name: string; // required
+  owner_airline_id: string; // required
+}
+
+// Get Single Loyalty Programme Params interface
+export interface GetSingleLoyaltyProgrammeParams {
+  id: string; // required
+}
+
+// Main Get Single Loyalty Programme Response interface
+export interface GetSingleLoyaltyProgrammeResponse {
+  data: LoyaltyProgramme; // required
+}
+
+// Query parameters for listing loyalty programmes
+export interface ListLoyaltyProgrammesParams {
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+  limit?: number; // pagination limit (defaults to 50, between 1 and 200)
+}
+
+// Main List Loyalty Programmes Response interface
+export interface ListLoyaltyProgrammesResponse {
+  data: LoyaltyProgramme[]; // required
+  after?: string; // cursor for pagination
+  before?: string; // cursor for pagination
+}
