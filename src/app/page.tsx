@@ -1,5 +1,3 @@
-// app/page.tsx
-
 import Image from "next/image";
 import Contact from "@/components/contact";
 import { TabsTrigger, TabsList, TabsContent, Tabs } from "@/components/ui/tabs";
@@ -32,10 +30,7 @@ export default function Home() {
             <div className="container px-4 md:px-6">
               <div className="flex flex-col items-center justify-center space-y-4 text-center">
                 <div className="space-y-2">
-                  <h1
-                    className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
-              to-muted"
-                  >
+                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-muted-foreground">
                     Discover the World with Travelese
                   </h1>
                   <p className="mx-auto max-w-[700px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -115,10 +110,7 @@ export default function Home() {
                   <div className="inline-block rounded-lg px-3 py-1 text-sm">
                     Featured Destinations
                   </div>
-                  <h2
-                    className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
-              to-blue-950"
-                  >
+                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-muted-foreground">
                     Explore the World
                   </h2>
                   <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -158,10 +150,7 @@ export default function Home() {
                   <div className="inline-block rounded-lg px-3 py-1 text-sm">
                     Fashion Week Packages
                   </div>
-                  <h2
-                    className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
-              to-blue-950"
-                  >
+                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-muted-foreground">
                     Fashion Week 2024
                   </h2>
                   <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -234,10 +223,7 @@ export default function Home() {
                   <div className="inline-block rounded-lg px-3 py-1 text-sm">
                     Featured stays
                   </div>
-                  <h2
-                    className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-200
-              to-blue-950"
-                  >
+                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-muted-foreground">
                     Luxury Stays
                   </h2>
                   <p className="max-w-[900px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -279,7 +265,6 @@ export default function Home() {
           <Contact />
         </footer>
       </div>
-      <Footer />
     </>
   );
 }

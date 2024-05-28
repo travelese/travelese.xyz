@@ -1,6 +1,3 @@
-// File: /src/components/main-nav.tsx
-// Description: This file contains the main navigation component for the dashboard.
-
 "use client"; 
 
 import React from "react";
@@ -28,8 +25,8 @@ import {
   Package2Icon,
   MenuIcon,
   User,
-  Triangle,
   Layers3,
+  BellIcon
 } from "lucide-react";
 
 const MainNav = () => {
@@ -52,7 +49,7 @@ const MainNav = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+    <header className="sticky top-0 z-10 flex h-[57px] items-center gap-1 border-b bg-background px-4">
       <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
         <Link
           className="flex items-center gap-2 text-lg font-semibold md:text-base"
@@ -67,7 +64,7 @@ const MainNav = () => {
         >
           Fly
         </Link>
-         <Link
+        <Link
           className="text-muted-foreground transition-colors hover:text-foreground"
           href="#"
         >
@@ -138,27 +135,22 @@ const MainNav = () => {
           </nav>
         </SheetContent>
       </Sheet>
-      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-        <div className="ml-auto flex-1 sm:flex-initial">
-          <p className="text-sm text-muted-foreground">
-            Press{" "}
-            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-              <span className="text-xs">⌘</span>K
-            </kbd>
-          </p>
-          <CommandDialog open={open} onOpenChange={setOpen}>
-            <CommandInput placeholder="Type a command or search..." />
-            <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup heading="Suggestions">
-                <CommandItem>Paris Fashion Week SS25</CommandItem>
-                <CommandItem>Formula 1 Moanco Grand-Prix</CommandItem>
-                <CommandItem>National Geographic</CommandItem>
-              </CommandGroup>
-            </CommandList>
-          </CommandDialog>
-        </div>
-        {/* <form className="ml-auto flex-1 sm:flex-initial">
+      <div className="flex w-full top-0 z-10 h-[57px] items-center gap-1">
+        <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+          <div className="ml-auto flex-1 sm:flex-initial">
+            <CommandDialog open={open} onOpenChange={setOpen}>
+              <CommandInput placeholder="Type a command or search..." />
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandGroup heading="Suggestions">
+                  <CommandItem>Paris Fashion Week SS25</CommandItem>
+                  <CommandItem>Formula 1 Moanco Grand-Prix</CommandItem>
+                  <CommandItem>National Geographic</CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </CommandDialog>
+          </div>
+          {/* <form className="ml-auto flex-1 sm:flex-initial">
           <div className="relative">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -168,7 +160,7 @@ const MainNav = () => {
             />
           </div>
         </form> */}
-        {/* {session ? (
+          {/* {session ? (
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -219,25 +211,51 @@ const MainNav = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         )} */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <div className="flex w-full top-0 z-10 h-[57px] items-center gap-1">
+            <div className="ml-auto flex-1 sm:flex-initial">
+              <p className="text-sm text-muted-foreground">
+                Press{" "}
+                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </p>
+              <CommandDialog open={open} onOpenChange={setOpen}>
+                <CommandInput placeholder="Type a command or search..." />
+                <CommandList>
+                  <CommandEmpty>No results found.</CommandEmpty>
+                  <CommandGroup heading="Suggestions">
+                    <CommandItem>Paris Fashion Week SS25</CommandItem>
+                    <CommandItem>Formula 1 Moanco Grand-Prix</CommandItem>
+                    <CommandItem>National Geographic</CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </CommandDialog>
+            </div>
             <Button size="icon" variant="outline">
-              <User className="h-5 w-5" />
-              <span className="sr-only">Toggle user menu</span>
+              <BellIcon className="h-4 w-4" />
+              <span className="sr-only">Toggle notifications</span>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <Link href="/login">
-              <DropdownMenuItem>Login</DropdownMenuItem>
-            </Link>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <ModeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="outline">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <Link href="/login">
+                  <DropdownMenuItem>Login</DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ModeToggle />
+          </div>
+        </div>
       </div>
     </header>
   );
