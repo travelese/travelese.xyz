@@ -1,5 +1,3 @@
-// File: /src/app/playground/layout.tsx
-// Description: This file contains the layout component for the playground.
 "use client";
 
 import Image from "next/image";

@@ -1,6 +1,3 @@
-// File: /src/app/playground/travel
-// Description: Travel booking UI components
-
 "use client";
 
 import * as React from "react";
@@ -1007,9 +1004,9 @@ const FlightBooking = () => {
                 <section>
                   <div>
                     <section className="mt-4">
-                      <h2 className="text-xl font-semibold">
+                      <h3 className="text-xl font-semibold">
                         Select passengers
-                      </h2>
+                      </h3>
                       <div className="flex items-center justify-between p-4 border rounded-md">
                         <Avatar>
                           <AvatarImage
@@ -1026,9 +1023,9 @@ const FlightBooking = () => {
                       </div>
                     </section>
                     <section className="mt-4">
-                      <h2 className="text-xl font-semibold">
+                      <h3 className="text-xl font-semibold">
                         Primary passenger
-                      </h2>
+                      </h3>
                       <div className="p-4 border rounded-md">
                         <form>
                           <div className="grid grid-cols-2 gap-4">

@@ -1,6 +1,3 @@
-// File: /src/app/playground/dashboard/page.tsx
-// Description: Dashboard page for the application
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
