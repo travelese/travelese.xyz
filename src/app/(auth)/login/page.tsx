@@ -1,6 +1,3 @@
-// File: /src/app/playground/settings/page.tsx
-// Description: Settings page for the application
-
 import {
   CardTitle,
   CardDescription,
@@ -33,7 +30,7 @@ export default function Login() {
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                placeholder="m@example.com"
+                placeholder="armin.babaei@me.com"
                 required
                 type="email"
               />
