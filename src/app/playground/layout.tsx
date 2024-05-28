@@ -1,6 +1,3 @@
-// File: /src/app/playground/layout.tsx
-// Description: This file contains the layout component for the playground.
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
