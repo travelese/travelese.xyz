@@ -1,6 +1,6 @@
 {
   "name": "travelese.xyz",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3003 --turbo",
@@ -88,12 +88,27 @@
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.18",
-    "postcss": "^8.4.39",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3",
+    "cz-conventional-changelog": "^3.3.0",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.22.8",
+    "eslint": "^9.6.0",
+    "eslint-config-prettier": "^9.1.0",
+    "git-format-staged": "^3.1.1",
     "pg": "^8.12.0",
-    "tsx": "^4.16.2"
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.16.2",
+    "typescript": "^5.3.3"
+  },
+  "packageManager": "pnpm@9.5.0",
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "prepare-commit-msg": "exec < /dev/tty && npx cz --hook || true"
+    }
   }
 }
