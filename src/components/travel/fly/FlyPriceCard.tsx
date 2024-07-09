@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,20 +6,20 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-} from '@/components/ui/pagination'
-import { Separator } from '@/components/ui/separator'
+} from "@/components/ui/pagination";
+import { Separator } from "@/components/ui/separator";
 
 import {
   ChevronLeftIcon,
@@ -27,7 +27,7 @@ import {
   Code2Icon,
   CopyIcon,
   MoveVerticalIcon,
-} from 'lucide-react'
+} from "lucide-react";
 
 export default function FlyPriceCard() {
   return (
@@ -46,7 +46,7 @@ export default function FlyPriceCard() {
             </Button>
           </CardTitle>
           <CardDescription>
-            Created on{' '}
+            Created on{" "}
             <time dateTime="2024-04-11T15:48:11Z">April 11, 2024</time>
           </CardDescription>
         </div>
@@ -198,5 +198,5 @@ export default function FlyPriceCard() {
         </Pagination>
       </CardFooter>
     </Card>
-  )
+  );
 }

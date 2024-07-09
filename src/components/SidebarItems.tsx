@@ -1,31 +1,31 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { topNavItems, bottomNavItems } from '@/config/nav'
+} from "@/components/ui/tooltip";
+import { topNavItems, bottomNavItems } from "@/config/nav";
 
 const SidebarItems = () => {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const NavItem = ({ item }: { item: (typeof topNavItems)[0] }) => (
     <Tooltip key={item.href}>
       <TooltipTrigger asChild>
         <Button
           aria-label={item.label}
-          className={`rounded-lg ${pathname === item.href ? 'bg-muted' : ''}`}
+          className={`rounded-lg ${pathname === item.href ? "bg-muted" : ""}`}
           size="icon"
           variant="ghost"
         >
           <Link href={item.href}>
             <item.icon
               className={`size-5 ${
-                pathname === item.href ? 'text-primary' : ''
+                pathname === item.href ? "text-primary" : ""
               }`}
             />
             <span className="sr-only">{item.label}</span>
@@ -34,7 +34,7 @@ const SidebarItems = () => {
       </TooltipTrigger>
       <TooltipContent side="right">{item.label}</TooltipContent>
     </Tooltip>
-  )
+  );
 
   return (
     <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r">
@@ -49,7 +49,7 @@ const SidebarItems = () => {
         ))}
       </nav>
     </aside>
-  )
-}
+  );
+};
 
-export default SidebarItems
+export default SidebarItems;

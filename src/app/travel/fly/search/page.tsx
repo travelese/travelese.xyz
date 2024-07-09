@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import React, { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 import {
   Select,
@@ -9,93 +9,93 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
-import { ListOrderedIcon } from 'lucide-react'
+import { ListOrderedIcon } from "lucide-react";
 
-import FlySearchFilters from '@/components//travel/fly/FlySearchFilters'
-import FlyCard from '@/components/travel/fly/FlyCard'
-import { FlySkeleton } from '@/components/travel/fly/FlySkeleton'
-import useNavigation from '@/hooks/useNavigation'
-import type { Offer } from '@duffel/api/types'
+import FlySearchFilters from "@/components//travel/fly/FlySearchFilters";
+import FlyCard from "@/components/travel/fly/FlyCard";
+import { FlySkeleton } from "@/components/travel/fly/FlySkeleton";
+import useNavigation from "@/hooks/useNavigation";
+import type { Offer } from "@duffel/api/types";
 
-type SortValues = 'total_amount' | 'total_duration'
+type SortValues = "total_amount" | "total_duration";
 
 export default function FlySearchResults() {
-  const [offers, setOffers] = useState<Offer[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<null | Error>(null)
-  const { navigateToBookPage } = useNavigation()
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<null | Error>(null);
+  const { navigateToBookPage } = useNavigation();
 
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const sortBy = (searchParams.get('sortBy') as SortValues) || 'total_amount'
-  const limit = parseInt(searchParams.get('limit') || '10', 10)
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const sortBy = (searchParams.get("sortBy") as SortValues) || "total_amount";
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
   const currency =
-    (searchParams.get('currency') as 'CAD' | 'USD' | 'EUR') || 'USD'
-  const currentPage = parseInt(searchParams.get('page') || '1', 10)
+    (searchParams.get("currency") as "CAD" | "USD" | "EUR") || "USD";
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   const setSortBy = (value: SortValues) => {
-    const current = new URLSearchParams(searchParams)
-    current.set('sortBy', value)
-    router.push(`?${current.toString()}`)
-  }
+    const current = new URLSearchParams(searchParams);
+    current.set("sortBy", value);
+    router.push(`?${current.toString()}`);
+  };
 
   const setPage = (page: number) => {
-    const current = new URLSearchParams(searchParams)
-    current.set('page', page.toString())
-    router.push(`?${current.toString()}`)
-  }
+    const current = new URLSearchParams(searchParams);
+    current.set("page", page.toString());
+    router.push(`?${current.toString()}`);
+  };
 
   useEffect(() => {
     if (limit < 1) {
-      setError(new Error('Limit must be at least 1'))
-      return
+      setError(new Error("Limit must be at least 1"));
+      return;
     }
 
     const fetchOffers = async () => {
       try {
-        setLoading(true)
-        const params = new URLSearchParams(searchParams)
+        setLoading(true);
+        const params = new URLSearchParams(searchParams);
 
-        params.set('limit', limit.toString())
-        params.set('currency', currency)
+        params.set("limit", limit.toString());
+        params.set("currency", currency);
 
         const response = await fetch(
           `/api/travel/fly/search?${params?.toString()}`,
-        )
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch offers')
+          throw new Error("Failed to fetch offers");
         }
 
-        const data: Offer[] = (await response.json()) as Offer[]
-        console.log('fetchOffers API response:', data)
+        const data: Offer[] = (await response.json()) as Offer[];
+        console.log("fetchOffers API response:", data);
 
         if (!Array.isArray(data) || data.length === 0) {
-          throw new Error('No offers found')
+          throw new Error("No offers found");
         }
 
-        setOffers(data)
+        setOffers(data);
       } catch (error: unknown) {
         if (error instanceof Error) {
-          setError(error)
-          console.error('Error fetching flight offers:', error.message)
+          setError(error);
+          console.error("Error fetching flight offers:", error.message);
         } else {
-          console.error('An unknown error occurred.')
-          setError(new Error('An unknown error occurred.'))
+          console.error("An unknown error occurred.");
+          setError(new Error("An unknown error occurred."));
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    void fetchOffers()
-  }, [searchParams, limit, currency])
+    void fetchOffers();
+  }, [searchParams, limit, currency]);
 
   if (loading) {
-    const skeletonCount = limit < 10 ? limit : 10
+    const skeletonCount = limit < 10 ? limit : 10;
     return (
       <div className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">
         <div className="space-y-6">
@@ -126,10 +126,10 @@ export default function FlySearchResults() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (error) return <div>Error: {error.message}</div>
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <main className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">
@@ -183,5 +183,5 @@ export default function FlySearchResults() {
         </div>
       </div>
     </main>
-  )
+  );
 }

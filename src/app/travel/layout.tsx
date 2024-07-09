@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import React from 'react'
-import { usePathname } from 'next/navigation'
+import Link from "next/link";
+import React from "react";
+import { usePathname } from "next/navigation";
 
 import {
   Breadcrumb,
@@ -11,26 +11,26 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-import { Toaster } from '@/components/ui/toaster'
+} from "@/components/ui/breadcrumb";
+import { Toaster } from "@/components/ui/toaster";
 
 const FlyLayout = ({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) => {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const breadcrumbItems = [
     {
-      label: 'Search',
-      href: '/travel/fly/search',
+      label: "Search",
+      href: "/travel/fly/search",
     },
     {
-      label: 'Book',
-      href: '/travel/fly/book',
+      label: "Book",
+      href: "/travel/fly/book",
     },
-  ]
+  ];
 
   return (
     <>
@@ -61,7 +61,7 @@ const FlyLayout = ({
       </div>
       <Toaster />
     </>
-  )
-}
+  );
+};
 
-export default FlyLayout
+export default FlyLayout;

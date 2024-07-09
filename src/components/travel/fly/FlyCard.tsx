@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import * as React from 'react'
+import * as React from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,7 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -20,61 +20,61 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+} from "@/components/ui/dialog";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Drawer,
   DrawerTrigger,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-} from '@/components/ui/drawer'
+} from "@/components/ui/drawer";
 
-import { BackpackIcon, CloudFogIcon, ShareIcon } from 'lucide-react'
+import { BackpackIcon, CloudFogIcon, ShareIcon } from "lucide-react";
 
-import FlySegment from '@/components/travel/fly/FlySegment'
-import type { Offer } from '@duffel/api/types'
-import type { OfferSliceSegment } from '@duffel/api/booking/Offers/OfferTypes'
+import FlySegment from "@/components/travel/fly/FlySegment";
+import type { Offer } from "@duffel/api/types";
+import type { OfferSliceSegment } from "@duffel/api/booking/Offers/OfferTypes";
 
 interface FlyCardProps {
-  offer: Offer
-  onSelect?: () => void
+  offer: Offer;
+  onSelect?: () => void;
 }
 
 const formatTime = (dateTime: string | undefined) =>
   dateTime
     ? new Date(dateTime).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
+        hour: "2-digit",
+        minute: "2-digit",
       })
-    : 'N/A'
+    : "N/A";
 
 const formatDuration = (isoDuration: string | undefined): string => {
-  if (!isoDuration) return 'N/A'
+  if (!isoDuration) return "N/A";
 
   const matches = isoDuration.match(
     /P(?:([0-9]+)Y)?(?:([0-9]+)M)?(?:([0-9]+)D)?T(?:([0-9]+)H)?(?:([0-9]+)M)?/,
-  )
+  );
 
-  if (!matches) return 'N/A'
+  if (!matches) return "N/A";
 
-  const hours = matches[4] ? `${matches[4]}h` : '0h'
-  const minutes = matches[5] ? `${matches[5]}m` : '0m'
+  const hours = matches[4] ? `${matches[4]}h` : "0h";
+  const minutes = matches[5] ? `${matches[5]}m` : "0m";
 
-  return `${hours} ${minutes}`
-}
+  return `${hours} ${minutes}`;
+};
 
 const calculateDayDifference = (startDate: string, endDate: string): number => {
-  const start = new Date(startDate)
-  const end = new Date(endDate)
-  const diffTime = end.getTime() - start.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays - 1 // since arriving on the same day means 0 increment
-}
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = end.getTime() - start.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays - 1; // since arriving on the same day means 0 increment
+};
 
 const countBagType = (
-  type: 'personal_item' | 'carry_on' | 'checked',
+  type: "personal_item" | "carry_on" | "checked",
   segments: OfferSliceSegment[] | undefined,
 ): number => {
   return (
@@ -88,34 +88,34 @@ const countBagType = (
               0),
           0,
         ) || 0)
-      )
+      );
     }, 0) || 0
-  )
-}
+  );
+};
 
 export default function FlyCard({ offer, onSelect }: FlyCardProps) {
   if (!offer || !Array.isArray(offer.slices) || offer.slices.length === 0)
-    return null
+    return null;
 
-  const outbound = offer.slices[0]
-  const inbound = offer.slices.length > 1 ? offer.slices[1] : null
-  const emission = offer.total_emissions_kg || 'N/A'
-  const price = offer.total_amount
-  const currency = offer.total_currency
-  const remainingSeats = offer?.available_services?.[0]?.total_amount || 0
+  const outbound = offer.slices[0];
+  const inbound = offer.slices.length > 1 ? offer.slices[1] : null;
+  const emission = offer.total_emissions_kg || "N/A";
+  const price = offer.total_amount;
+  const currency = offer.total_currency;
+  const remainingSeats = offer?.available_services?.[0]?.total_amount || 0;
 
-  const personalBags = countBagType('personal_item', outbound!.segments)
-  const carryOnBags = countBagType('carry_on', outbound!.segments)
-  const checkedBags = countBagType('checked', outbound!.segments)
+  const personalBags = countBagType("personal_item", outbound!.segments);
+  const carryOnBags = countBagType("carry_on", outbound!.segments);
+  const checkedBags = countBagType("checked", outbound!.segments);
 
   const outboundDayDifference = calculateDayDifference(
-    outbound!.segments?.[0]?.departing_at || '',
-    outbound?.segments?.at(-1)?.arriving_at || '',
-  )
+    outbound!.segments?.[0]?.departing_at || "",
+    outbound?.segments?.at(-1)?.arriving_at || "",
+  );
   const inboundDayDifference = calculateDayDifference(
-    inbound?.segments?.[0]?.departing_at || '',
-    inbound?.segments?.at(-1)?.arriving_at || '',
-  )
+    inbound?.segments?.[0]?.departing_at || "",
+    inbound?.segments?.at(-1)?.arriving_at || "",
+  );
 
   return (
     <Drawer>
@@ -134,7 +134,7 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
                   <div className="text-sm">
                     {outbound!.segments?.length
                       ? outbound!.segments.length - 1
-                      : 0}{' '}
+                      : 0}{" "}
                     stop(s)
                   </div>
                   <Avatar>
@@ -142,13 +142,13 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
                       alt={`${
                         outbound!.segments
                           ? outbound?.segments?.[0]?.operating_carrier.name
-                          : ''
+                          : ""
                       } Logo`}
                       src={
                         outbound!.segments?.[0]?.operating_carrier
-                          .logo_symbol_url || '/placeholder.svg'
+                          .logo_symbol_url || "/placeholder.svg"
                       }
-                      style={{ filter: 'grayscale(100%)' }}
+                      style={{ filter: "grayscale(100%)" }}
                     />
                     <AvatarFallback>
                       {outbound!.segments?.[0]?.operating_carrier.iata_code}
@@ -161,7 +161,7 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
                 </div>
                 <div className="flex justify-between">
                   <time className="text-2xl font-bold">
-                    {formatTime(outbound!.segments?.[0]?.departing_at || '')}
+                    {formatTime(outbound!.segments?.[0]?.departing_at || "")}
                   </time>
                   <Badge variant="secondary">
                     {formatDuration(
@@ -171,7 +171,7 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
                     )}
                   </Badge>
                   <time className="relative text-2xl font-bold">
-                    {formatTime(outbound!.segments?.at(-1)?.arriving_at || '')}
+                    {formatTime(outbound!.segments?.at(-1)?.arriving_at || "")}
                     {outboundDayDifference > 0 && (
                       <sup>+{outboundDayDifference}</sup>
                     )}
@@ -190,7 +190,7 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
                     <div className="text-sm">
                       {inbound.segments?.length
                         ? inbound.segments.length - 1
-                        : 0}{' '}
+                        : 0}{" "}
                       stop(s)
                     </div>
                     <Avatar>
@@ -198,13 +198,13 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
                         alt={`${
                           inbound.segments
                             ? inbound.segments?.[0]?.operating_carrier.name
-                            : ''
+                            : ""
                         } Logo`}
                         src={
                           inbound.segments?.[0]?.operating_carrier
-                            .logo_symbol_url || '/placeholder.svg'
+                            .logo_symbol_url || "/placeholder.svg"
                         }
-                        style={{ filter: 'grayscale(100%)' }}
+                        style={{ filter: "grayscale(100%)" }}
                       />
                       <AvatarFallback>
                         {inbound.segments?.[0]?.operating_carrier.iata_code}
@@ -217,7 +217,7 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
                   </div>
                   <div className="flex justify-between">
                     <time className="text-2xl font-bold">
-                      {formatTime(inbound.segments?.[0]?.departing_at || '')}
+                      {formatTime(inbound.segments?.[0]?.departing_at || "")}
                     </time>
                     <Badge variant="secondary">
                       {formatDuration(
@@ -227,7 +227,7 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
                       )}
                     </Badge>
                     <time className="relative text-2xl font-bold">
-                      {formatTime(inbound.segments?.at(-1)?.arriving_at || '')}
+                      {formatTime(inbound.segments?.at(-1)?.arriving_at || "")}
                       {inboundDayDifference > 0 && (
                         <sup>+{inboundDayDifference}</sup>
                       )}
@@ -332,5 +332,5 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
         </div>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

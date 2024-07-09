@@ -1,4 +1,4 @@
-import { LucideIcon } from 'lucide-react'
+import { LucideIcon } from "lucide-react";
 import {
   HomeIcon,
   TerminalSquareIcon,
@@ -8,37 +8,37 @@ import {
   CreditCardIcon,
   BarChartIcon,
   MailIcon,
-} from 'lucide-react'
+} from "lucide-react";
 
 export interface SidebarLink {
-  href: string
-  label: string
-  icon: LucideIcon
+  href: string;
+  label: string;
+  icon: LucideIcon;
 }
 
 export type AdditionalLinks = {
-  label: string
-  links: SidebarLink[]
-}
+  label: string;
+  links: SidebarLink[];
+};
 
 export const topNavItems: SidebarLink[] = [
-  { href: '/dashboard', icon: HomeIcon, label: 'Dashboard' },
-  { href: '/dashboard/ai', icon: TerminalSquareIcon, label: 'Travelese AI' },
-  { href: '/dashboard/charts', icon: BarChartIcon, label: 'Charts' },
-  { href: '/dashboard/resend', icon: MailIcon, label: 'Resend' },
-]
+  { href: "/dashboard", icon: HomeIcon, label: "Dashboard" },
+  { href: "/dashboard/ai", icon: TerminalSquareIcon, label: "Travelese AI" },
+  { href: "/dashboard/charts", icon: BarChartIcon, label: "Charts" },
+  { href: "/dashboard/resend", icon: MailIcon, label: "Resend" },
+];
 
 export const bottomNavItems: SidebarLink[] = [
-  { href: '/dashboard/account', icon: User, label: 'Account' },
-  { href: '/dashboard/settings', icon: SettingsIcon, label: 'Settings' },
+  { href: "/dashboard/account", icon: User, label: "Account" },
+  { href: "/dashboard/settings", icon: SettingsIcon, label: "Settings" },
   {
-    href: '/dashboard/account/billing',
+    href: "/dashboard/account/billing",
     icon: CreditCardIcon,
-    label: 'Billing',
+    label: "Billing",
   },
-  { href: '#', icon: LifeBuoyIcon, label: 'Help' },
-]
+  { href: "#", icon: LifeBuoyIcon, label: "Help" },
+];
 
-export const defaultLinks: SidebarLink[] = [...topNavItems, ...bottomNavItems]
+export const defaultLinks: SidebarLink[] = [...topNavItems, ...bottomNavItems];
 
-export const additionalLinks: AdditionalLinks[] = []
+export const additionalLinks: AdditionalLinks[] = [];

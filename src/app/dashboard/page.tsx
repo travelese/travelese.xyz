@@ -1,8 +1,8 @@
-import SignIn from '@/components/auth/SignIn'
-import { getUserAuth } from '@/lib/auth/utils'
+import SignIn from "@/components/auth/SignIn";
+import { getUserAuth } from "@/lib/auth/utils";
 
 export default async function Home() {
-  const { session } = await getUserAuth()
+  const { session } = await getUserAuth();
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
@@ -15,5 +15,5 @@ export default async function Home() {
       ) : null}
       <SignIn />
     </main>
-  )
+  );
 }

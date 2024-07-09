@@ -1,5 +1,5 @@
-import { Card } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function FlySkeleton() {
   return (
@@ -52,5 +52,5 @@ export function FlySkeleton() {
         </div>
       </div>
     </Card>
-  )
+  );
 }

@@ -1,146 +1,146 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import * as React from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 
 import {
   Calendar as CalendarIcon,
   MailIcon,
   PhoneIcon,
   UserCircleIcon,
-} from 'lucide-react'
+} from "lucide-react";
 
-import useNavigation from '@/hooks/useNavigation'
-import { useToast } from '@/hooks/useToast'
-import type { Offer } from '@duffel/api/types'
+import useNavigation from "@/hooks/useNavigation";
+import { useToast } from "@/hooks/useToast";
+import type { Offer } from "@duffel/api/types";
 
 interface FlyBookFormProps {
-  selectedOffer: Offer
+  selectedOffer: Offer;
 }
 
 const FormSchema = z.object({
   passengers: z.array(
     z.object({
       id: z.string(),
-      title: z.enum(['mr', 'ms', 'mrs', 'miss', 'dr']),
-      given_name: z.string().min(1, 'Given name is required'),
-      family_name: z.string().min(1, 'Family name is required'),
-      gender: z.enum(['m', 'f']),
-      born_on: z.string().min(1, 'Birth date is required'),
-      phone_number: z.string().min(1, 'Phone number is required'),
-      email: z.string().email('Invalid email address'),
+      title: z.enum(["mr", "ms", "mrs", "miss", "dr"]),
+      given_name: z.string().min(1, "Given name is required"),
+      family_name: z.string().min(1, "Family name is required"),
+      gender: z.enum(["m", "f"]),
+      born_on: z.string().min(1, "Birth date is required"),
+      phone_number: z.string().min(1, "Phone number is required"),
+      email: z.string().email("Invalid email address"),
     }),
   ),
   payments: z.array(
     z.object({
-      amount: z.number().positive('Amount must be positive'),
-      currency: z.string().length(3, 'Currency must be 3 characters'),
-      type: z.enum(['arc_basp_cash', 'balance', 'credit']),
+      amount: z.number().positive("Amount must be positive"),
+      currency: z.string().length(3, "Currency must be 3 characters"),
+      type: z.enum(["arc_basp_cash", "balance", "credit"]),
     }),
   ),
-  selected_offers: z.array(z.string().min(1, 'Offer ID is required')),
-})
+  selected_offers: z.array(z.string().min(1, "Offer ID is required")),
+});
 
 export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
-  const { toast } = useToast()
-  const { navigateToBookPage } = useNavigation()
+  const { toast } = useToast();
+  const { navigateToBookPage } = useNavigation();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       passengers: [
         {
-          id: selectedOffer ? selectedOffer.id : '',
-          title: 'mr',
-          given_name: '',
-          family_name: '',
-          gender: 'm',
-          born_on: '',
-          phone_number: '',
-          email: '',
+          id: selectedOffer ? selectedOffer.id : "",
+          title: "mr",
+          given_name: "",
+          family_name: "",
+          gender: "m",
+          born_on: "",
+          phone_number: "",
+          email: "",
         },
       ],
       payments: [
         {
           amount: selectedOffer ? Number(selectedOffer.total_amount) : 0,
-          currency: selectedOffer ? selectedOffer.total_currency : '',
-          type: 'balance',
+          currency: selectedOffer ? selectedOffer.total_currency : "",
+          type: "balance",
         },
       ],
       selected_offers: [],
     },
-  })
+  });
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!selectedOffer) {
-      console.error('No selected offer to proceed with booking')
-      return
+      console.error("No selected offer to proceed with booking");
+      return;
     }
 
-    console.log('Offer to book:', selectedOffer.id)
+    console.log("Offer to book:", selectedOffer.id);
 
     const formData = {
       selected_offers: [selectedOffer.id],
       passengers: data.passengers,
       payments: data.payments,
-    }
+    };
 
-    console.log('Book form data:', formData)
+    console.log("Book form data:", formData);
 
     try {
-      const response = await fetch('/api/travel/fly/book', {
-        method: 'POST',
+      const response = await fetch("/api/travel/fly/book", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      })
+      });
 
       if (!response.ok) {
-        console.error('Error:', response.status)
-        return
+        console.error("Error:", response.status);
+        return;
       }
 
-      let order
+      let order;
       try {
-        order = await response.json()
-        console.log('Order:', order)
+        order = await response.json();
+        console.log("Order:", order);
       } catch (e) {
-        console.error('Error parsing JSON:', e)
-        return
+        console.error("Error parsing JSON:", e);
+        return;
       }
 
       if (order) {
         toast({
-          title: 'Order booked successfully',
-          description: 'Rendering the Order...',
-        })
-        navigateToBookPage(order.id)
+          title: "Order booked successfully",
+          description: "Rendering the Order...",
+        });
+        navigateToBookPage(order.id);
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error("Error:", error);
     }
-  }
+  };
 
   return (
     <Card>
@@ -323,5 +323,5 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }

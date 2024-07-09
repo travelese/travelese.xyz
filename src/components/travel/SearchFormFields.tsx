@@ -1,37 +1,37 @@
-import React from 'react'
-import { format } from 'date-fns'
-import { DateRange } from 'react-day-picker'
-import { Control } from 'react-hook-form'
+import React from "react";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { Control } from "react-hook-form";
 import {
   FormField,
   FormItem,
   FormControl,
   FormMessage,
-} from '@/components/ui/form'
+} from "@/components/ui/form";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Command,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command'
-import { Seat } from '@kiwicom/orbit-components/icons'
-import { CalendarIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import PlacesSelector from '@/components/travel/PlacesSelector'
-import PassengerSelector from '@/components/travel/PassengerSelector'
+} from "@/components/ui/command";
+import { Seat } from "@kiwicom/orbit-components/icons";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import PlacesSelector from "@/components/travel/PlacesSelector";
+import PassengerSelector from "@/components/travel/PassengerSelector";
 
 interface FieldProps {
-  control: Control<any>
-  date?: DateRange | undefined
-  setDate?: React.Dispatch<React.SetStateAction<DateRange | undefined>>
+  control: Control<any>;
+  date?: DateRange | undefined;
+  setDate?: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }
 
 export const OriginField: React.FC<FieldProps> = ({ control }) => (
@@ -56,7 +56,7 @@ export const OriginField: React.FC<FieldProps> = ({ control }) => (
       </FormItem>
     )}
   />
-)
+);
 
 export const DestinationField: React.FC<FieldProps> = ({ control }) => (
   <FormField
@@ -80,7 +80,7 @@ export const DestinationField: React.FC<FieldProps> = ({ control }) => (
       </FormItem>
     )}
   />
-)
+);
 
 export const DatesField: React.FC<FieldProps> = ({
   control,
@@ -99,19 +99,19 @@ export const DatesField: React.FC<FieldProps> = ({
                 id="date"
                 variant="outline"
                 className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !date && 'text-muted-foreground',
+                  "w-full justify-start text-left font-normal",
+                  !date && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {date?.from ? (
                   date.to ? (
                     <>
-                      {format(date.from, 'LLL dd, y')} -
-                      {format(date.to, 'LLL dd, y')}
+                      {format(date.from, "LLL dd, y")} -
+                      {format(date.to, "LLL dd, y")}
                     </>
                   ) : (
-                    format(date.from, 'LLL dd, y')
+                    format(date.from, "LLL dd, y")
                   )
                 ) : (
                   <span>Pick a date</span>
@@ -126,8 +126,8 @@ export const DatesField: React.FC<FieldProps> = ({
               defaultMonth={field.value?.from}
               selected={date}
               onSelect={(selected) => {
-                setDate?.(selected as DateRange | undefined)
-                field.onChange(selected)
+                setDate?.(selected as DateRange | undefined);
+                field.onChange(selected);
               }}
               numberOfMonths={2}
             />
@@ -137,7 +137,7 @@ export const DatesField: React.FC<FieldProps> = ({
       </FormItem>
     )}
   />
-)
+);
 
 export const PassengersField: React.FC<FieldProps> = ({ control }) => (
   <FormField
@@ -153,7 +153,7 @@ export const PassengersField: React.FC<FieldProps> = ({ control }) => (
       </FormItem>
     )}
   />
-)
+);
 
 export const CabinField: React.FC<FieldProps> = ({ control }) => (
   <FormField
@@ -179,18 +179,18 @@ export const CabinField: React.FC<FieldProps> = ({ control }) => (
               <CommandInput placeholder="Select cabin class" />
               <CommandList>
                 <CommandGroup>
-                  <CommandItem onSelect={() => field.onChange('economy')}>
+                  <CommandItem onSelect={() => field.onChange("economy")}>
                     Economy
                   </CommandItem>
                   <CommandItem
-                    onSelect={() => field.onChange('premium_economy')}
+                    onSelect={() => field.onChange("premium_economy")}
                   >
                     Premium Economy
                   </CommandItem>
-                  <CommandItem onSelect={() => field.onChange('business')}>
+                  <CommandItem onSelect={() => field.onChange("business")}>
                     Business
                   </CommandItem>
-                  <CommandItem onSelect={() => field.onChange('first')}>
+                  <CommandItem onSelect={() => field.onChange("first")}>
                     First
                   </CommandItem>
                 </CommandGroup>
@@ -202,4 +202,4 @@ export const CabinField: React.FC<FieldProps> = ({ control }) => (
       </FormItem>
     )}
   />
-)
+);

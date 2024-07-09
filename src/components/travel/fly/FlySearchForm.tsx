@@ -1,29 +1,29 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Form } from '@/components/ui/form'
-import { Button } from '@/components/ui/button'
-import { SearchIcon } from 'lucide-react'
-import { useSearchForm } from '@/hooks/useSearchForm'
+import { useState, useEffect } from "react";
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { SearchIcon } from "lucide-react";
+import { useSearchForm } from "@/hooks/useSearchForm";
 import {
   OriginField,
   DestinationField,
   DatesField,
   PassengersField,
   CabinField,
-} from '@/components/travel/SearchFormFields'
-import Loading from '@/app/loading'
+} from "@/components/travel/SearchFormFields";
+import Loading from "@/app/loading";
 
 export default function FlySearchForm() {
-  const [isClient, setIsClient] = useState(false)
-  const { form, date, setDate, onSubmit } = useSearchForm()
+  const [isClient, setIsClient] = useState(false);
+  const { form, date, setDate, onSubmit } = useSearchForm();
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
+    setIsClient(true);
+  }, []);
 
   if (!isClient) {
-    return <Loading />
+    return <Loading />;
   }
 
   return (
@@ -59,5 +59,5 @@ export default function FlySearchForm() {
         </Form>
       </div>
     </div>
-  )
+  );
 }
