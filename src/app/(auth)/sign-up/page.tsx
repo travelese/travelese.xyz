@@ -1,49 +1,49 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import * as React from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import Link from "next/link";
+import * as React from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   email: z.string().email(),
   password: z.string(),
-})
+});
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
     },
-  })
+  });
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
-    console.log(data)
-  }
+    console.log(data);
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -145,5 +145,5 @@ export default function SignupForm() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

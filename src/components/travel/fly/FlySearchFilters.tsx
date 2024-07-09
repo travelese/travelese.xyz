@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import React from 'react'
+import React from "react";
 
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import { Slider } from '@/components/ui/slider'
+} from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 
 export default function FlySearchFilters() {
   return (
@@ -127,5 +127,5 @@ export default function FlySearchFilters() {
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }

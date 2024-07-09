@@ -1,17 +1,17 @@
-import Link from 'next/link'
-import { AuthSession, getUserAuth } from '@/lib/auth/utils'
-import SidebarItems from '@/components/SidebarItems'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import Link from "next/link";
+import { AuthSession, getUserAuth } from "@/lib/auth/utils";
+import SidebarItems from "@/components/SidebarItems";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from "@/components/ui/tooltip";
 
 const Sidebar = async () => {
-  const session = await getUserAuth()
-  if (session.session === null) return null
+  const session = await getUserAuth();
+  if (session.session === null) return null;
 
   return (
     <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r">
@@ -26,16 +26,16 @@ const Sidebar = async () => {
         </TooltipProvider>
       </nav>
     </aside>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;
 
 const UserDetails = ({ session }: { session: AuthSession }) => {
-  if (session.session === null) return null
-  const { user } = session.session
+  if (session.session === null) return null;
+  const { user } = session.session;
 
-  if (!user?.name || user.name.length == 0) return null
+  if (!user?.name || user.name.length == 0) return null;
 
   return (
     <Tooltip>
@@ -45,10 +45,10 @@ const UserDetails = ({ session }: { session: AuthSession }) => {
             <AvatarFallback className="border-border border-2 text-muted-foreground">
               {user.name
                 ? user.name
-                    .split(' ')
+                    .split(" ")
                     .map((word) => word[0].toUpperCase())
-                    .join('')
-                : '~'}
+                    .join("")
+                : "~"}
             </AvatarFallback>
           </Avatar>
         </Link>
@@ -60,5 +60,5 @@ const UserDetails = ({ session }: { session: AuthSession }) => {
         </div>
       </TooltipContent>
     </Tooltip>
-  )
-}
+  );
+};

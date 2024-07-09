@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import * as React from 'react'
+import * as React from "react";
 
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+} from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 import {
   CalendarDaysIcon,
@@ -19,43 +19,43 @@ import {
   PlaneLandingIcon,
   PlaneTakeoffIcon,
   WifiIcon,
-} from 'lucide-react'
+} from "lucide-react";
 
-import { Seat } from '@kiwicom/orbit-components/icons'
+import { Seat } from "@kiwicom/orbit-components/icons";
 
-import type { OfferSliceSegment } from '@duffel/api/booking/Offers/OfferTypes'
+import type { OfferSliceSegment } from "@duffel/api/booking/Offers/OfferTypes";
 
 const formatDuration = (isoDuration: string | undefined): string => {
-  if (!isoDuration) return 'N/A'
+  if (!isoDuration) return "N/A";
 
   const matches = isoDuration.match(
     /P(?:([0-9]+)Y)?(?:([0-9]+)M)?(?:([0-9]+)D)?T(?:([0-9]+)H)?(?:([0-9]+)M)?/,
-  )
+  );
 
-  if (!matches) return 'N/A'
+  if (!matches) return "N/A";
 
-  const hours = matches[4] ? `${matches[4]}h` : '0h'
-  const minutes = matches[5] ? `${matches[5]}m` : '0m'
+  const hours = matches[4] ? `${matches[4]}h` : "0h";
+  const minutes = matches[5] ? `${matches[5]}m` : "0m";
 
-  return `${hours} ${minutes}`
-}
+  return `${hours} ${minutes}`;
+};
 
 const calculateDayDifference = (startDate: string, endDate: string): number => {
-  const start = new Date(startDate)
-  const end = new Date(endDate)
+  const start = new Date(startDate);
+  const end = new Date(endDate);
 
-  const diffTime = end.getTime() - start.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const diffTime = end.getTime() - start.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  return diffDays - 1
-}
+  return diffDays - 1;
+};
 
 export default function FlySegment({
   segment,
 }: {
-  segment: OfferSliceSegment | undefined
+  segment: OfferSliceSegment | undefined;
 }) {
-  if (!segment) return <div>Segment details are unavailable.</div>
+  if (!segment) return <div>Segment details are unavailable.</div>;
 
   const {
     aircraft: { name: aircraftName },
@@ -70,9 +70,9 @@ export default function FlySegment({
     destination: { iata_code: destinationCode },
     duration,
     passengers,
-  } = segment
+  } = segment;
 
-  const dayDifference = calculateDayDifference(departureTime, arrivalTime)
+  const dayDifference = calculateDayDifference(departureTime, arrivalTime);
 
   return (
     <div className="segment m-2 space-y-4">
@@ -90,8 +90,8 @@ export default function FlySegment({
         <Avatar className="ml-2">
           <AvatarImage
             alt={`${airline} Logo`}
-            src={airlineLogo || ''}
-            style={{ filter: 'grayscale(100%)' }}
+            src={airlineLogo || ""}
+            style={{ filter: "grayscale(100%)" }}
           />
           <AvatarFallback>{airlineCode}</AvatarFallback>
         </Avatar>
@@ -105,8 +105,8 @@ export default function FlySegment({
       <div className="flex justify-between">
         <time className="text-xl font-bold">
           {new Date(departureTime).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </time>
         <Badge variant="secondary">
@@ -114,8 +114,8 @@ export default function FlySegment({
         </Badge>
         <time className="relative text-xl font-bold">
           {new Date(arrivalTime).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
+            hour: "2-digit",
+            minute: "2-digit",
           })}
           {dayDifference > 0 && <sup>+{dayDifference}</sup>}
         </time>
@@ -128,8 +128,8 @@ export default function FlySegment({
                 <Avatar>
                   <AvatarImage
                     alt={`${airline} Logo`}
-                    src={airlineLogo || ''}
-                    style={{ filter: 'grayscale(100%)' }}
+                    src={airlineLogo || ""}
+                    style={{ filter: "grayscale(100%)" }}
                   />
                   <AvatarFallback>{airlineCode}</AvatarFallback>
                 </Avatar>
@@ -172,7 +172,7 @@ export default function FlySegment({
                         <span className="ml-2 text-sm">Seat pitch</span>
                       </div>
                       <span className="text-sm font-semibold">
-                        {passengers[0]?.cabin?.amenities?.seat?.pitch || 'N/A'}
+                        {passengers[0]?.cabin?.amenities?.seat?.pitch || "N/A"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
@@ -181,7 +181,7 @@ export default function FlySegment({
                         <span className="ml-2 text-sm">Seat width</span>
                       </div>
                       <span className="text-sm font-semibold">
-                        {passengers?.[0]?.cabin?.amenities?.seat?.type || 'N/A'}
+                        {passengers?.[0]?.cabin?.amenities?.seat?.type || "N/A"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
@@ -191,8 +191,8 @@ export default function FlySegment({
                       </div>
                       <span className="text-sm font-semibold">
                         {passengers[0]?.cabin?.amenities?.wifi?.available
-                          ? 'Yes'
-                          : 'No'}
+                          ? "Yes"
+                          : "No"}
                       </span>
                     </div>
                   </div>
@@ -203,5 +203,5 @@ export default function FlySegment({
         </Accordion>
       </div>
     </div>
-  )
+  );
 }

@@ -1,68 +1,68 @@
-'use client'
+"use client";
 
-import * as React from 'react'
+import * as React from "react";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command'
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
+} from "@/components/ui/popover";
 
 import {
   ChevronsUpDown,
   PlaneTakeoffIcon,
   PlaneLandingIcon,
   HotelIcon,
-} from 'lucide-react'
+} from "lucide-react";
 
-import type { Place } from '@duffel/api/types/shared'
+import type { Place } from "@duffel/api/types/shared";
 
 interface PlacesSelectorProps {
-  value: string
-  onSelect: (iataCode: string, name: string) => void
-  placeholder: string
-  type: 'origin' | 'destination'
+  value: string;
+  onSelect: (iataCode: string, name: string) => void;
+  placeholder: string;
+  type: "origin" | "destination";
 }
 
 const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
   ({ value, onSelect, placeholder, type }, ref) => {
-    const [query, setQuery] = React.useState('')
-    const [places, setPlaces] = React.useState<Place[]>([])
-    const [open, setOpen] = React.useState(false)
+    const [query, setQuery] = React.useState("");
+    const [places, setPlaces] = React.useState<Place[]>([]);
+    const [open, setOpen] = React.useState(false);
 
     const fetchPlaces = async (query: string) => {
       if (query.length < 1) {
-        setPlaces([])
-        return
+        setPlaces([]);
+        return;
       }
       try {
         const response = await fetch(
           `/api/travel/places?name=${encodeURIComponent(query)}`,
-        )
-        const result = await response.json()
-        setPlaces(result.data || [])
+        );
+        const result = await response.json();
+        setPlaces(result.data || []);
       } catch (error) {
-        setPlaces([])
+        setPlaces([]);
       }
-    }
+    };
 
     React.useEffect(() => {
-      fetchPlaces(query)
-    }, [query])
+      fetchPlaces(query);
+    }, [query]);
 
-    const cities = places.filter((place) => place.type === 'city')
-    const airports = places.filter((place) => place.type === 'airport')
+    const cities = places.filter((place) => place.type === "city");
+    const airports = places.filter((place) => place.type === "airport");
 
     const IconComponent =
-      type === 'origin' ? PlaneTakeoffIcon : PlaneLandingIcon
+      type === "origin" ? PlaneTakeoffIcon : PlaneLandingIcon;
 
     return (
       <Popover open={open} onOpenChange={setOpen}>
@@ -95,8 +95,8 @@ const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
                       key={city.id}
                       value={city.id}
                       onSelect={() => {
-                        onSelect(city.iata_code!, city.name)
-                        setOpen(false)
+                        onSelect(city.iata_code!, city.name);
+                        setOpen(false);
                       }}
                       className="text-sm"
                     >
@@ -116,8 +116,8 @@ const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
                       key={airport.id}
                       value={airport.id}
                       onSelect={() => {
-                        onSelect(airport.iata_code!, airport.name)
-                        setOpen(false)
+                        onSelect(airport.iata_code!, airport.name);
+                        setOpen(false);
                       }}
                       className="text-sm"
                     >
@@ -134,10 +134,10 @@ const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
           </Command>
         </PopoverContent>
       </Popover>
-    )
+    );
   },
-)
+);
 
-PlacesSelector.displayName = 'PlacesSelector'
+PlacesSelector.displayName = "PlacesSelector";
 
-export default PlacesSelector
+export default PlacesSelector;

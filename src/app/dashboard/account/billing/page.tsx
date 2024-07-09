@@ -1,6 +1,6 @@
-import SuccessToast from './SuccessToast'
-import { ManageUserSubscriptionButton } from './ManageSubscription'
-import { Button } from '@/components/ui/button'
+import SuccessToast from "./SuccessToast";
+import { ManageUserSubscriptionButton } from "./ManageSubscription";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,27 +8,27 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { storeSubscriptionPlans } from '@/config/subscriptions'
-import { checkAuth, getUserAuth } from '@/lib/auth/utils'
-import { getUserSubscriptionPlan } from '@/lib/stripe/subscription'
-import { CheckCircle2Icon } from 'lucide-react'
-import Link from 'next/link'
-import { redirect } from 'next/navigation'
+} from "@/components/ui/card";
+import { storeSubscriptionPlans } from "@/config/subscriptions";
+import { checkAuth, getUserAuth } from "@/lib/auth/utils";
+import { getUserSubscriptionPlan } from "@/lib/stripe/subscription";
+import { CheckCircle2Icon } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function Billing() {
-  await checkAuth()
-  const { session } = await getUserAuth()
-  const subscriptionPlan = await getUserSubscriptionPlan()
+  await checkAuth();
+  const { session } = await getUserAuth();
+  const subscriptionPlan = await getUserSubscriptionPlan();
 
-  if (!session) return redirect('/')
+  if (!session) return redirect("/");
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
       <div className="min-h-[calc(100vh-57px)] ">
         <SuccessToast />
         <Link href="/account">
-          <Button variant={'link'} className="px-0">
+          <Button variant={"link"} className="px-0">
             Back
           </Button>
         </Link>
@@ -42,10 +42,10 @@ export default async function Billing() {
           </p>
           <p className="text-sm text-muted-foreground">
             {!subscriptionPlan.isSubscribed
-              ? 'You are not subscribed to any plan.'
+              ? "You are not subscribed to any plan."
               : subscriptionPlan.isCanceled
-                ? 'Your plan will be canceled on '
-                : 'Your plan renews on '}
+                ? "Your plan will be canceled on "
+                : "Your plan renews on "}
             {subscriptionPlan?.stripeCurrentPeriodEnd
               ? subscriptionPlan.stripeCurrentPeriodEnd.toLocaleDateString()
               : null}
@@ -56,7 +56,7 @@ export default async function Billing() {
             <Card
               key={plan.id}
               className={
-                plan.name === subscriptionPlan.name ? 'border-primary' : ''
+                plan.name === subscriptionPlan.name ? "border-primary" : ""
               }
             >
               {plan.name === subscriptionPlan.name ? (
@@ -93,7 +93,7 @@ export default async function Billing() {
                 {session?.user.email ? (
                   <ManageUserSubscriptionButton
                     userId={session.user.id}
-                    email={session.user.email || ''}
+                    email={session.user.email || ""}
                     stripePriceId={plan.stripePriceId}
                     stripeCustomerId={subscriptionPlan?.stripeCustomerId}
                     isSubscribed={!!subscriptionPlan.isSubscribed}
@@ -114,5 +114,5 @@ export default async function Billing() {
         </div>
       </div>
     </main>
-  )
+  );
 }

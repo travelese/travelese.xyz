@@ -1,30 +1,30 @@
-import { NextRequest } from 'next/server'
-import { StreamingTextResponse, streamText } from 'ai'
-import { openai } from '@ai-sdk/openai'
-import { anthropic } from '@ai-sdk/anthropic'
-import { google } from '@ai-sdk/google'
-import { searchFlights, getPlaceSuggestions } from '@/lib/travel/duffel'
-import { z } from 'zod'
+import { NextRequest } from "next/server";
+import { StreamingTextResponse, streamText } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
+import { searchFlights, getPlaceSuggestions } from "@/lib/travel/duffel";
+import { z } from "zod";
 
 export async function POST(req: NextRequest) {
   try {
     const { messages, model, temperature, topP, topK, systemMessage } =
-      await req.json()
-    console.log('Received request:', {
+      await req.json();
+    console.log("Received request:", {
       model,
       temperature,
       topP,
       topK,
       systemMessage,
       messages,
-    })
+    });
 
     const result = await streamText({
       model: getModel(model, temperature, topP, topK),
       messages: systemMessage
         ? [
             {
-              role: 'system',
+              role: "system",
               content: systemMessage,
             },
             ...messages,
@@ -35,29 +35,29 @@ export async function POST(req: NextRequest) {
       tools: {
         search_flights: {
           description:
-            'Search for flights. Use this tool whenever a user asks to find, search, or book flights between two locations.',
+            "Search for flights. Use this tool whenever a user asks to find, search, or book flights between two locations.",
           parameters: z.object({
-            origin: z.string().describe('Origin city name'),
-            destination: z.string().describe('Destination city name'),
+            origin: z.string().describe("Origin city name"),
+            destination: z.string().describe("Destination city name"),
             departure_date: z
               .string()
-              .describe('Departure date in YYYY-MM-DD format'),
+              .describe("Departure date in YYYY-MM-DD format"),
             return_date: z
               .string()
               .optional()
-              .describe('Return date in YYYY-MM-DD format for round trips'),
+              .describe("Return date in YYYY-MM-DD format for round trips"),
             passengers: z
               .array(
                 z.object({
-                  type: z.enum(['adult', 'child', 'infant_without_seat']),
+                  type: z.enum(["adult", "child", "infant_without_seat"]),
                   age: z.number().optional(),
                 }),
               )
-              .describe('Array of passenger objects'),
+              .describe("Array of passenger objects"),
             cabin_class: z
-              .enum(['economy', 'premium_economy', 'business', 'first'])
-              .describe('Desired cabin class'),
-            limit: z.number().optional().describe('Number of offers to fetch'),
+              .enum(["economy", "premium_economy", "business", "first"])
+              .describe("Desired cabin class"),
+            limit: z.number().optional().describe("Number of offers to fetch"),
           }),
           execute: async (args) => {
             const {
@@ -68,29 +68,29 @@ export async function POST(req: NextRequest) {
               passengers,
               limit,
               cabin_class,
-            } = args
+            } = args;
 
             try {
               const originSuggestions = await getPlaceSuggestions({
                 query: origin,
-              })
+              });
               const destinationSuggestions = await getPlaceSuggestions({
                 query: destination,
-              })
+              });
 
               if (!originSuggestions.length || !destinationSuggestions.length) {
                 throw new Error(
-                  'Unable to find IATA codes for provided locations.',
-                )
+                  "Unable to find IATA codes for provided locations.",
+                );
               }
 
               // Use iata_city_code if available
               const originCode =
                 originSuggestions[0].iata_city_code ||
-                originSuggestions[0].iata_code
+                originSuggestions[0].iata_code;
               const destinationCode =
                 destinationSuggestions[0].iata_city_code ||
-                destinationSuggestions[0].iata_code
+                destinationSuggestions[0].iata_code;
 
               const slices = [
                 {
@@ -107,72 +107,72 @@ export async function POST(req: NextRequest) {
                       },
                     ]
                   : []),
-              ]
+              ];
 
               const results = await searchFlights(
                 slices,
                 passengers,
                 cabin_class,
                 limit,
-              )
+              );
 
               console.log(
-                'search_flights results:',
+                "search_flights results:",
                 JSON.stringify(results, null, 2),
-              )
-              return results
+              );
+              return results;
             } catch (error: any) {
-              console.error('Error in search_flights:', error)
+              console.error("Error in search_flights:", error);
               return {
-                error: 'Failed to search flights',
+                error: "Failed to search flights",
                 details: error.message,
                 stack: error.stack,
-              }
+              };
             }
           },
         },
         get_place_suggestions: {
-          description: 'Get place suggestions based on a query',
+          description: "Get place suggestions based on a query",
           parameters: z.object({
-            query: z.string().describe('Search query for place suggestions'),
+            query: z.string().describe("Search query for place suggestions"),
           }),
           execute: async (args) => {
             try {
-              const { query } = args
-              const results = await getPlaceSuggestions({ query })
+              const { query } = args;
+              const results = await getPlaceSuggestions({ query });
               console.log(
-                'get_place_suggestions results:',
+                "get_place_suggestions results:",
                 JSON.stringify(results, null, 2),
-              )
-              return results
+              );
+              return results;
             } catch (error: any) {
-              console.error('Error in get_place_suggestions:', error)
+              console.error("Error in get_place_suggestions:", error);
               return {
-                error: 'Failed to get place suggestions',
+                error: "Failed to get place suggestions",
                 details: error.message,
                 stack: error.stack,
-              }
+              };
             }
           },
         },
       },
-    })
+    });
 
-    console.log('Stream generated, converting to response')
-    return new StreamingTextResponse(result.toAIStream())
+    console.log("Stream generated, converting to response");
+    return new StreamingTextResponse(result.toAIStream());
   } catch (error) {
-    console.error('Error in AI route:', error)
+    console.error("Error in AI route:", error);
     return new Response(
       JSON.stringify({
-        error: 'An error occurred',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "An error occurred",
+        message: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
 }
 
@@ -183,16 +183,16 @@ function getModel(
   topK: number,
 ) {
   switch (model) {
-    case 'gpt-4o':
-      return openai('gpt-4o')
-    case 'claude-3-5-sonnet-20240620':
-      return anthropic('claude-3-5-sonnet-20240620')
-    case 'gemini-1.5-pro-latest':
-      return google('gemini-1.5-pro-latest', {
+    case "gpt-4o":
+      return openai("gpt-4o");
+    case "claude-3-5-sonnet-20240620":
+      return anthropic("claude-3-5-sonnet-20240620");
+    case "gemini-1.5-pro-latest":
+      return google("gemini-1.5-pro-latest", {
         topK,
-      })
+      });
     default:
-      console.warn(`Invalid model selected: ${model}. Defaulting to gpt-4o.`)
-      return openai('gpt-4o')
+      console.warn(`Invalid model selected: ${model}. Defaulting to gpt-4o.`);
+      return openai("gpt-4o");
   }
 }

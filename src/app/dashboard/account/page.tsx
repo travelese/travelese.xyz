@@ -1,12 +1,12 @@
-import UserSettings from './UserSettings'
-import PlanSettings from './PlanSettings'
-import { checkAuth, getUserAuth } from '@/lib/auth/utils'
-import { getUserSubscriptionPlan } from '@/lib/stripe/subscription'
+import UserSettings from "./UserSettings";
+import PlanSettings from "./PlanSettings";
+import { checkAuth, getUserAuth } from "@/lib/auth/utils";
+import { getUserSubscriptionPlan } from "@/lib/stripe/subscription";
 
 export default async function Account() {
-  await checkAuth()
-  const { session } = await getUserAuth()
-  const subscriptionPlan = await getUserSubscriptionPlan()
+  await checkAuth();
+  const { session } = await getUserAuth();
+  const subscriptionPlan = await getUserSubscriptionPlan();
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
@@ -16,5 +16,5 @@ export default async function Account() {
         <UserSettings session={session} />
       </div>
     </main>
-  )
+  );
 }

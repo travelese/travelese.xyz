@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react'
-import { useChat, Message } from 'ai/react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import React, { useState, useRef, useEffect } from "react";
+import { useChat, Message } from "ai/react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
@@ -11,25 +11,25 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from "@/components/ui/tooltip";
 
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import {
   BirdIcon,
@@ -39,20 +39,20 @@ import {
   RabbitIcon,
   SettingsIcon,
   TurtleIcon,
-} from 'lucide-react'
-import Loading from '@/app/loading'
-import FlyCard from '@/components/travel/fly/FlyCard'
+} from "lucide-react";
+import Loading from "@/app/loading";
+import FlyCard from "@/components/travel/fly/FlyCard";
 
 export default function TraveleseAI() {
-  const [model, setModel] = useState('gpt-4o')
-  const [temperature, setTemperature] = useState(0.7)
-  const [topP, setTopP] = useState(1)
-  const [topK, setTopK] = useState(50)
-  const [maxTokens, setMaxTokens] = useState(4096)
+  const [model, setModel] = useState("gpt-4o");
+  const [temperature, setTemperature] = useState(0.7);
+  const [topP, setTopP] = useState(1);
+  const [topK, setTopK] = useState(50);
+  const [maxTokens, setMaxTokens] = useState(4096);
   const [systemMessage, setSystemMessage] = useState(
-    'You are a travel agent AI assistant.',
-  )
-  const [role, setRole] = useState('system')
+    "You are a travel agent AI assistant.",
+  );
+  const [role, setRole] = useState("system");
 
   const {
     messages,
@@ -63,46 +63,46 @@ export default function TraveleseAI() {
     error,
     reload,
   } = useChat({
-    api: '/api/ai',
+    api: "/api/ai",
     body: { model, temperature, topP, topK, maxTokens, systemMessage },
     onResponse: (response) => {
-      console.log('Received response:', response)
+      console.log("Received response:", response);
     },
     onFinish: (message) => {
-      console.log('Finished message:', message)
+      console.log("Finished message:", message);
     },
     onError: (error) => {
-      console.error('Error in chat:', error)
+      console.error("Error in chat:", error);
     },
-  })
+  });
 
-  const OutputRef = useRef<HTMLDivElement>(null)
+  const OutputRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (OutputRef.current) {
-      OutputRef.current.scrollTop = OutputRef.current.scrollHeight
+      OutputRef.current.scrollTop = OutputRef.current.scrollHeight;
     }
-  }, [messages])
+  }, [messages]);
 
   useEffect(() => {
     if (error) {
-      console.error('Error in chat:', error)
+      console.error("Error in chat:", error);
     }
-  }, [error])
+  }, [error]);
 
   const handleModelChange = (newModel: string) => {
-    setModel(newModel)
-    reload()
-  }
+    setModel(newModel);
+    reload();
+  };
 
   const renderMessage = (message: Message) => {
     return (
       <div className="mb-4">
         <h3 className="font-semibold">
-          {message.role === 'user' ? 'You:' : 'Travelese:'}
+          {message.role === "user" ? "You:" : "Travelese:"}
         </h3>
         <pre className="whitespace-pre-wrap">{message.content}</pre>
-        {message.role === 'assistant' &&
+        {message.role === "assistant" &&
           message.toolInvocations &&
           message.toolInvocations.map((toolInvocation, index) => (
             <div key={index} className="mt-2 border-l-2 border-gray-300 pl-2">
@@ -115,8 +115,8 @@ export default function TraveleseAI() {
             </div>
           ))}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -418,7 +418,7 @@ export default function TraveleseAI() {
               {isLoading && <Loading />}
               {error && (
                 <div className="text-red-500">
-                  Error:{' '}
+                  Error:{" "}
                   {error instanceof Error ? error.message : String(error)}
                 </div>
               )}
@@ -427,8 +427,8 @@ export default function TraveleseAI() {
           </ScrollArea>
           <form
             onSubmit={(e) => {
-              e.preventDefault()
-              handleSubmit(e)
+              e.preventDefault();
+              handleSubmit(e);
             }}
             className="relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
           >
@@ -468,7 +468,7 @@ export default function TraveleseAI() {
                   type="submit"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Thinking...' : 'Send Message'}
+                  {isLoading ? "Thinking..." : "Send Message"}
                   <CornerDownLeftIcon className="size-3.5" />
                 </Button>
               </TooltipProvider>
@@ -477,5 +477,5 @@ export default function TraveleseAI() {
         </div>
       </main>
     </>
-  )
+  );
 }

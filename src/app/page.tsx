@@ -1,18 +1,18 @@
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from "next/image";
+import Link from "next/link";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-import FlySearchForm from '@/components/travel/fly/FlySearchForm'
+import FlySearchForm from "@/components/travel/fly/FlySearchForm";
 
 export default function LandingPage() {
   return (
@@ -69,7 +69,7 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
-              {['Tokyo, Japan', 'Paris, France', 'Milan, Italy'].map(
+              {["Tokyo, Japan", "Paris, France", "Milan, Italy"].map(
                 (destination) => (
                   <Card key={destination}>
                     <CardHeader>
@@ -108,19 +108,19 @@ export default function LandingPage() {
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
               {[
                 {
-                  price: '$666',
-                  duration: '5-night',
-                  tickets: '10',
+                  price: "$666",
+                  duration: "5-night",
+                  tickets: "10",
                 },
                 {
-                  price: '$666',
-                  duration: '7-night',
-                  tickets: '7',
+                  price: "$666",
+                  duration: "7-night",
+                  tickets: "7",
                 },
                 {
-                  price: '$666',
-                  duration: '10-night',
-                  tickets: '10',
+                  price: "$666",
+                  duration: "10-night",
+                  tickets: "10",
                 },
               ].map((pkg, index) => (
                 <Card key={index}>
@@ -180,9 +180,9 @@ export default function LandingPage() {
             </div>
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
               {[
-                'Tuba Club, Marseille',
-                'Giulia, Milan',
-                'Drei Berge, Mürren',
+                "Tuba Club, Marseille",
+                "Giulia, Milan",
+                "Drei Berge, Mürren",
               ].map((stay) => (
                 <Card key={stay}>
                   <CardHeader>
@@ -242,7 +242,7 @@ export default function LandingPage() {
         </nav>
       </footer>
     </div>
-  )
+  );
 }
 
 function CarIcon(props: any) {
@@ -264,7 +264,7 @@ function CarIcon(props: any) {
       <path d="M9 17h6" />
       <circle cx="17" cy="17" r="2" />
     </svg>
-  )
+  );
 }
 
 function HotelIcon(props: any) {
@@ -292,7 +292,7 @@ function HotelIcon(props: any) {
       <path d="M8 7h.01" />
       <rect x="4" y="2" width="16" height="20" rx="2" />
     </svg>
-  )
+  );
 }
 
 function PlaneIcon(props: any) {
@@ -311,7 +311,7 @@ function PlaneIcon(props: any) {
     >
       <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
     </svg>
-  )
+  );
 }
 
 function PlaneTakeoffIcon(props: any) {
@@ -331,7 +331,7 @@ function PlaneTakeoffIcon(props: any) {
       <path d="M2 22h20" />
       <path d="M6.36 17.4 4 17l-2-4 1.1-.55a2 2 0 0 1 1.8 0l.17.1a2 2 0 0 0 1.8 0L8 12 5 6l.9-.45a2 2 0 0 1 2.09.2l4.02 3a2 2 0 0 0 2.1.2l4.19-2.06a2.41 2.41 0 0 1 1.73-.17L21 7a1.4 1.4 0 0 1 .87 1.99l-.38.76c-.23.46-.6.84-1.07 1.08L7.58 17.2a2 2 0 0 1-1.22.18Z" />
     </svg>
-  )
+  );
 }
 
 function TicketIcon(props: any) {
@@ -353,5 +353,5 @@ function TicketIcon(props: any) {
       <path d="M13 17v2" />
       <path d="M13 11v2" />
     </svg>
-  )
+  );
 }

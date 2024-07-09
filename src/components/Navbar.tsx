@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import React from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useSession, signOut } from 'next-auth/react'
-import { useNavbar } from '@/hooks/useNavbar'
-import CurrencySelector from '@/components/travel/CurrencySelector'
-import ModeToggle from '@/components/ModeToggle'
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import { useNavbar } from "@/hooks/useNavbar";
+import CurrencySelector from "@/components/travel/CurrencySelector";
+import ModeToggle from "@/components/ModeToggle";
 
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuGroup,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import {
   CommandDialog,
   CommandInput,
@@ -25,15 +25,15 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-} from '@/components/ui/command'
+} from "@/components/ui/command";
 
-import { Layers3, User } from 'lucide-react'
-import { defaultLinks } from '@/config/nav'
+import { Layers3, User } from "lucide-react";
+import { defaultLinks } from "@/config/nav";
 
 export default function Navbar() {
-  const { commandOpen, toggleCommand } = useNavbar()
-  const pathname = usePathname()
-  const { data: session } = useSession()
+  const { commandOpen, toggleCommand } = useNavbar();
+  const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <header className="sticky top-0 z-10 flex h-[57px] items-center justify-between gap-1 border-b bg-background px-4">
@@ -48,7 +48,7 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         <div className="hidden sm:block">
           <p className="text-sm text-muted-foreground">
-            Press{' '}
+            Press{" "}
             <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
               <span className="text-xs">⌘</span>K
             </kbd>
@@ -93,7 +93,7 @@ export default function Navbar() {
                       <Link
                         href={link.href}
                         className={
-                          pathname === link.href ? 'font-semibold' : ''
+                          pathname === link.href ? "font-semibold" : ""
                         }
                       >
                         <link.icon className="mr-2 h-4 w-4" />
@@ -105,8 +105,8 @@ export default function Navbar() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={(event) => {
-                    event.preventDefault()
-                    void signOut({ callbackUrl: '/' })
+                    event.preventDefault();
+                    void signOut({ callbackUrl: "/" });
                   }}
                 >
                   Sign out
@@ -122,5 +122,5 @@ export default function Navbar() {
         <ModeToggle />
       </div>
     </header>
-  )
+  );
 }

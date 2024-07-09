@@ -1,41 +1,41 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
-import FlyBookForm from '@/components/travel/fly/FlyBookForm'
-import FlyCard from '@/components/travel/fly/FlyCard'
-import FlyPriceCard from '@/components/travel/fly/FlyPriceCard'
-import { Skeleton } from '@/components/ui/skeleton'
-import type { Offer } from '@duffel/api/types'
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import FlyBookForm from "@/components/travel/fly/FlyBookForm";
+import FlyCard from "@/components/travel/fly/FlyCard";
+import FlyPriceCard from "@/components/travel/fly/FlyPriceCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Offer } from "@duffel/api/types";
 
 export default function FlyBookPage() {
-  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const searchParams = useSearchParams()
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const flightId = searchParams.get('id')
+    const flightId = searchParams.get("id");
     if (flightId) {
-      setLoading(true)
+      setLoading(true);
       fetch(`/api/travel/fly/book?id=${flightId}`)
         .then((res) => {
-          if (!res.ok) throw new Error('Failed to fetch offer')
-          return res.json()
+          if (!res.ok) throw new Error("Failed to fetch offer");
+          return res.json();
         })
         .then((data: Offer) => {
-          setSelectedOffer(data)
+          setSelectedOffer(data);
         })
         .catch((error) => {
-          console.error('Error fetching flight:', error)
-          setError(error.message)
+          console.error("Error fetching flight:", error);
+          setError(error.message);
         })
-        .finally(() => setLoading(false))
+        .finally(() => setLoading(false));
     } else {
-      setError('No flight ID provided')
-      setLoading(false)
+      setError("No flight ID provided");
+      setLoading(false);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   if (loading) {
     return (
@@ -46,11 +46,11 @@ export default function FlyBookPage() {
         </div>
         <Skeleton className="h-[300px] w-full" />
       </main>
-    )
+    );
   }
 
   if (error) {
-    return <div className="text-center text-red-500 p-4">{error}</div>
+    return <div className="text-center text-red-500 p-4">{error}</div>;
   }
 
   return (
@@ -63,5 +63,5 @@ export default function FlyBookPage() {
       </div>
       <FlyPriceCard />
     </main>
-  )
+  );
 }
