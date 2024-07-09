@@ -1,86 +1,106 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  CardTitle,
-  CardDescription,
-  CardHeader,
-  CardContent,
-  CardFooter,
-  Card,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+'use client'
 
-const Settings = () => {
+import { Button } from '@/components/ui/button'
+import { useTheme } from 'next-themes'
+
+export default function Page() {
+  const { setTheme } = useTheme()
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="mx-auto grid w-full max-w-6xl gap-2">
-        <h1 className="text-3xl font-semibold">Settings</h1>
-      </div>
-      <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
-        <nav
-          className="grid gap-4 text-sm text-muted-foreground"
-          x-chunk="dashboard-04-chunk-0"
-        >
-          <Link className="font-semibold text-primary" href="#">
-            General
-          </Link>
-          <Link href="#">Security</Link>
-          <Link href="#">Integrations</Link>
-          <Link href="#">Support</Link>
-          <Link href="#">Organizations</Link>
-          <Link href="#">Advanced</Link>
-        </nav>
-        <div className="grid gap-6">
-          <Card x-chunk="dashboard-04-chunk-1">
-            <CardHeader>
-              <CardTitle>Store Name</CardTitle>
-              <CardDescription>
-                Used to identify your store in the marketplace.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form>
-                <Input placeholder="Store Name" />
-              </form>
-            </CardContent>
-            <CardFooter className="border-t px-6 py-4">
-              <Button>Save</Button>
-            </CardFooter>
-          </Card>
-          <Card x-chunk="dashboard-04-chunk-2">
-            <CardHeader>
-              <CardTitle>Plugins Directory</CardTitle>
-              <CardDescription>
-                The directory within your project, in which your plugins are
-                located.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="flex flex-col gap-4">
-                <Input
-                  defaultValue="/content/plugins"
-                  placeholder="Project Name"
-                />
-                <div className="flex items-center space-x-2">
-                  <Checkbox defaultChecked id="include" />
-                  <label
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    htmlFor="include"
-                  >
-                    Allow administrators to change the directory.
-                  </label>
-                </div>
-              </form>
-            </CardContent>
-            <CardFooter className="border-t px-6 py-4">
-              <Button>Save</Button>
-            </CardFooter>
-          </Card>
+    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+      <h1 className="text-2xl font-semibold">Settings</h1>
+      <div className="space-y-4 my-4">
+        <div>
+          <h3 className="text-lg font-medium">Appearance</h3>
+          <p className="text-sm text-muted-foreground">
+            Customize the appearance of the app. Automatically switch between
+            day and night themes.
+          </p>
         </div>
+        <Button
+          asChild
+          variant={'ghost'}
+          className="w-fit h-fit"
+          onClick={() => setTheme('light')}
+        >
+          <div className="flex flex-col">
+            <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
+              <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
+                <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
+                  <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
+                  <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+                </div>
+                <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
+                  <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                  <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+                </div>
+                <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
+                  <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                  <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+                </div>
+              </div>
+            </div>
+            <span className="block w-full p-2 text-center font-normal">
+              Light
+            </span>
+          </div>
+        </Button>
+        <Button
+          asChild
+          variant={'ghost'}
+          onClick={() => setTheme('dark')}
+          className="w-fit h-fit"
+        >
+          <div className="flex flex-col">
+            <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
+              <div className="space-y-2 rounded-sm bg-neutral-950 p-2">
+                <div className="space-y-2 rounded-md bg-neutral-800 p-2 shadow-sm">
+                  <div className="h-2 w-[80px] rounded-lg bg-neutral-400" />
+                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
+                </div>
+                <div className="flex items-center space-x-2 rounded-md bg-neutral-800 p-2 shadow-sm">
+                  <div className="h-4 w-4 rounded-full bg-neutral-400" />
+                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
+                </div>
+                <div className="flex items-center space-x-2 rounded-md bg-neutral-800 p-2 shadow-sm">
+                  <div className="h-4 w-4 rounded-full bg-neutral-400" />
+                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
+                </div>
+              </div>
+            </div>
+            <span className="block w-full p-2 text-center font-normal">
+              Dark
+            </span>
+          </div>
+        </Button>
+        <Button
+          asChild
+          variant={'ghost'}
+          onClick={() => setTheme('system')}
+          className="w-fit h-fit"
+        >
+          <div className="flex flex-col">
+            <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
+              <div className="space-y-2 rounded-sm bg-neutral-300 p-2">
+                <div className="space-y-2 rounded-md bg-neutral-600 p-2 shadow-sm">
+                  <div className="h-2 w-[80px] rounded-lg bg-neutral-400" />
+                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
+                </div>
+                <div className="flex items-center space-x-2 rounded-md bg-neutral-600 p-2 shadow-sm">
+                  <div className="h-4 w-4 rounded-full bg-neutral-400" />
+                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
+                </div>
+                <div className="flex items-center space-x-2 rounded-md bg-neutral-600 p-2 shadow-sm">
+                  <div className="h-4 w-4 rounded-full bg-neutral-400" />
+                  <div className="h-2 w-[100px] rounded-lg bg-neutral-400" />
+                </div>
+              </div>
+            </div>
+            <span className="block w-full p-2 text-center font-normal">
+              System
+            </span>
+          </div>
+        </Button>
       </div>
     </main>
-  );
+  )
 }
-
-export default Settings;
