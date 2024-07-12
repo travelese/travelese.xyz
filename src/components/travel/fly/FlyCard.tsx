@@ -13,22 +13,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Drawer,
   DrawerTrigger,
   DrawerContent,
+  DrawerTitle,
   DrawerFooter,
   DrawerHeader,
+  DrawerDescription,
 } from "@/components/ui/drawer";
 
 import { BackpackIcon, CloudFogIcon, ShareIcon } from "lucide-react";
@@ -284,15 +278,15 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
         </Card>
       </DrawerTrigger>
       <DrawerContent className="w-full max-w-full">
+        <DrawerHeader>
+          <DrawerTitle>Flight Details</DrawerTitle>
+          <DrawerDescription></DrawerDescription>
+        </DrawerHeader>
         <div className="flex justify-center gap-4 p-4">
           <Card className="w-[500px]">
             <ScrollArea className="h-[500px]">
               <CardHeader className="p-4 border-b">
-                <CardTitle>
-                  <h3 className="text-md font-semibold mt-2">
-                    To {outbound!.destination.name}
-                  </h3>
-                </CardTitle>
+                <CardTitle>To {outbound!.destination.name}</CardTitle>
                 <CardDescription>
                   Details of your outbound flight
                 </CardDescription>
@@ -311,11 +305,7 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
             <Card className="w-[500px]">
               <ScrollArea className="h-[500px]">
                 <CardHeader className="p-4 border-b">
-                  <CardTitle>
-                    <h3 className="text-md font-semibold mt-2">
-                      To {inbound.destination.name}
-                    </h3>
-                  </CardTitle>
+                  <CardTitle>To {inbound.destination.name}</CardTitle>
                   <CardDescription>
                     Details of your inbound flight
                   </CardDescription>
@@ -330,6 +320,7 @@ export default function FlyCard({ offer, onSelect }: FlyCardProps) {
             </Card>
           )}
         </div>
+        <DrawerFooter></DrawerFooter>
       </DrawerContent>
     </Drawer>
   );

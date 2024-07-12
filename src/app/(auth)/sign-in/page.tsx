@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { signIn } from "next-auth/react";
 
 const Page = () => {

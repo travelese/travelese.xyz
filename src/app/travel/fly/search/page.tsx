@@ -33,8 +33,6 @@ export default function FlySearchResults() {
   const router = useRouter();
   const sortBy = (searchParams.get("sortBy") as SortValues) || "total_amount";
   const limit = parseInt(searchParams.get("limit") || "10", 10);
-  const currency =
-    (searchParams.get("currency") as "CAD" | "USD" | "EUR") || "USD";
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   const setSortBy = (value: SortValues) => {
@@ -49,6 +47,10 @@ export default function FlySearchResults() {
     router.push(`?${current.toString()}`);
   };
 
+  const handleSelectOffer = (offer: Offer) => {
+    navigateToBookPage(offer);
+  };
+
   useEffect(() => {
     if (limit < 1) {
       setError(new Error("Limit must be at least 1"));
@@ -61,7 +63,6 @@ export default function FlySearchResults() {
         const params = new URLSearchParams(searchParams);
 
         params.set("limit", limit.toString());
-        params.set("currency", currency);
 
         const response = await fetch(
           `/api/travel/fly/search?${params?.toString()}`,
@@ -71,7 +72,6 @@ export default function FlySearchResults() {
         }
 
         const data: Offer[] = (await response.json()) as Offer[];
-        console.log("fetchOffers API response:", data);
 
         if (!Array.isArray(data) || data.length === 0) {
           throw new Error("No offers found");
@@ -92,7 +92,7 @@ export default function FlySearchResults() {
     };
 
     void fetchOffers();
-  }, [searchParams, limit, currency]);
+  }, [searchParams, limit]);
 
   if (loading) {
     const skeletonCount = limit < 10 ? limit : 10;
@@ -160,7 +160,7 @@ export default function FlySearchResults() {
             <FlyCard
               key={offer.id}
               offer={offer}
-              onSelect={() => navigateToBookPage(offer.id)}
+              onSelect={() => handleSelectOffer(offer)}
             />
           ))}
         </div>

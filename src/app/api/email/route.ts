@@ -1,22 +1,22 @@
-import { EmailTemplate } from "@/components/emails/FirstEmail";
-import { resend } from "@/lib/email/index";
-import { emailSchema } from "@/lib/email/utils";
 import { NextResponse } from "next/server";
+import { emailSchema, sendEmail } from "@/lib/email/utils";
+import { OrderConfirmationEmail } from "@/components/emails/OrderConfirmation";
 
 export async function POST(request: Request) {
   const body = await request.json();
   const { name, email } = emailSchema.parse(body);
   try {
-    const data = await resend.emails.send({
-      from: "Armin <hey@arminbabaeistudio.com>",
+    const data = await sendEmail({
       to: [email],
       subject: "Travelese!",
-      react: EmailTemplate({ firstName: name }),
-      text: "Email powered by Resend.",
+      react: OrderConfirmationEmail({ firstName: name }),
     });
 
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error });
+    return NextResponse.json(
+      { error: "Failed to send email" },
+      { status: 500 },
+    );
   }
 }

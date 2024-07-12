@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, Ticket } from "lucide-react";
 import {
   HomeIcon,
   TerminalSquareIcon,
@@ -7,7 +7,7 @@ import {
   User,
   CreditCardIcon,
   BarChartIcon,
-  MailIcon,
+  TicketIcon,
 } from "lucide-react";
 
 export interface SidebarLink {
@@ -25,7 +25,7 @@ export const topNavItems: SidebarLink[] = [
   { href: "/dashboard", icon: HomeIcon, label: "Dashboard" },
   { href: "/dashboard/ai", icon: TerminalSquareIcon, label: "Travelese AI" },
   { href: "/dashboard/charts", icon: BarChartIcon, label: "Charts" },
-  { href: "/dashboard/resend", icon: MailIcon, label: "Resend" },
+  { href: "/dashboard/orders", icon: TicketIcon, label: "Orders" },
 ];
 
 export const bottomNavItems: SidebarLink[] = [

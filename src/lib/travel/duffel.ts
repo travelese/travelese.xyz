@@ -19,10 +19,6 @@ export async function searchFlights(
   sort?: ListOffersParams["sort"],
   limit?: number,
 ): Promise<Offer[]> {
-  console.log(
-    "searchFlights called with:",
-    JSON.stringify({ slices, passengers, cabin_class, sort, limit }, null, 2),
-  );
   try {
     const offerRequest = await duffel.offerRequests.create({
       slices,
@@ -51,8 +47,14 @@ export async function getOffer(offerId: string): Promise<Offer> {
 }
 
 export async function createOrder(params: CreateOrder): Promise<Order> {
-  const response = await duffel.orders.create(params);
-  return response.data;
+  try {
+    const response = await duffel.orders.create(params);
+    return response.data;
+  } catch (error) {
+    if (error.errors) {
+    }
+    throw error;
+  }
 }
 
 export async function getPlaceSuggestions(
@@ -60,6 +62,35 @@ export async function getPlaceSuggestions(
 ): Promise<Places[]> {
   const response = await duffel.suggestions.list(params);
   return response.data;
+}
+
+export async function listOrders(params: {
+  limit?: number;
+  after?: string;
+  before?: string;
+  sort?:
+    | "payment_required_by"
+    | "created_at"
+    | "departing_at"
+    | "booking_reference";
+  booking_reference?: string;
+  awaiting_payment?: boolean;
+  passenger_name?: string[];
+  origin_iata_code?: string;
+  destination_iata_code?: string;
+}) {
+  try {
+    console.log(
+      "Calling duffel.orders.list with params:",
+      JSON.stringify(params, null, 2),
+    );
+    const response = await duffel.orders.list(params);
+    console.log("Received response from duffel.orders.list");
+    return response;
+  } catch (error) {
+    console.error("Error listing orders:", error);
+    throw error;
+  }
 }
 
 export { duffel };

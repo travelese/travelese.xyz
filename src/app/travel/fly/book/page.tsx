@@ -6,36 +6,55 @@ import FlyBookForm from "@/components/travel/fly/FlyBookForm";
 import FlyCard from "@/components/travel/fly/FlyCard";
 import FlyPriceCard from "@/components/travel/fly/FlyPriceCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Offer } from "@duffel/api/types";
+import type { Offer, Order } from "@duffel/api/types";
+import { useToast } from "@/hooks/useToast";
+import useNavigation from "@/hooks/useNavigation";
 
 export default function FlyBookPage() {
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const { toast } = useToast();
+  const { navigateToConfirmationPage } = useNavigation();
 
   useEffect(() => {
-    const flightId = searchParams.get("id");
-    if (flightId) {
+    const offerId = searchParams.get("id");
+    console.log("Offer ID from URL:", offerId);
+    if (offerId) {
       setLoading(true);
-      fetch(`/api/travel/fly/book?id=${flightId}`)
+      fetch(`/api/travel/fly/book?id=${offerId}`)
         .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch offer");
+          console.log("API response status:", res.status);
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
           return res.json();
         })
         .then((data: Offer) => {
+          console.log("Fetched offer data:", data);
           setSelectedOffer(data);
         })
         .catch((error) => {
-          console.error("Error fetching flight:", error);
+          console.error("Error fetching offer:", error);
           setError(error.message);
         })
         .finally(() => setLoading(false));
     } else {
-      setError("No flight ID provided");
+      console.log("No offer ID provided");
+      setError("No Offer ID provided");
       setLoading(false);
     }
   }, [searchParams]);
+
+  const handleBookingSuccess = (bookingData: Order) => {
+    setOrder(bookingData);
+    toast({
+      title: "Booking Successful",
+      description: `Your booking reference is ${bookingData.booking_reference}`,
+    });
+
+    navigateToConfirmationPage(bookingData);
+  };
 
   if (loading) {
     return (
@@ -58,10 +77,15 @@ export default function FlyBookPage() {
       <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
         <div className="grid gap-6">
           {selectedOffer && <FlyCard offer={selectedOffer} />}
-          {selectedOffer && <FlyBookForm selectedOffer={selectedOffer} />}
+          {selectedOffer && (
+            <FlyBookForm
+              selectedOffer={selectedOffer}
+              onBookingSuccess={handleBookingSuccess}
+            />
+          )}
         </div>
       </div>
-      <FlyPriceCard />
+      {selectedOffer && <FlyPriceCard selectedOffer={selectedOffer} />}
     </main>
   );
 }

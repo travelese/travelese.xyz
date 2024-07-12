@@ -1,3 +1,4 @@
+import * as React from "react";
 import { getUserAuth } from "@/lib/auth/utils";
 import { redirect } from "next/navigation";
 

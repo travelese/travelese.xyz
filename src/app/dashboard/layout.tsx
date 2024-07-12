@@ -1,3 +1,4 @@
+import * as React from "react";
 import { checkAuth } from "@/lib/auth/utils";
 import { Toaster } from "@/components/ui/sonner";
 import NextAuthProvider from "@/lib/auth/Provider";
@@ -8,7 +9,8 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await checkAuth();
+  const session = await checkAuth();
+  if (session?.session) redirect("/sign-in");
 
   return (
     <main>

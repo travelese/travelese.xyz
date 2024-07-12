@@ -32,10 +32,13 @@ import {
 
 import useNavigation from "@/hooks/useNavigation";
 import { useToast } from "@/hooks/useToast";
-import type { Offer } from "@duffel/api/types";
+import type { Offer, Order } from "@duffel/api/types";
+import { saveOrderToDatabase } from "@/hooks/saveOrderToDatabase";
+import { sendOrderConfirmation } from "@/hooks/sendOrderConfirmation";
 
 interface FlyBookFormProps {
   selectedOffer: Offer;
+  onBookingSuccess: (order: Order) => void;
 }
 
 const FormSchema = z.object({
@@ -63,7 +66,7 @@ const FormSchema = z.object({
 
 export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
   const { toast } = useToast();
-  const { navigateToBookPage } = useNavigation();
+  const { navigateToConfirmationPage } = useNavigation();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -93,16 +96,33 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!selectedOffer) {
-      console.error("No selected offer to proceed with booking");
       return;
     }
 
     console.log("Offer to book:", selectedOffer.id);
 
+    const passengerId = selectedOffer.passengers[0]?.id;
+
+    if (!passengerId) {
+      return;
+    }
+
     const formData = {
       selected_offers: [selectedOffer.id],
-      passengers: data.passengers,
-      payments: data.payments,
+      passengers: [
+        {
+          ...data.passengers[0],
+          id: passengerId,
+          type: selectedOffer.passengers[0].type,
+        },
+      ],
+      payments: [
+        {
+          type: "balance",
+          amount: selectedOffer.total_amount,
+          currency: selectedOffer.total_currency,
+        },
+      ],
     };
 
     console.log("Book form data:", formData);
@@ -117,28 +137,32 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
       });
 
       if (!response.ok) {
-        console.error("Error:", response.status);
-        return;
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create the booking.");
       }
 
-      let order;
-      try {
-        order = await response.json();
-        console.log("Order:", order);
-      } catch (e) {
-        console.error("Error parsing JSON:", e);
-        return;
-      }
+      const order = await response.json();
+      console.log("Order:", order);
 
-      if (order) {
-        toast({
-          title: "Order booked successfully",
-          description: "Rendering the Order...",
-        });
-        navigateToBookPage(order.id);
-      }
+      // Save order to database
+      await saveOrderToDatabase(order);
+
+      // Send confirmation email
+      // await sendOrderConfirmation(order);
+
+      toast({
+        title: "Order booked successfully",
+        description: "Redirecting to confirmation page...",
+      });
+
+      onBookingSuccess(order);
+      navigateToConfirmationPage(order);
     } catch (error) {
-      console.error("Error:", error);
+      toast({
+        title: "Booking failed",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 

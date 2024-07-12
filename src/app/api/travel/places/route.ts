@@ -4,25 +4,17 @@ import { duffel } from "@/lib/travel/duffel";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get("query") || "";
     const name = searchParams.get("name") || "";
-    const rad = searchParams.get("rad") || "";
-    const lat = searchParams.get("lat") || "";
-    const lng = searchParams.get("lng") || "";
 
-    if (!query && !name) {
+    if (!name) {
       return NextResponse.json(
-        { error: "At least one of 'query' or 'name' parameters is required" },
+        { error: "The 'name' parameter is required" },
         { status: 400 },
       );
     }
 
     const response = await duffel.suggestions.list({
-      query,
       name,
-      rad,
-      lat,
-      lng,
     });
 
     return NextResponse.json(response);
