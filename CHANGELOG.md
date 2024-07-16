@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.2.3...v0.3.0) (2024-07-16)
+
+### ⚠ BREAKING CHANGES
+
+- **travel:** This commit includes significant changes to the database schema, API routes, and
+  overall application structure. It may require data migration and updates to integration points.
+
+- **travel:** overhaul booking system and update dependencies ([da070de](https://github.com/arminbabaeistudio/travelese.xyz/commit/da070de2c4b0518f5354cff72da5b8b0838ba873)), closes [#DEV-27](https://github.com/arminbabaeistudio/travelese.xyz/issues/DEV-27)
+
 ### [0.2.3](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.2.2...v0.2.3) (2024-07-12)
 
 ### Bug Fixes
