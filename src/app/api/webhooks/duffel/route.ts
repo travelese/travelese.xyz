@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/index";
 import { orders } from "@/lib/db/schema/orders";
-import { passengers } from "@/lib/db/schema/passengers";
+import { travellers } from "@/lib/db/schema/travellers";
 import { segments } from "@/lib/db/schema/segments";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -18,11 +18,9 @@ export async function POST(request: NextRequest) {
   const signature = headers().get("X-Duffel-Signature");
 
   if (signature) {
-    // This is a webhook event from Duffel
     console.log("Handling Duffel webhook");
     return handleWebhook(request, signature);
   } else {
-    // This is a manual sync request
     console.log("Handling manual sync");
     return handleManualSync(request);
   }
@@ -55,12 +53,13 @@ async function handleManualSync(request: NextRequest) {
 
   try {
     console.log(`Fetching orders for user ${userId}`);
-    const userOrders = await duffel.orders.list({
-      metadata: { userId },
-    });
+    const allOrders = await duffel.orders.list();
+    const userOrders = allOrders.data.filter(
+      (order) => order.metadata?.userId === userId,
+    );
 
-    console.log(`Found ${userOrders.data.length} orders`);
-    for (const order of userOrders.data) {
+    console.log(`Found ${userOrders.length} orders`);
+    for (const order of userOrders) {
       await upsertOrder(order);
     }
 
@@ -110,71 +109,88 @@ async function processEvent(event: any) {
 }
 
 async function upsertOrder(orderData: any) {
-  const orderValues = {
-    id: orderData.id,
-    userId: orderData.metadata?.userId,
-    bookingReference: orderData.booking_reference,
-    totalAmount: orderData.total_amount,
-    currency: orderData.total_currency,
-    passengerName:
-      orderData.passengers[0].given_name +
-      " " +
-      orderData.passengers[0].family_name,
-    passengerEmail: orderData.passengers[0].email,
-    taxAmount: orderData.tax_amount || "0",
-    paymentStatus: orderData.payment_status.awaiting_payment
-      ? "Awaiting Payment"
-      : "Paid",
-    isLive: orderData.live_mode,
-    syncedAt: new Date(),
-  };
-
-  await db.insert(orders).values(orderValues).onConflictDoUpdate({
-    target: orders.id,
-    set: orderValues,
-  });
-
-  for (const passenger of orderData.passengers) {
-    const passengerValues = {
-      id: passenger.id,
-      orderId: orderData.id,
-      givenName: passenger.given_name,
-      familyName: passenger.family_name,
-      email: passenger.email || "",
-      phoneNumber: passenger.phone_number || "",
-      bornOn: new Date(passenger.botn_on),
-      gender: passenger.gender || "",
-      loyaltyProgramme:
-        passenger.loyalty_programme_accounts?.[0]?.account_number || null,
-    };
-
-    await db.insert(passengers).values(passengerValues).onConflictDoUpdate({
-      target: passengers.id,
-      set: passengerValues,
-    });
-  }
-
-  for (const slice of orderData.slices) {
-    for (const segment of slice.segments) {
-      const segmentValues = {
-        id: segment.id,
-        orderId: orderData.id,
-        origin: segment.origin.iata_code,
-        destination: segment.destination.iata_code,
-        departingAt: new Date(segment.departing_at),
-        arrivingAt: new Date(segment.arriving_at),
-        duration: segment.duration,
-        marketingCarrier: segment.marketing_carrier.iata_code,
-        operatingCarrier: segment.operating_carrier.iata_code,
-        aircraft: segment.aircraft.iata_code,
-      };
-
-      await db.insert(segments).values(segmentValues).onConflictDoUpdate({
-        target: segments.id,
-        set: segmentValues,
+  await db.transaction(async (trx) => {
+    // Upsert order
+    await trx
+      .insert(orders)
+      .values({
+        id: orderData.id,
+        userId: orderData.metadata?.userId,
+        bookingReference: orderData.booking_reference,
+        totalAmount: orderData.total_amount,
+        currency: orderData.total_currency,
+        passengerName: `${orderData.passengers[0].given_name} ${orderData.passengers[0].family_name}`,
+        passengerEmail: orderData.passengers[0].email,
+        taxAmount: orderData.tax_amount || "0",
+        paymentStatus: orderData.payment_status.awaiting_payment
+          ? "Awaiting Payment"
+          : "Paid",
+        isLive: orderData.live_mode,
+        syncedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: orders.id,
+        set: {
+          syncedAt: new Date(),
+          paymentStatus: orderData.payment_status.awaiting_payment
+            ? "Awaiting Payment"
+            : "Paid",
+        },
       });
+
+    // Upsert travellers
+    for (const passenger of orderData.passengers) {
+      await trx
+        .insert(travellers)
+        .values({
+          id: passenger.id,
+          userId: orderData.metadata?.userId,
+          orderId: orderData.id,
+          givenName: passenger.given_name,
+          familyName: passenger.family_name,
+          email: passenger.email || "",
+          phoneNumber: passenger.phone_number || "",
+          bornOn: passenger.born_on ? new Date(passenger.born_on) : new Date(0),
+          gender: passenger.gender || "",
+          loyaltyProgramme:
+            passenger.loyalty_programme_accounts?.[0]?.account_number || null,
+        })
+        .onConflictDoUpdate({
+          target: travellers.id,
+          set: {
+            email: passenger.email || "",
+            phoneNumber: passenger.phone_number || "",
+          },
+        });
     }
-  }
+
+    // Upsert segments
+    for (const slice of orderData.slices) {
+      for (const segment of slice.segments) {
+        await trx
+          .insert(segments)
+          .values({
+            id: segment.id,
+            orderId: orderData.id,
+            origin: segment.origin.iata_code,
+            destination: segment.destination.iata_code,
+            departingAt: new Date(segment.departing_at),
+            arrivingAt: new Date(segment.arriving_at),
+            duration: segment.duration,
+            marketingCarrier: segment.marketing_carrier.iata_code,
+            operatingCarrier: segment.operating_carrier.iata_code,
+            aircraft: segment.aircraft.iata_code,
+          })
+          .onConflictDoUpdate({
+            target: segments.id,
+            set: {
+              departingAt: new Date(segment.departing_at),
+              arrivingAt: new Date(segment.arriving_at),
+            },
+          });
+      }
+    }
+  });
 }
 
 async function cancelOrder(orderId: string) {

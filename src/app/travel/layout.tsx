@@ -12,13 +12,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Toaster } from "@/components/ui/toaster";
 
-const FlyLayout = ({
+export default function FlyLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) => {
+}>) {
   const pathname = usePathname();
 
   const breadcrumbItems = [
@@ -59,9 +58,6 @@ const FlyLayout = ({
         </header>
         <main>{children}</main>
       </div>
-      <Toaster />
     </>
   );
-};
-
-export default FlyLayout;
+}

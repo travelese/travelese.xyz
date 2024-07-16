@@ -160,11 +160,17 @@ export default function FlyPriceCard({ selectedOffer }: FlyPriceCardProps) {
                 <time
                   dateTime={
                     selectedOffer.payment_requirements.payment_required_by
+                      ? new Date(
+                          selectedOffer.payment_requirements.payment_required_by,
+                        ).toISOString()
+                      : undefined
                   }
                 >
-                  {formatDate(
-                    selectedOffer.payment_requirements.payment_required_by,
-                  )}
+                  {selectedOffer.payment_requirements.payment_required_by
+                    ? formatDate(
+                        selectedOffer.payment_requirements.payment_required_by,
+                      )
+                    : "Not specified"}
                 </time>
               </span>
             </li>

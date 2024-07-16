@@ -66,3 +66,5 @@ export const OrderConfirmationEmail: React.FC<Readonly<EmailTemplateProps>> = ({
     <p>Thank you for booking with us!</p>
   </div>
 );
+
+export default OrderConfirmationEmail;

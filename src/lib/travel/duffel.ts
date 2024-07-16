@@ -1,4 +1,4 @@
-import { Duffel } from "@duffel/api";
+import { Duffel, DuffelError } from "@duffel/api";
 import type { Offer } from "@duffel/api/booking/Offers/OfferTypes";
 import type { Order } from "@duffel/api/booking/Orders/OrdersTypes";
 import type {
@@ -51,9 +51,17 @@ export async function createOrder(params: CreateOrder): Promise<Order> {
     const response = await duffel.orders.create(params);
     return response.data;
   } catch (error) {
-    if (error.errors) {
+    if (error instanceof DuffelError && error.errors) {
+      // Handle Duffel-specific errors
+      const errorMessage = error.errors.map((e) => e.message).join(", ");
+      throw new Error(`Failed to create order: ${errorMessage}`);
+    } else if (error instanceof Error) {
+      // Handle general errors
+      throw new Error(`Failed to create order: ${error.message}`);
+    } else {
+      // Handle unknown errors
+      throw new Error("An unknown error occurred while creating the order");
     }
-    throw error;
   }
 }
 

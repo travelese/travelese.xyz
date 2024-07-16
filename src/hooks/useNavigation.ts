@@ -23,13 +23,8 @@ export default function useNavigation() {
     router.push(`/travel/fly/book?id=${offer.id}`);
   };
 
-  const navigateToConfirmationPage = (order: Order) => {
-    router.push(`/travel/fly/confirmation?id=${order.id}`);
-  };
-
   return {
     navigateToFlightsPage,
     navigateToBookPage,
-    navigateToConfirmationPage,
   };
 }

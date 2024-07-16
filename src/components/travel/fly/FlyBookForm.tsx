@@ -28,17 +28,14 @@ import {
   MailIcon,
   PhoneIcon,
   UserCircleIcon,
+  Check,
 } from "lucide-react";
 
-import useNavigation from "@/hooks/useNavigation";
-import { useToast } from "@/hooks/useToast";
-import type { Offer, Order } from "@duffel/api/types";
-import { saveOrderToDatabase } from "@/hooks/saveOrderToDatabase";
-import { sendOrderConfirmation } from "@/hooks/sendOrderConfirmation";
+import { toast } from "sonner";
+import type { Offer } from "@duffel/api/types";
 
 interface FlyBookFormProps {
   selectedOffer: Offer;
-  onBookingSuccess: (order: Order) => void;
 }
 
 const FormSchema = z.object({
@@ -52,11 +49,12 @@ const FormSchema = z.object({
       born_on: z.string().min(1, "Birth date is required"),
       phone_number: z.string().min(1, "Phone number is required"),
       email: z.string().email("Invalid email address"),
+      type: z.string(),
     }),
   ),
   payments: z.array(
     z.object({
-      amount: z.number().positive("Amount must be positive"),
+      amount: z.number(),
       currency: z.string().length(3, "Currency must be 3 characters"),
       type: z.enum(["arc_basp_cash", "balance", "credit"]),
     }),
@@ -65,15 +63,18 @@ const FormSchema = z.object({
 });
 
 export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
-  const { toast } = useToast();
-  const { navigateToConfirmationPage } = useNavigation();
+  const [bookingStatus, setBookingStatus] = React.useState({
+    booked: false,
+    emailSent: false,
+    savedToDb: false,
+  });
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       passengers: [
         {
-          id: selectedOffer ? selectedOffer.id : "",
+          id: selectedOffer ? selectedOffer.passengers[0].id : "",
           title: "mr",
           given_name: "",
           family_name: "",
@@ -81,6 +82,7 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
           born_on: "",
           phone_number: "",
           email: "",
+          type: selectedOffer ? selectedOffer.passengers[0].type : "",
         },
       ],
       payments: [
@@ -90,29 +92,17 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
           type: "balance",
         },
       ],
-      selected_offers: [],
+      selected_offers: [selectedOffer ? selectedOffer.id : ""],
     },
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
-    if (!selectedOffer) {
-      return;
-    }
-
-    console.log("Offer to book:", selectedOffer.id);
-
-    const passengerId = selectedOffer.passengers[0]?.id;
-
-    if (!passengerId) {
-      return;
-    }
-
     const formData = {
       selected_offers: [selectedOffer.id],
       passengers: [
         {
           ...data.passengers[0],
-          id: passengerId,
+          id: selectedOffer.passengers[0].id,
           type: selectedOffer.passengers[0].type,
         },
       ],
@@ -125,10 +115,9 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
       ],
     };
 
-    console.log("Book form data:", formData);
-
     try {
-      const response = await fetch("/api/travel/fly/book", {
+      // Book the flight
+      const bookingResponse = await fetch("/api/travel/fly/book", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -136,32 +125,57 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!bookingResponse.ok) {
+        const errorData = await bookingResponse.json();
         throw new Error(errorData.error || "Failed to create the booking.");
       }
 
-      const order = await response.json();
-      console.log("Order:", order);
-
-      // Save order to database
-      await saveOrderToDatabase(order);
-
-      // Send confirmation email
-      // await sendOrderConfirmation(order);
-
-      toast({
-        title: "Order booked successfully",
-        description: "Redirecting to confirmation page...",
+      const order = await bookingResponse.json();
+      setBookingStatus((prev) => ({ ...prev, booked: true }));
+      toast.success("Booking successful", {
+        description: `Booking reference: ${order.booking_reference}`,
       });
 
-      onBookingSuccess(order);
-      navigateToConfirmationPage(order);
+      // Save the order
+      const saveResponse = await fetch("/api/travel/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      });
+
+      if (saveResponse.ok) {
+        setBookingStatus((prev) => ({ ...prev, savedToDb: true }));
+        toast.success("Order saved to database");
+      } else {
+        toast.error("Failed to save order to database");
+      }
+
+      // Send email confirmation
+      const emailResponse = await fetch("/api/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: order.passengers[0].email,
+          ...order, // Include all order details for the email template
+        }),
+      });
+
+      if (emailResponse.ok) {
+        setBookingStatus((prev) => ({ ...prev, emailSent: true }));
+        toast.success("Email sent", {
+          description: `Email has been sent to ${order.passengers[0].email}`,
+        });
+      } else {
+        console.error("Failed to send confirmation email");
+        toast.error("Failed to send confirmation email");
+      }
     } catch (error) {
-      toast({
-        title: "Booking failed",
-        description: error.message,
-        variant: "destructive",
+      toast.error("Error", {
+        description: `Failed to book the flight: ${error}`,
       });
     }
   };
@@ -169,7 +183,7 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Traveler Details</CardTitle>
+        <CardTitle>Traveller Details</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-6">
         <Form {...form}>
@@ -339,12 +353,39 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
               />
             </div>
             <div className="flex-1 w-full">
-              <Button type="submit" className="w-full h-full">
-                Book
+              <Button
+                type="submit"
+                className="w-full h-full"
+                disabled={bookingStatus.booked}
+              >
+                {bookingStatus.booked ? "Booked" : "Book"}
               </Button>
             </div>
           </form>
         </Form>
+        {bookingStatus.booked && (
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">Booking Status:</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center">
+                <Check className="mr-2 h-5 w-5 text-green-500" />
+                Flight booked successfully
+              </li>
+              <li className="flex items-center">
+                <Check
+                  className={`mr-2 h-5 w-5 ${bookingStatus.savedToDb ? "text-green-500" : "text-gray-300"}`}
+                />
+                Order saved to database
+              </li>
+              <li className="flex items-center">
+                <Check
+                  className={`mr-2 h-5 w-5 ${bookingStatus.emailSent ? "text-green-500" : "text-gray-300"}`}
+                />
+                Confirmation email sent
+              </li>
+            </ul>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

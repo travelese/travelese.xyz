@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOffer, createOrder } from "@/lib/travel/duffel";
 import type { CreateOrder } from "@duffel/api/booking/Orders/OrdersTypes";
+import { DuffelError } from "@duffel/api/Client";
 import { getUserAuth } from "@/lib/auth/utils";
+import { db } from "@/lib/db/index";
+import { travellers } from "@/lib/db/schema/travellers";
+import { eq } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,10 +17,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const offerId = searchParams.get("id");
 
-    console.log("Received request for offer ID:", offerId);
-
     if (!offerId) {
-      console.log("No offer ID provided");
       return NextResponse.json(
         { error: "Offer ID is required" },
         { status: 400 },
@@ -25,10 +26,7 @@ export async function GET(request: NextRequest) {
 
     const offer = await getOffer(offerId);
 
-    console.log("Fetched offer:", offer);
-
     if (new Date(offer.expires_at) < new Date()) {
-      console.log("Offer has expired");
       return NextResponse.json(
         {
           error:
@@ -40,8 +38,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(offer);
   } catch (error) {
-    console.error("Error fetching offer:", error);
-    if (error.meta && error.meta.status === 404) {
+    if ((error as DuffelError).meta.status === 404) {
       return NextResponse.json(
         { error: "Offer not found. It may have expired." },
         { status: 404 },
@@ -64,13 +61,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const orderParams = body as CreateOrder;
 
-    // Ensure the user ID is included in the order metadata
+    // Check if the user already has a Duffel passenger ID
+    const existingTraveller = await db
+      .select()
+      .from(travellers)
+      .where(eq(travellers.userId, session.user.id))
+      .limit(1);
+
+    if (existingTraveller.length > 0) {
+      // Use the existing Duffel passenger ID
+      orderParams.passengers[0].id = existingTraveller[0].id;
+    }
+
     orderParams.metadata = {
       ...orderParams.metadata,
       userId: session.user.id,
     };
 
-    // Validate required fields
     if (
       !orderParams.selected_offers ||
       !orderParams.passengers ||
@@ -82,7 +89,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Format phone numbers if necessary
     orderParams.passengers = orderParams.passengers.map((passenger) => ({
       ...passenger,
       phone_number: passenger.phone_number.startsWith("+")
@@ -92,11 +98,23 @@ export async function POST(request: NextRequest) {
 
     const order = await createOrder(orderParams);
 
-    // Return the created order
+    // If this is a new traveller, save their Duffel passenger ID
+    if (existingTraveller.length === 0) {
+      await db.insert(travellers).values({
+        id: order.passengers[0].id,
+        userId: session.user.id,
+        givenName: orderParams.passengers[0].given_name,
+        familyName: orderParams.passengers[0].family_name,
+        email: orderParams.passengers[0].email,
+        phoneNumber: orderParams.passengers[0].phone_number,
+        bornOn: new Date(orderParams.passengers[0].born_on),
+        gender: orderParams.passengers[0].gender,
+      });
+    }
+
     return NextResponse.json(order);
   } catch (error) {
-    console.error("Error creating order:", error);
-    if (error.meta && error.meta.status === 422) {
+    if ((error as DuffelError).meta.status === 422) {
       return NextResponse.json(
         {
           error:

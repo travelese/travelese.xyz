@@ -3,10 +3,8 @@ import {
   HomeIcon,
   TerminalSquareIcon,
   SettingsIcon,
-  LifeBuoyIcon,
   User,
   CreditCardIcon,
-  BarChartIcon,
   TicketIcon,
 } from "lucide-react";
 
@@ -24,7 +22,6 @@ export type AdditionalLinks = {
 export const topNavItems: SidebarLink[] = [
   { href: "/dashboard", icon: HomeIcon, label: "Dashboard" },
   { href: "/dashboard/ai", icon: TerminalSquareIcon, label: "Travelese AI" },
-  { href: "/dashboard/charts", icon: BarChartIcon, label: "Charts" },
   { href: "/dashboard/orders", icon: TicketIcon, label: "Orders" },
 ];
 
@@ -36,7 +33,6 @@ export const bottomNavItems: SidebarLink[] = [
     icon: CreditCardIcon,
     label: "Billing",
   },
-  { href: "#", icon: LifeBuoyIcon, label: "Help" },
 ];
 
 export const defaultLinks: SidebarLink[] = [...topNavItems, ...bottomNavItems];

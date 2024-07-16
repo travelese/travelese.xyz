@@ -2,6 +2,9 @@ import * as React from "react";
 import { getUserAuth } from "@/lib/auth/utils";
 
 export default async function Home() {
+  const user = await getUserAuth();
+  if (!user.session) throw new Error("Unauthorized");
+
   const { session } = await getUserAuth();
 
   return (
