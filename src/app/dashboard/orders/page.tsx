@@ -33,7 +33,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-        
+
 export default async function OrdersPage() {
   await checkAuth();
   const { session } = await getUserAuth();
