@@ -33,7 +33,6 @@ export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
     references: [user.id],
   }),
 }));
-
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   user: one(user, {
     fields: [orders.user_id],
