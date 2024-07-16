@@ -1,3 +1,7 @@
+"use client";
+
+import * as React from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,13 +33,32 @@ import {
   MoveVerticalIcon,
 } from "lucide-react";
 
-export default function FlyPriceCard() {
+import { Offer } from "@duffel/api/types";
+
+interface FlyPriceCardProps {
+  selectedOffer: Offer;
+}
+
+export default function FlyPriceCard({ selectedOffer }: FlyPriceCardProps) {
+  const baseAmount = selectedOffer.base_amount;
+  const taxAmount = selectedOffer.tax_amount;
+  const totalAmount = selectedOffer.total_amount;
+  const currency = selectedOffer.total_currency;
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <Card className="overflow-hidden" x-chunk="dashboard-05-chunk-4">
       <CardHeader className="flex flex-row items-start bg-muted/50">
         <div className="grid gap-0.5">
           <CardTitle className="group flex items-center gap-2 text-lg">
-            Booking Reference: RZPNX8
+            Order ID: {selectedOffer?.id}
             <Button
               className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
               size="icon"
@@ -47,7 +70,9 @@ export default function FlyPriceCard() {
           </CardTitle>
           <CardDescription>
             Created on{" "}
-            <time dateTime="2024-04-11T15:48:11Z">April 11, 2024</time>
+            <time dateTime={selectedOffer.created_at}>
+              {formatDate(selectedOffer.created_at)}
+            </time>
           </CardDescription>
         </div>
         <div className="ml-auto flex items-center gap-1">
@@ -75,15 +100,19 @@ export default function FlyPriceCard() {
       </CardHeader>
       <CardContent className="p-6 text-sm">
         <div className="grid gap-3">
-          <div className="font-semibold">Price Details (CAD)</div>
+          <div className="font-semibold">Price Details ({currency})</div>
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Base Amount</span>
-              <span>CAD $60.60</span>
+              <span>
+                {currency} {baseAmount}
+              </span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Tax</span>
-              <span>CAD $30.20</span>
+              <span>
+                {currency} {taxAmount}
+              </span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Seat Cost</span>
@@ -91,7 +120,9 @@ export default function FlyPriceCard() {
             </li>
             <li className="flex items-center justify-between font-semibold">
               <span className="text-muted-foreground">Total</span>
-              <span>CAD $90.80</span>
+              <span>
+                {currency} {totalAmount}
+              </span>
             </li>
           </ul>
           <Separator className="my-2" />
@@ -118,22 +149,38 @@ export default function FlyPriceCard() {
                 Price Guarantee Expires At
               </span>
               <span>
-                <time dateTime="2024-01-17T10:42:14.545Z">
-                  January 17, 2024
+                <time dateTime={selectedOffer.expires_at}>
+                  {formatDate(selectedOffer.expires_at)}
                 </time>
               </span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Payment Required By</span>
               <span>
-                <time dateTime="2024-01-17T10:42:14.545Z">
-                  January 17, 2024
+                <time
+                  dateTime={
+                    selectedOffer.payment_requirements.payment_required_by
+                      ? new Date(
+                          selectedOffer.payment_requirements.payment_required_by,
+                        ).toISOString()
+                      : undefined
+                  }
+                >
+                  {selectedOffer.payment_requirements.payment_required_by
+                    ? formatDate(
+                        selectedOffer.payment_requirements.payment_required_by,
+                      )
+                    : "Not specified"}
                 </time>
               </span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Payment Status</span>
-              <span>Awaiting Payment</span>
+              <span>
+                {selectedOffer.payment_requirements.requires_instant_payment
+                  ? "Instant Payment Required"
+                  : "Awaiting Payment"}
+              </span>
             </li>
           </ul>
           <Separator className="my-2" />
@@ -178,7 +225,10 @@ export default function FlyPriceCard() {
       </CardContent>
       <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
         <div className="text-xs text-muted-foreground">
-          Updated <time dateTime="2024-05-25">May 25, 2024</time>
+          Updated{" "}
+          <time dateTime={selectedOffer.updated_at}>
+            {formatDate(selectedOffer.updated_at)}
+          </time>
         </div>
         <Pagination className="ml-auto mr-0 w-auto">
           <PaginationContent>

@@ -50,6 +50,7 @@ const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
         const result = await response.json();
         setPlaces(result.data || []);
       } catch (error) {
+        console.error("Error fetching places:", error);
         setPlaces([]);
       }
     };

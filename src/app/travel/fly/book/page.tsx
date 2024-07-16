@@ -15,24 +15,28 @@ export default function FlyBookPage() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const flightId = searchParams.get("id");
-    if (flightId) {
+    const offerId = searchParams.get("id");
+    console.log("Offer ID from URL:", offerId);
+    if (offerId) {
       setLoading(true);
-      fetch(`/api/travel/fly/book?id=${flightId}`)
+      fetch(`/api/travel/fly/book?id=${offerId}`)
         .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch offer");
+          console.log("API response status:", res.status);
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
           return res.json();
         })
         .then((data: Offer) => {
+          console.log("Fetched offer data:", data);
           setSelectedOffer(data);
         })
         .catch((error) => {
-          console.error("Error fetching flight:", error);
+          console.error("Error fetching offer:", error);
           setError(error.message);
         })
         .finally(() => setLoading(false));
     } else {
-      setError("No flight ID provided");
+      console.log("No offer ID provided");
+      setError("No Offer ID provided");
       setLoading(false);
     }
   }, [searchParams]);
@@ -61,7 +65,7 @@ export default function FlyBookPage() {
           {selectedOffer && <FlyBookForm selectedOffer={selectedOffer} />}
         </div>
       </div>
-      <FlyPriceCard />
+      {selectedOffer && <FlyPriceCard selectedOffer={selectedOffer} />}
     </main>
   );
 }

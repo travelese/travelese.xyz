@@ -1,4 +1,6 @@
-import { checkAuth } from "@/lib/auth/utils";
+import * as React from "react";
+import { redirect } from "next/navigation";
+import { checkAuth, getUserAuth } from "@/lib/auth/utils";
 import { Toaster } from "@/components/ui/sonner";
 import NextAuthProvider from "@/lib/auth/Provider";
 import Sidebar from "@/components/Sidebar";
@@ -9,6 +11,10 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   await checkAuth();
+  const session = await getUserAuth();
+  if (!session) {
+    redirect("/sign-in");
+  }
 
   return (
     <main>

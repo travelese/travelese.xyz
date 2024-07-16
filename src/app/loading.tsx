@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export default function Loading() {
   return (
     <div className="grid place-items-center animate-pulse text-neutral-300 p-4">

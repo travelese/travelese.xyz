@@ -1,12 +1,13 @@
 "use client";
 
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 
 export default function Page() {
   const { setTheme } = useTheme();
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8 bg-muted/40">
       <h1 className="text-2xl font-semibold">Settings</h1>
       <div className="space-y-4 my-4">
         <div>

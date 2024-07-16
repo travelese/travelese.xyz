@@ -1,3 +1,4 @@
+import * as React from "react";
 import UserSettings from "./UserSettings";
 import PlanSettings from "./PlanSettings";
 import { checkAuth, getUserAuth } from "@/lib/auth/utils";

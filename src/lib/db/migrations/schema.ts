@@ -3,9 +3,10 @@ import {
   text,
   timestamp,
   foreignKey,
-  primaryKey,
   unique,
   varchar,
+  boolean,
+  primaryKey,
   integer,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -26,6 +27,32 @@ export const session = pgTable("session", {
   expires: timestamp("expires", { mode: "string" }).notNull(),
 });
 
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    user_id: varchar("user_id", { length: 255 }).references(() => user.id),
+    stripe_customer_id: varchar("stripe_customer_id", { length: 255 }),
+    stripe_subscription_id: varchar("stripe_subscription_id", { length: 255 }),
+    stripe_price_id: varchar("stripe_price_id", { length: 255 }),
+    stripe_current_period_end: timestamp("stripe_current_period_end", {
+      mode: "string",
+    }),
+  },
+  (table) => {
+    return {
+      subscriptions_user_id_unique: unique("subscriptions_user_id_unique").on(
+        table.user_id,
+      ),
+      subscriptions_stripe_customer_id_unique: unique(
+        "subscriptions_stripe_customer_id_unique",
+      ).on(table.stripe_customer_id),
+      subscriptions_stripe_subscription_id_unique: unique(
+        "subscriptions_stripe_subscription_id_unique",
+      ).on(table.stripe_subscription_id),
+    };
+  },
+);
+
 export const orders = pgTable("orders", {
   id: text("id").primaryKey().notNull(),
   booking_reference: text("booking_reference").notNull(),
@@ -39,20 +66,13 @@ export const orders = pgTable("orders", {
   payment_status: text("payment_status").notNull(),
   updated_at: timestamp("updated_at", { mode: "string" }).defaultNow(),
   synced_at: timestamp("synced_at", { mode: "string" }),
-});
-
-export const passengers = pgTable("passengers", {
-  id: text("id").primaryKey().notNull(),
-  order_id: text("order_id")
-    .notNull()
-    .references(() => orders.id),
-  given_name: text("given_name").notNull(),
-  family_name: text("family_name").notNull(),
-  email: text("email").notNull(),
-  phone_number: text("phone_number").notNull(),
-  born_on: timestamp("born_on", { mode: "string" }).notNull(),
-  gender: text("gender").notNull(),
-  loyalty_programme: text("loyalty_programme"),
+  is_live: boolean("is_live").default(false).notNull(),
+  passenger_id: text("passenger_id"),
+  base_amount: text("base_amount"),
+  commission_amount: text("commission_amount"),
+  markup_amount: text("markup_amount"),
+  travel_agent_id: text("travel_agent_id").references(() => travel_agents.id),
+  offer_id: text("offer_id"),
 });
 
 export const segments = pgTable("segments", {
@@ -70,6 +90,47 @@ export const segments = pgTable("segments", {
   aircraft: text("aircraft").notNull(),
 });
 
+export const travellers = pgTable("travellers", {
+  id: text("id").primaryKey().notNull(),
+  order_id: text("order_id"),
+  given_name: text("given_name").notNull(),
+  family_name: text("family_name").notNull(),
+  email: text("email").notNull(),
+  phone_number: text("phone_number").notNull(),
+  born_on: timestamp("born_on", { mode: "string" }).notNull(),
+  gender: text("gender").notNull(),
+  loyalty_programme: text("loyalty_programme"),
+  user_id: text("user_id").references(() => user.id),
+  title: text("title"),
+  passport_number: text("passport_number"),
+  passport_expiry_date: timestamp("passport_expiry_date", { mode: "string" }),
+  nationality: text("nationality"),
+  company_name: text("company_name"),
+  job_title: text("job_title"),
+});
+
+export const travel_agents = pgTable("travel_agents", {
+  id: text("id").primaryKey().notNull(),
+  user_id: text("user_id").references(() => user.id),
+  agency_id: text("agency_id").references(() => travel_agencies.id),
+  given_name: text("given_name").notNull(),
+  family_name: text("family_name").notNull(),
+  email: text("email").notNull(),
+  phone_number: text("phone_number").notNull(),
+  created_at: timestamp("created_at", { mode: "string" }).defaultNow(),
+  updated_at: timestamp("updated_at", { mode: "string" }).defaultNow(),
+});
+
+export const travel_agencies = pgTable("travel_agencies", {
+  id: text("id").primaryKey().notNull(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone_number: text("phone_number").notNull(),
+  address: text("address"),
+  created_at: timestamp("created_at", { mode: "string" }).defaultNow(),
+  updated_at: timestamp("updated_at", { mode: "string" }).defaultNow(),
+});
+
 export const verificationToken = pgTable(
   "verificationToken",
   {
@@ -83,40 +144,6 @@ export const verificationToken = pgTable(
         columns: [table.identifier, table.token],
         name: "verificationToken_identifier_token_pk",
       }),
-    };
-  },
-);
-
-export const subscriptions = pgTable(
-  "subscriptions",
-  {
-    user_id: varchar("user_id", { length: 255 })
-      .notNull()
-      .references(() => user.id),
-    stripe_customer_id: varchar("stripe_customer_id", {
-      length: 255,
-    }).notNull(),
-    stripe_subscription_id: varchar("stripe_subscription_id", { length: 255 }),
-    stripe_price_id: varchar("stripe_price_id", { length: 255 }),
-    stripe_current_period_end: timestamp("stripe_current_period_end", {
-      mode: "string",
-    }),
-  },
-  (table) => {
-    return {
-      subscriptions_user_id_stripe_customer_id_pk: primaryKey({
-        columns: [table.user_id, table.stripe_customer_id],
-        name: "subscriptions_user_id_stripe_customer_id_pk",
-      }),
-      subscriptions_user_id_unique: unique("subscriptions_user_id_unique").on(
-        table.user_id,
-      ),
-      subscriptions_stripe_customer_id_unique: unique(
-        "subscriptions_stripe_customer_id_unique",
-      ).on(table.stripe_customer_id),
-      subscriptions_stripe_subscription_id_unique: unique(
-        "subscriptions_stripe_subscription_id_unique",
-      ).on(table.stripe_subscription_id),
     };
   },
 );

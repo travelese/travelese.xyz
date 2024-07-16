@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { Analytics } from "@vercel/analytics/react";
@@ -6,6 +8,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import NextAuthProvider from "@/lib/auth/Provider";
 import Navbar from "@/components/Navbar";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Travelese",
@@ -18,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
         <NextAuthProvider>
           <ThemeProvider
@@ -33,6 +36,7 @@ export default function RootLayout({
         </NextAuthProvider>
         <Analytics />
         <SpeedInsights />
+        <Toaster />
       </body>
     </html>
   );

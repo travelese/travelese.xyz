@@ -17,8 +17,6 @@ export async function POST(request: NextRequest) {
     } = await request.json();
     const { slices, passengers, cabin_class, sort, limit } = body;
 
-    console.log("API request body:", JSON.stringify(body, null, 2));
-
     const offers: Offer[] = await searchFlights(
       slices,
       passengers,
@@ -27,11 +25,8 @@ export async function POST(request: NextRequest) {
       limit,
     );
 
-    console.log("API offers response:", JSON.stringify(offers, null, 2));
-
     return NextResponse.json(offers);
   } catch (error) {
-    console.error("Error handling Duffel API request:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
@@ -81,8 +76,6 @@ export async function GET(request: NextRequest) {
       sort,
       limit,
     );
-
-    console.log("API offers response:", JSON.stringify(offers, null, 2));
 
     return NextResponse.json(offers);
   } catch (error) {

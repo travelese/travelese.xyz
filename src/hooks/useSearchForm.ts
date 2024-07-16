@@ -6,7 +6,6 @@ import { addDays, format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { useToast } from "@/hooks/useToast";
 import useNavigation from "@/hooks/useNavigation";
-import { useSearchParams } from "next/navigation";
 
 const FormSchema = z.object({
   origin: z
@@ -23,17 +22,12 @@ const FormSchema = z.object({
   }),
   passengers: z.array(z.enum(["adult", "child", "infant_without_seat"])),
   cabin: z.enum(["first", "business", "premium_economy", "economy"]),
-  currency: z.enum(["CAD", "USD", "EUR"]),
   sort: z.enum(["total_amount", "total_duration"]),
 });
 
 export function useSearchForm() {
   const { toast } = useToast();
   const { navigateToFlightsPage } = useNavigation();
-
-  const searchParams = useSearchParams();
-  const currency =
-    (searchParams.get("currency") as "CAD" | "USD" | "EUR") || "USD";
 
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(),
@@ -51,7 +45,6 @@ export function useSearchForm() {
       },
       passengers: ["adult"],
       cabin: "economy",
-      currency,
       sort: "total_amount",
     },
   });
@@ -63,59 +56,31 @@ export function useSearchForm() {
     });
   }, []);
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const { origin, destination, dates, cabin, passengers } = data;
-
-    const slices = [
-      {
-        origin,
-        destination,
-        departure_date: format(dates.from, "yyyy-MM-dd"),
-      },
-      {
-        origin: destination,
-        destination: origin,
-        departure_date: format(dates.to, "yyyy-MM-dd"),
-      },
-    ];
 
     const formattedPassengers = passengers.map((type) => ({ type }));
 
-    navigateToFlightsPage({
+    const queryParams = {
       origin,
       destination,
       from: format(dates.from, "yyyy-MM-dd"),
       to: format(dates.to, "yyyy-MM-dd"),
       passengers: JSON.stringify(formattedPassengers),
       cabin,
-    });
-
-    const formData = {
-      slices,
-      passengers: formattedPassengers,
-      cabin_class: cabin,
     };
 
-    fetch("/api/travel/fly", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          toast({
-            title: "Offer fetched successfully",
-            description: "Rendering the offers...",
-          });
-        } else {
-          console.error("Error:", response.status);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    try {
+      // Navigate to the flights page with the search parameters
+      navigateToFlightsPage(queryParams);
+    } catch (error) {
+      console.error("Error navigating to flights page:", error);
+      toast({
+        title: "Error",
+        description: "Unable to process your search. Please try again.",
+        variant: "destructive",
       });
+    }
   };
 
   return {

@@ -1,4 +1,5 @@
 import { useRouter, useSearchParams } from "next/navigation";
+import type { Offer, Order } from "@duffel/api/types";
 
 export default function useNavigation() {
   const router = useRouter();
@@ -18,8 +19,8 @@ export default function useNavigation() {
     router.push(path);
   }
 
-  const navigateToBookPage = (offerId: string) => {
-    router.push(`/travel/fly/book?id=${offerId}`);
+  const navigateToBookPage = (offer: Offer) => {
+    router.push(`/travel/fly/book?id=${offer.id}`);
   };
 
   return {

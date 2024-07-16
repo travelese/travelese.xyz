@@ -1,6 +1,8 @@
 "use client";
 
+import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function SignOutBtn() {
   const router = useRouter();
@@ -17,8 +19,8 @@ export default function SignOutBtn() {
     }
   };
   return (
-    <button onClick={handleSignOut} className="w-full text-left">
+    <Button onClick={handleSignOut} className="w-full text-left">
       Sign out
-    </button>
+    </Button>
   );
 }

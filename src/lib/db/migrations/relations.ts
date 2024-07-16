@@ -2,10 +2,12 @@ import { relations } from "drizzle-orm/relations";
 import {
   user,
   session,
-  orders,
-  passengers,
-  segments,
   subscriptions,
+  orders,
+  travel_agents,
+  segments,
+  travellers,
+  travel_agencies,
   account,
 } from "./schema";
 
@@ -18,32 +20,11 @@ export const sessionRelations = relations(session, ({ one }) => ({
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
-  orders: many(orders),
   subscriptions: many(subscriptions),
+  orders: many(orders),
+  travellers: many(travellers),
+  travel_agents: many(travel_agents),
   accounts: many(account),
-}));
-
-export const ordersRelations = relations(orders, ({ one, many }) => ({
-  user: one(user, {
-    fields: [orders.user_id],
-    references: [user.id],
-  }),
-  passengers: many(passengers),
-  segments: many(segments),
-}));
-
-export const passengersRelations = relations(passengers, ({ one }) => ({
-  order: one(orders, {
-    fields: [passengers.order_id],
-    references: [orders.id],
-  }),
-}));
-
-export const segmentsRelations = relations(segments, ({ one }) => ({
-  order: one(orders, {
-    fields: [segments.order_id],
-    references: [orders.id],
-  }),
 }));
 
 export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
@@ -52,6 +33,53 @@ export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
     references: [user.id],
   }),
 }));
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(user, {
+    fields: [orders.user_id],
+    references: [user.id],
+  }),
+  travel_agent: one(travel_agents, {
+    fields: [orders.travel_agent_id],
+    references: [travel_agents.id],
+  }),
+  segments: many(segments),
+}));
+
+export const travel_agentsRelations = relations(
+  travel_agents,
+  ({ one, many }) => ({
+    orders: many(orders),
+    user: one(user, {
+      fields: [travel_agents.user_id],
+      references: [user.id],
+    }),
+    travel_agency: one(travel_agencies, {
+      fields: [travel_agents.agency_id],
+      references: [travel_agencies.id],
+    }),
+  }),
+);
+
+export const segmentsRelations = relations(segments, ({ one }) => ({
+  order: one(orders, {
+    fields: [segments.order_id],
+    references: [orders.id],
+  }),
+}));
+
+export const travellersRelations = relations(travellers, ({ one }) => ({
+  user: one(user, {
+    fields: [travellers.user_id],
+    references: [user.id],
+  }),
+}));
+
+export const travel_agenciesRelations = relations(
+  travel_agencies,
+  ({ many }) => ({
+    travel_agents: many(travel_agents),
+  }),
+);
 
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {

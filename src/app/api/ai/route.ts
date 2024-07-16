@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { getUserAuth } from "@/lib/auth/utils";
 import { StreamingTextResponse, streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
@@ -7,17 +8,12 @@ import { searchFlights, getPlaceSuggestions } from "@/lib/travel/duffel";
 import { z } from "zod";
 
 export async function POST(req: NextRequest) {
+  const { session } = await getUserAuth();
+  if (!session) return new Response("Error", { status: 400 });
+
   try {
     const { messages, model, temperature, topP, topK, systemMessage } =
       await req.json();
-    console.log("Received request:", {
-      model,
-      temperature,
-      topP,
-      topK,
-      systemMessage,
-      messages,
-    });
 
     const result = await streamText({
       model: getModel(model, temperature, topP, topK),
@@ -116,13 +112,8 @@ export async function POST(req: NextRequest) {
                 limit,
               );
 
-              console.log(
-                "search_flights results:",
-                JSON.stringify(results, null, 2),
-              );
               return results;
             } catch (error: any) {
-              console.error("Error in search_flights:", error);
               return {
                 error: "Failed to search flights",
                 details: error.message,
@@ -140,13 +131,9 @@ export async function POST(req: NextRequest) {
             try {
               const { query } = args;
               const results = await getPlaceSuggestions({ query });
-              console.log(
-                "get_place_suggestions results:",
-                JSON.stringify(results, null, 2),
-              );
+
               return results;
             } catch (error: any) {
-              console.error("Error in get_place_suggestions:", error);
               return {
                 error: "Failed to get place suggestions",
                 details: error.message,
@@ -158,10 +145,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log("Stream generated, converting to response");
     return new StreamingTextResponse(result.toAIStream());
   } catch (error) {
-    console.error("Error in AI route:", error);
     return new Response(
       JSON.stringify({
         error: "An error occurred",
@@ -192,7 +177,6 @@ function getModel(
         topK,
       });
     default:
-      console.warn(`Invalid model selected: ${model}. Defaulting to gpt-4o.`);
       return openai("gpt-4o");
   }
 }
