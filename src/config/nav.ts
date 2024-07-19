@@ -1,11 +1,11 @@
-import { LucideIcon, Ticket } from "lucide-react";
 import {
+  LucideIcon,
   HomeIcon,
   TerminalSquareIcon,
-  SettingsIcon,
   User,
   CreditCardIcon,
   TicketIcon,
+  BugIcon,
 } from "lucide-react";
 
 export interface SidebarLink {
@@ -26,8 +26,8 @@ export const topNavItems: SidebarLink[] = [
 ];
 
 export const bottomNavItems: SidebarLink[] = [
+  { href: "/dashboard/admin", icon: BugIcon, label: "Admin" },
   { href: "/dashboard/account", icon: User, label: "Account" },
-  { href: "/dashboard/settings", icon: SettingsIcon, label: "Settings" },
   {
     href: "/dashboard/account/billing",
     icon: CreditCardIcon,

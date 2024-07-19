@@ -1,3 +1,4 @@
+import * as React from "react";
 import Link from "next/link";
 import { AuthSession, getUserAuth } from "@/lib/auth/utils";
 import SidebarItems from "@/components/SidebarItems";
@@ -14,14 +15,10 @@ const Sidebar = async () => {
   if (session.session === null) return null;
 
   return (
-    <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r">
-      <nav className="grid gap-1 p-2">
+    <aside className="inset-y fixed left-0 z-20 flex min-h-screen flex-col border-r">
+      <nav className="gap-1 p-2">
         <TooltipProvider>
           <SidebarItems />
-        </TooltipProvider>
-      </nav>
-      <nav className="mt-auto grid gap-1 p-2">
-        <TooltipProvider>
           <UserDetails session={session} />
         </TooltipProvider>
       </nav>
@@ -41,7 +38,7 @@ const UserDetails = ({ session }: { session: AuthSession }) => {
     <Tooltip>
       <TooltipTrigger asChild>
         <Link href="/dashboard/account">
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-7 w-7">
             <AvatarFallback className="border-border border-2 text-muted-foreground">
               {user.name
                 ? user.name

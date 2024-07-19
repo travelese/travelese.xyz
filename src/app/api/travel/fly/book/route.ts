@@ -1,51 +1,49 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getOffer, createOrder } from "@/lib/travel/duffel";
 import type { CreateOrder } from "@duffel/api/booking/Orders/OrdersTypes";
-import { DuffelError } from "@duffel/api/Client";
+import { DuffelError } from "@duffel/api";
 import { getUserAuth } from "@/lib/auth/utils";
-import { db } from "@/lib/db/index";
-import { travellers } from "@/lib/db/schema/travellers";
-import { eq } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   try {
     const { session } = await getUserAuth();
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
     }
 
     const { searchParams } = new URL(request.url);
     const offerId = searchParams.get("id");
 
     if (!offerId) {
-      return NextResponse.json(
-        { error: "Offer ID is required" },
-        { status: 400 },
-      );
+      return new Response(JSON.stringify({ error: "Offer ID is required" }), {
+        status: 400,
+      });
     }
 
     const offer = await getOffer(offerId);
 
     if (new Date(offer.expires_at) < new Date()) {
-      return NextResponse.json(
-        {
+      return new Response(
+        JSON.stringify({
           error:
             "The selected offer has expired. Please search for new offers.",
-        },
+        }),
         { status: 400 },
       );
     }
 
-    return NextResponse.json(offer);
+    return new Response(JSON.stringify(offer));
   } catch (error) {
-    if ((error as DuffelError).meta.status === 404) {
-      return NextResponse.json(
-        { error: "Offer not found. It may have expired." },
-        { status: 404 },
-      );
+    if (error instanceof DuffelError && error.meta) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: error.meta.status,
+      });
     }
-    return NextResponse.json(
-      { error: "Internal Server Error" },
+
+    return new Response(
+      JSON.stringify({ error: "An unexpected error occurred" }),
       { status: 500 },
     );
   }
@@ -55,23 +53,14 @@ export async function POST(request: NextRequest) {
   try {
     const { session } = await getUserAuth();
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
     }
 
-    const body = await request.json();
-    const orderParams = body as CreateOrder;
+    const orderParams = (await request.json()) as CreateOrder;
 
-    // Check if the user already has a Duffel passenger ID
-    const existingTraveller = await db
-      .select()
-      .from(travellers)
-      .where(eq(travellers.userId, session.user.id))
-      .limit(1);
-
-    if (existingTraveller.length > 0) {
-      // Use the existing Duffel passenger ID
-      orderParams.passengers[0].id = existingTraveller[0].id;
-    }
+    console.log("Received order params:", JSON.stringify(orderParams, null, 2));
 
     orderParams.metadata = {
       ...orderParams.metadata,
@@ -83,8 +72,8 @@ export async function POST(request: NextRequest) {
       !orderParams.passengers ||
       !orderParams.payments
     ) {
-      return NextResponse.json(
-        { error: "Missing required booking information" },
+      return new Response(
+        JSON.stringify({ error: "Missing required booking information" }),
         { status: 400 },
       );
     }
@@ -96,36 +85,34 @@ export async function POST(request: NextRequest) {
         : `+${passenger.phone_number}`,
     }));
 
+    console.log("Final order params:", JSON.stringify(orderParams, null, 2));
+
     const order = await createOrder(orderParams);
 
-    // If this is a new traveller, save their Duffel passenger ID
-    if (existingTraveller.length === 0) {
-      await db.insert(travellers).values({
-        id: order.passengers[0].id,
-        userId: session.user.id,
-        givenName: orderParams.passengers[0].given_name,
-        familyName: orderParams.passengers[0].family_name,
-        email: orderParams.passengers[0].email,
-        phoneNumber: orderParams.passengers[0].phone_number,
-        bornOn: new Date(orderParams.passengers[0].born_on),
-        gender: orderParams.passengers[0].gender,
+    if (!order.booking_reference) {
+      throw new Error("Booking failed: No booking reference received");
+    }
+
+    return new Response(JSON.stringify(order));
+  } catch (error) {
+    console.error("Error in POST handler:", error);
+
+    if (error instanceof DuffelError && error.meta) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: error.meta.status,
       });
     }
 
-    return NextResponse.json(order);
-  } catch (error) {
-    if ((error as DuffelError).meta.status === 422) {
-      return NextResponse.json(
-        {
-          error:
-            "The selected offer is no longer valid. Please try again with a new search.",
-        },
-        { status: 422 },
-      );
-    }
-    return NextResponse.json(
-      { error: "An unexpected error occurred while creating the order." },
+    return new Response(
+      JSON.stringify({
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      }),
       { status: 500 },
     );
+  } finally {
+    console.log("POST request to /api/travel/fly/book completed");
   }
 }

@@ -20,6 +20,8 @@ import FlyCard from "@/components/travel/fly/FlyCard";
 import { FlySkeleton } from "@/components/travel/fly/FlySkeleton";
 import useNavigation from "@/hooks/useNavigation";
 import type { Offer } from "@duffel/api/types";
+import { toast } from "sonner";
+import Loading from "@/app/loading";
 
 type SortValues = "total_amount" | "total_duration";
 
@@ -129,7 +131,14 @@ export default function FlySearchResults() {
     );
   }
 
-  if (error) return <div>Error: {error.message}</div>;
+  if (error) {
+    toast.error(
+      <div className="flex items-center gap-2">
+        <Loading />
+        <span>{error.message}</span>
+      </div>,
+    );
+  }
 
   return (
     <main className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">

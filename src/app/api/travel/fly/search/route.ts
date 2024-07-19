@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { searchFlights } from "@/lib/travel/duffel";
 import type {
   CreateOfferRequest,
@@ -25,12 +25,9 @@ export async function POST(request: NextRequest) {
       limit,
     );
 
-    return NextResponse.json(offers);
+    return Response.json(offers);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -52,7 +49,7 @@ export async function GET(request: NextRequest) {
       : undefined;
 
     if (!origin || !destination || !from || !passengersJson || !cabin) {
-      return NextResponse.json(
+      return Response.json(
         { error: "Missing required parameters" },
         { status: 400 },
       );
@@ -77,12 +74,9 @@ export async function GET(request: NextRequest) {
       limit,
     );
 
-    return NextResponse.json(offers);
+    return Response.json(offers);
   } catch (error) {
     console.error("Error handling GET request:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

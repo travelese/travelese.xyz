@@ -1,12 +1,31 @@
-import * as React from "react";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { sendEmail } from "@/lib/email/utils";
 import { OrderConfirmationEmail } from "@/components/emails/OrderConfirmation";
 import type { OrderSlice, OrderSliceSegment } from "@duffel/api/types";
+import { getUserAuth } from "@/lib/auth/utils";
 
 export async function POST(request: NextRequest) {
+  const { session } = await getUserAuth();
+
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
   try {
     const order = await request.json();
+
+    if (
+      !order.passengers ||
+      !order.passengers.length ||
+      !order.booking_reference ||
+      !order.slices
+    ) {
+      return new Response(JSON.stringify({ error: "Invalid order data" }), {
+        status: 400,
+      });
+    }
 
     const segmentData = order.slices.flatMap((slice: OrderSlice) =>
       slice.segments.map((segment: OrderSliceSegment) => ({
@@ -35,12 +54,17 @@ export async function POST(request: NextRequest) {
     });
 
     console.log("Order confirmation email sent:", result);
-    return NextResponse.json({ message: "Email sent successfully" });
+    return new Response(JSON.stringify({ message: "Email sent successfully" }));
   } catch (error) {
     console.error("Failed to send order confirmation email:", error);
-    return NextResponse.json(
-      { error: "Failed to send confirmation email" },
-      { status: 500 },
-    );
+    let errorMessage = "Failed to send confirmation email";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+    });
+  } finally {
+    console.log("POST request to /api/email completed");
   }
 }
