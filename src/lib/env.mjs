@@ -1,6 +1,6 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
-import "dotenv/config";
+import  "dotenv/config";
 
 export const env = createEnv({
   server: {
@@ -30,12 +30,21 @@ export const env = createEnv({
     RESEND_API_KEY: z.string().min(1),
     STRIPE_SECRET_KEY: z.string().min(1),
     STRIPE_WEBHOOK_SECRET: z.string().min(1),
+    DUFFEL_ACCESS_TOKEN: z.string().min(1),
+    DUFFEL_WEBHOOK_SECRET: z.string().min(1),
+    OPENAI_API_KEY: z.string().min(1),
+    ANTHROPIC_API_KEY: z.string().min(1),
+    UPSTASH_REDIS_REST_URL: z.string().min(1),
+    UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+    SENTRY_AUTH_TOKEN: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
     NEXT_PUBLIC_STRIPE_PRO_PRICE_ID: z.string().min(1),
     NEXT_PUBLIC_STRIPE_MAX_PRICE_ID: z.string().min(1),
-    NEXT_PUBLIC_STRIPE_ULTRA_PRICE_ID: z.string().min(1),                // NEXT_PUBLIC_PUBLISHABLE_KEY: z.string().min(1),
+    NEXT_PUBLIC_STRIPE_ULTRA_PRICE_ID: z.string().min(1),
+    NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1),
+    NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   // runtimeEnv: {

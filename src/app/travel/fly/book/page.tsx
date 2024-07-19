@@ -7,6 +7,7 @@ import FlyCard from "@/components/travel/fly/FlyCard";
 import FlyPriceCard from "@/components/travel/fly/FlyPriceCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Offer } from "@duffel/api/types";
+import { toast } from "sonner";
 
 export default function FlyBookPage() {
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -16,26 +17,21 @@ export default function FlyBookPage() {
 
   useEffect(() => {
     const offerId = searchParams.get("id");
-    console.log("Offer ID from URL:", offerId);
     if (offerId) {
       setLoading(true);
       fetch(`/api/travel/fly/book?id=${offerId}`)
         .then((res) => {
-          console.log("API response status:", res.status);
           if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
           return res.json();
         })
         .then((data: Offer) => {
-          console.log("Fetched offer data:", data);
           setSelectedOffer(data);
         })
         .catch((error) => {
-          console.error("Error fetching offer:", error);
           setError(error.message);
         })
         .finally(() => setLoading(false));
     } else {
-      console.log("No offer ID provided");
       setError("No Offer ID provided");
       setLoading(false);
     }
@@ -54,7 +50,9 @@ export default function FlyBookPage() {
   }
 
   if (error) {
-    return <div className="text-center text-red-500 p-4">{error}</div>;
+    return toast.error(error as string, {
+      description: "Failed to fetch offer",
+    });
   }
 
   return (

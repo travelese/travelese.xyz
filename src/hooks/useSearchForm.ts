@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { addDays, format } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { useToast } from "@/hooks/useToast";
 import useNavigation from "@/hooks/useNavigation";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   origin: z
@@ -26,7 +26,6 @@ const FormSchema = z.object({
 });
 
 export function useSearchForm() {
-  const { toast } = useToast();
   const { navigateToFlightsPage } = useNavigation();
 
   const [date, setDate] = useState<DateRange | undefined>({
@@ -75,11 +74,16 @@ export function useSearchForm() {
       navigateToFlightsPage(queryParams);
     } catch (error) {
       console.error("Error navigating to flights page:", error);
-      toast({
-        title: "Error",
-        description: "Unable to process your search. Please try again.",
-        variant: "destructive",
-      });
+
+      if (error instanceof Error) {
+        toast.error("Failed to search for flights", {
+          description: error.message,
+        });
+      } else {
+        toast.error("Failed to search for flights", {
+          description: "An unexpected error occurred",
+        });
+      }
     }
   };
 

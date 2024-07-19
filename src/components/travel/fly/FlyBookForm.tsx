@@ -28,11 +28,11 @@ import {
   MailIcon,
   PhoneIcon,
   UserCircleIcon,
-  Check,
 } from "lucide-react";
 
 import { toast } from "sonner";
 import type { Offer } from "@duffel/api/types";
+import Loading from "@/app/loading";
 
 interface FlyBookFormProps {
   selectedOffer: Offer;
@@ -63,12 +63,6 @@ const FormSchema = z.object({
 });
 
 export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
-  const [bookingStatus, setBookingStatus] = React.useState({
-    booked: false,
-    emailSent: false,
-    savedToDb: false,
-  });
-
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -115,6 +109,13 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
       ],
     };
 
+    const bookingToast = toast.loading(
+      <div className="flex items-center gap-2">
+        <Loading />
+        <span>Booking order...</span>
+      </div>,
+    );
+
     try {
       // Book the flight
       const bookingResponse = await fetch("/api/travel/fly/book", {
@@ -131,12 +132,24 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
       }
 
       const order = await bookingResponse.json();
-      setBookingStatus((prev) => ({ ...prev, booked: true }));
+
+      if (!order.booking_reference) {
+        throw new Error("Booking failed: No booking reference received");
+      }
+
       toast.success("Booking successful", {
+        id: bookingToast,
         description: `Booking reference: ${order.booking_reference}`,
       });
 
       // Save the order
+      const syncToast = toast.loading(
+        <div className="flex items-center gap-2">
+          <Loading />
+          <span>Syncying order...</span>
+        </div>,
+      );
+
       const saveResponse = await fetch("/api/travel/orders", {
         method: "POST",
         headers: {
@@ -145,14 +158,21 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
         body: JSON.stringify(order),
       });
 
-      if (saveResponse.ok) {
-        setBookingStatus((prev) => ({ ...prev, savedToDb: true }));
-        toast.success("Order saved to database");
-      } else {
-        toast.error("Failed to save order to database");
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json();
+        throw new Error(errorData.error || "Failed to save the order.");
       }
 
+      toast.success("Order synced successfully", { id: syncToast });
+
       // Send email confirmation
+      const emailToast = toast.loading(
+        <div className="flex items-center gap-2">
+          <Loading />
+          <span>Emailing order...</span>
+        </div>,
+      );
+
       const emailResponse = await fetch("/api/email", {
         method: "POST",
         headers: {
@@ -164,19 +184,23 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
         }),
       });
 
-      if (emailResponse.ok) {
-        setBookingStatus((prev) => ({ ...prev, emailSent: true }));
-        toast.success("Email sent", {
-          description: `Email has been sent to ${order.passengers[0].email}`,
-        });
-      } else {
-        console.error("Failed to send confirmation email");
-        toast.error("Failed to send confirmation email");
+      if (!emailResponse.ok) {
+        const errorData = await emailResponse.json();
+        throw new Error(
+          errorData.error || "Failed to send confirmation email.",
+        );
       }
+
+      toast.success("Confirmation email sent", {
+        id: emailToast,
+        description: `Email sent to ${order.passengers[0].email}`,
+      });
     } catch (error) {
       toast.error("Error", {
-        description: `Failed to book the flight: ${error}`,
+        description: `Failed to complete the booking process: ${error instanceof Error ? error.message : error}`,
       });
+
+      console.error("Booking process error:", error);
     }
   };
 
@@ -353,39 +377,12 @@ export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
               />
             </div>
             <div className="flex-1 w-full">
-              <Button
-                type="submit"
-                className="w-full h-full"
-                disabled={bookingStatus.booked}
-              >
-                {bookingStatus.booked ? "Booked" : "Book"}
+              <Button type="submit" className="w-full h-full">
+                Book
               </Button>
             </div>
           </form>
         </Form>
-        {bookingStatus.booked && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold mb-2">Booking Status:</h3>
-            <ul className="space-y-2">
-              <li className="flex items-center">
-                <Check className="mr-2 h-5 w-5 text-green-500" />
-                Flight booked successfully
-              </li>
-              <li className="flex items-center">
-                <Check
-                  className={`mr-2 h-5 w-5 ${bookingStatus.savedToDb ? "text-green-500" : "text-gray-300"}`}
-                />
-                Order saved to database
-              </li>
-              <li className="flex items-center">
-                <Check
-                  className={`mr-2 h-5 w-5 ${bookingStatus.emailSent ? "text-green-500" : "text-gray-300"}`}
-                />
-                Confirmation email sent
-              </li>
-            </ul>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

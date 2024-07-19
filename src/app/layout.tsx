@@ -9,6 +9,12 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import NextAuthProvider from "@/lib/auth/Provider";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
+import { PHProvider } from "./_analytics/providers";
+import dynamic from "next/dynamic";
+
+const PostHogPageView = dynamic(() => import("./_analytics/PostHogPageView"), {
+  ssr: false,
+});
 
 export const metadata: Metadata = {
   title: "Travelese",
@@ -22,22 +28,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={GeistSans.className}>
-        <NextAuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Navbar />
-            {children}
-          </ThemeProvider>
-        </NextAuthProvider>
-        <Analytics />
-        <SpeedInsights />
-        <Toaster />
-      </body>
+      <PHProvider>
+        <body className={GeistSans.className}>
+          <NextAuthProvider>
+            <PostHogPageView />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Navbar />
+              {children}
+            </ThemeProvider>
+          </NextAuthProvider>
+          <Analytics />
+          <SpeedInsights />
+          <Toaster />
+        </body>
+      </PHProvider>
     </html>
   );
 }

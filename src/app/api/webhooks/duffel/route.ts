@@ -1,75 +1,41 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { headers } from "next/headers";
+import crypto from "crypto";
 import { db } from "@/lib/db/index";
 import { orders } from "@/lib/db/schema/orders";
 import { travellers } from "@/lib/db/schema/travellers";
 import { segments } from "@/lib/db/schema/segments";
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
-import crypto from "crypto";
-import { Duffel } from "@duffel/api";
+import { env } from "@/lib/env.mjs";
 
-const WEBHOOK_SECRET = process.env.DUFFEL_WEBHOOK_SECRET!;
-const duffel = new Duffel({
-  token: process.env.DUFFEL_ACCESS_TOKEN!,
-});
+const WEBHOOK_SECRET = env.DUFFEL_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
-  console.log("Received request to /api/webhooks/duffel");
   const signature = headers().get("X-Duffel-Signature");
 
-  if (signature) {
-    console.log("Handling Duffel webhook");
-    return handleWebhook(request, signature);
-  } else {
-    console.log("Handling manual sync");
-    return handleManualSync(request);
+  if (!signature) {
+    return new Response(JSON.stringify({ error: "Missing signature" }), {
+      status: 400,
+    });
   }
-}
 
-async function handleWebhook(request: NextRequest, signature: string) {
   const body = await request.text();
 
   if (!verifySignature(signature, body)) {
-    return new NextResponse("Invalid signature", { status: 401 });
-  }
-
-  const event = JSON.parse(body);
-  await processEvent(event);
-
-  return new NextResponse(null, { status: 200 });
-}
-
-async function handleManualSync(request: NextRequest) {
-  console.log("In handleManualSync");
-  const body = await request.json();
-  console.log("Request body:", body);
-
-  const { userId } = body;
-
-  if (!userId) {
-    console.log("No userId provided");
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    return new Response(JSON.stringify({ error: "Invalid signature" }), {
+      status: 401,
+    });
   }
 
   try {
-    console.log(`Fetching orders for user ${userId}`);
-    const allOrders = await duffel.orders.list();
-    const userOrders = allOrders.data.filter(
-      (order) => order.metadata?.userId === userId,
-    );
-
-    console.log(`Found ${userOrders.length} orders`);
-    for (const order of userOrders) {
-      await upsertOrder(order);
-    }
-
-    return NextResponse.json({ message: "User orders synced successfully" });
+    const event = JSON.parse(body);
+    await processEvent(event);
+    return new Response(null, { status: 200 });
   } catch (error) {
-    console.error("Error syncing user orders:", error);
-    return NextResponse.json(
-      { error: "Failed to sync user orders" },
-      { status: 500 },
-    );
+    console.error("Error processing webhook:", error);
+    return new Response(JSON.stringify({ error: "Error processing webhook" }), {
+      status: 500,
+    });
   }
 }
 
@@ -92,25 +58,29 @@ function verifySignature(signature: string, payload: string): boolean {
 async function processEvent(event: any) {
   const { type, data } = event;
 
-  switch (type) {
-    case "order.created":
-    case "order.updated":
-      await upsertOrder(data);
-      break;
-    case "order.cancelled":
-      await cancelOrder(data.id);
-      break;
-    case "ping.triggered":
-      console.log("Received ping event");
-      break;
-    default:
-      console.log(`Unhandled event type: ${type}`);
+  try {
+    switch (type) {
+      case "order.created":
+      case "order.updated":
+        await upsertOrder(data);
+        break;
+      case "order.cancelled":
+        await cancelOrder(data.id);
+        break;
+      case "ping.triggered":
+        console.log("Received ping event");
+        break;
+      default:
+        console.log(`Unhandled event type: ${type}`);
+    }
+  } catch (error) {
+    console.error(`Error processing event type ${type}:`, error);
+    throw error;
   }
 }
 
 async function upsertOrder(orderData: any) {
   await db.transaction(async (trx) => {
-    // Upsert order
     await trx
       .insert(orders)
       .values({
@@ -138,7 +108,6 @@ async function upsertOrder(orderData: any) {
         },
       });
 
-    // Upsert travellers
     for (const passenger of orderData.passengers) {
       await trx
         .insert(travellers)
@@ -164,7 +133,6 @@ async function upsertOrder(orderData: any) {
         });
     }
 
-    // Upsert segments
     for (const slice of orderData.slices) {
       for (const segment of slice.segments) {
         await trx
@@ -172,20 +140,42 @@ async function upsertOrder(orderData: any) {
           .values({
             id: segment.id,
             orderId: orderData.id,
-            origin: segment.origin.iata_code,
-            destination: segment.destination.iata_code,
-            departingAt: new Date(segment.departing_at),
+            aircraft: segment.aircraft,
             arrivingAt: new Date(segment.arriving_at),
-            duration: segment.duration,
-            marketingCarrier: segment.marketing_carrier.iata_code,
-            operatingCarrier: segment.operating_carrier.iata_code,
-            aircraft: segment.aircraft.iata_code,
+            departingAt: new Date(segment.departing_at),
+            destination: segment.destination,
+            destinationTerminal: segment.destination_terminal ?? null,
+            duration: segment.duration ?? null,
+            marketingCarrier: segment.marketing_carrier,
+            marketingCarrierFlightNumber:
+              segment.marketing_carrier_flight_number,
+            operatingCarrier: segment.operating_carrier,
+            operatingCarrierFlightNumber:
+              segment.operating_carrier_flight_number,
+            origin: segment.origin,
+            originTerminal: segment.origin_terminal ?? null,
+            passengers: segment.passengers,
+            distance: segment.distance ?? null,
           })
           .onConflictDoUpdate({
             target: segments.id,
             set: {
-              departingAt: new Date(segment.departing_at),
+              aircraft: segment.aircraft,
               arrivingAt: new Date(segment.arriving_at),
+              departingAt: new Date(segment.departing_at),
+              destination: segment.destination,
+              destinationTerminal: segment.destination_terminal ?? null,
+              duration: segment.duration ?? null,
+              marketingCarrier: segment.marketing_carrier,
+              marketingCarrierFlightNumber:
+                segment.marketing_carrier_flight_number,
+              operatingCarrier: segment.operating_carrier,
+              operatingCarrierFlightNumber:
+                segment.operating_carrier_flight_number,
+              origin: segment.origin,
+              originTerminal: segment.origin_terminal ?? null,
+              passengers: segment.passengers,
+              distance: segment.distance ?? null,
             },
           });
       }

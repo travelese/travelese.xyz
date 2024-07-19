@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getUserAuth } from "@/lib/auth/utils";
 import { db } from "@/lib/db/index";
 import { orders } from "@/lib/db/schema/orders";
@@ -9,18 +9,18 @@ import { eq } from "drizzle-orm";
 export async function GET(request: NextRequest) {
   const { session } = await getUserAuth();
 
-  if (!session) return new Response("Unauthorized", { status: 401 });
+  if (!session)
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
 
   const url = new URL(request.url);
   const userId = url.searchParams.get("userId");
 
   if (!userId) {
-    return NextResponse.json(
-      { message: "User ID is required" },
-      {
-        status: 400,
-      },
-    );
+    return new Response(JSON.stringify({ error: "User ID is required" }), {
+      status: 400,
+    });
   }
 
   try {
@@ -29,25 +29,45 @@ export async function GET(request: NextRequest) {
       .from(orders)
       .where(eq(orders.userId, userId));
 
-    return NextResponse.json(userOrders);
+    return new Response(JSON.stringify(userOrders));
   } catch (error) {
-    console.error("Error fetching orders:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch orders" },
-      { status: 500 },
-    );
+    console.error("Failed to fetch orders:", error);
+    return new Response(JSON.stringify({ error: "Failed to fetch orders" }), {
+      status: 500,
+    });
   }
 }
 
 export async function POST(request: NextRequest) {
   const { session } = await getUserAuth();
-  if (!session) return new Response("Unauthorized", { status: 401 });
+
+  if (!session)
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
 
   try {
     const order = await request.json();
 
+    if (
+      !order.id ||
+      !order.booking_reference ||
+      !order.passengers ||
+      order.passengers.length === 0
+    ) {
+      return new Response(
+        JSON.stringify({ error: "Missing required order information" }),
+        { status: 400 },
+      );
+    }
+
     await db.transaction(async (trx) => {
-      // Insert or update the order
+      const createdAt = new Date(order.created_at);
+      const updatedAt = order.updated_at
+        ? new Date(order.updated_at)
+        : createdAt;
+      const syncedAt = new Date();
+
       await trx
         .insert(orders)
         .values({
@@ -63,22 +83,21 @@ export async function POST(request: NextRequest) {
             ? "Awaiting Payment"
             : "Paid",
           isLive: order.live_mode,
-          createdAt: new Date(order.created_at),
-          updatedAt: new Date(order.updated_at),
-          syncedAt: new Date(),
+          createdAt,
+          updatedAt,
+          syncedAt,
         })
         .onConflictDoUpdate({
           target: orders.id,
           set: {
-            updatedAt: new Date(order.updated_at),
-            syncedAt: new Date(),
+            updatedAt,
+            syncedAt,
             paymentStatus: order.payment_status.awaiting_payment
               ? "Awaiting Payment"
               : "Paid",
           },
         });
 
-      // Insert or update segments
       for (const slice of order.slices) {
         for (const segment of slice.segments) {
           await trx
@@ -86,26 +105,47 @@ export async function POST(request: NextRequest) {
             .values({
               id: segment.id,
               orderId: order.id,
-              origin: segment.origin.iata_code,
-              destination: segment.destination.iata_code,
-              departingAt: new Date(segment.departing_at),
+              aircraft: segment.aircraft,
               arrivingAt: new Date(segment.arriving_at),
-              duration: segment.duration,
-              marketingCarrier: segment.marketing_carrier.iata_code,
-              operatingCarrier: segment.operating_carrier.iata_code,
-              aircraft: segment.aircraft.iata_code,
+              departingAt: new Date(segment.departing_at),
+              destination: segment.destination,
+              destinationTerminal: segment.destination_terminal ?? null,
+              duration: segment.duration ?? null,
+              marketingCarrier: segment.marketing_carrier,
+              marketingCarrierFlightNumber:
+                segment.marketing_carrier_flight_number,
+              operatingCarrier: segment.operating_carrier,
+              operatingCarrierFlightNumber:
+                segment.operating_carrier_flight_number,
+              origin: segment.origin,
+              originTerminal: segment.origin_terminal ?? null,
+              passengers: segment.passengers,
+              distance: segment.distance ?? null,
             })
             .onConflictDoUpdate({
               target: segments.id,
               set: {
-                departingAt: new Date(segment.departing_at),
+                aircraft: segment.aircraft,
                 arrivingAt: new Date(segment.arriving_at),
+                departingAt: new Date(segment.departing_at),
+                destination: segment.destination,
+                destinationTerminal: segment.destination_terminal ?? null,
+                duration: segment.duration ?? null,
+                marketingCarrier: segment.marketing_carrier,
+                marketingCarrierFlightNumber:
+                  segment.marketing_carrier_flight_number,
+                operatingCarrier: segment.operating_carrier,
+                operatingCarrierFlightNumber:
+                  segment.operating_carrier_flight_number,
+                origin: segment.origin,
+                originTerminal: segment.origin_terminal ?? null,
+                passengers: segment.passengers,
+                distance: segment.distance ?? null,
               },
             });
         }
       }
 
-      // Insert or update traveller
       const traveller = order.passengers[0];
       await trx
         .insert(travellers)
@@ -132,12 +172,13 @@ export async function POST(request: NextRequest) {
         });
     });
 
-    return NextResponse.json({ message: "Order saved successfully" });
+    return new Response(
+      JSON.stringify({ message: "Order saved successfully" }),
+    );
   } catch (error) {
     console.error("Error saving order:", error);
-    return NextResponse.json(
-      { error: "Failed to save order" },
-      { status: 500 },
-    );
+    return new Response(JSON.stringify({ error: "Failed to save order" }), {
+      status: 500,
+    });
   }
 }
