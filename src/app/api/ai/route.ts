@@ -9,7 +9,11 @@ import { z } from "zod";
 
 export async function POST(req: NextRequest) {
   const { session } = await getUserAuth();
-  if (!session) return new Response("Error", { status: 400 });
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
 
   try {
     const { messages, model, temperature, topP, topK, systemMessage } =

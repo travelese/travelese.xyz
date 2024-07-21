@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getUserAuth } from "@/lib/auth/utils";
 import { duffel } from "@/lib/travel/duffel";
 
 export async function GET(request: NextRequest) {
+  const { session } = await getUserAuth();
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const name = searchParams.get("name") || "";
@@ -19,7 +27,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("Error fetching place suggestions from Duffel API:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

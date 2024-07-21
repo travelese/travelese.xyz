@@ -1,4 +1,13 @@
-import { AccountCard, AccountCardFooter, AccountCardBody } from "./AccountCard";
+"use client";
+import * as React from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -31,21 +40,24 @@ export default function UpdateEmailCard({ email }: { email: string }) {
   };
 
   return (
-    <AccountCard
-      params={{
-        header: "Your Email",
-        description:
-          "Please enter the email address you want to use with your account.",
-      }}
-    >
+    <Card>
+      <CardHeader>
+        <CardTitle>Your Email</CardTitle>
+        <CardDescription>
+          Please enter the email address you want to use with your account.
+        </CardDescription>
+      </CardHeader>
       <form onSubmit={handleSubmit}>
-        <AccountCardBody>
+        <CardContent>
           <Input defaultValue={email ?? ""} name="email" disabled={true} />
-        </AccountCardBody>
-        <AccountCardFooter description="We will email vou to verify the change.">
+        </CardContent>
+        <CardFooter>
+          <p className="text-muted-foreground text-sm">
+            We will email you to verify the change.
+          </p>
           <Button disabled={true}>Update Email</Button>
-        </AccountCardFooter>
+        </CardFooter>
       </form>
-    </AccountCard>
+    </Card>
   );
 }

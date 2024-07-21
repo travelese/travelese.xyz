@@ -1,5 +1,13 @@
 "use client";
-import { AccountCard, AccountCardFooter, AccountCardBody } from "./AccountCard";
+import * as React from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -31,21 +39,23 @@ export default function UpdateNameCard({ name }: { name: string }) {
   };
 
   return (
-    <AccountCard
-      params={{
-        header: "Your Name",
-        description:
-          "Please enter your full name, or a display name you are comfortable with.",
-      }}
-    >
+    <Card>
+      <CardHeader>
+        <CardTitle>Your Name</CardTitle>
+        <CardDescription>
+          Please enter your full name, or a display name you are comfortable
+          with.
+        </CardDescription>
+      </CardHeader>
       <form onSubmit={handleSubmit}>
-        <AccountCardBody>
+        <CardContent>
           <Input defaultValue={name ?? ""} name="name" disabled={true} />
-        </AccountCardBody>
-        <AccountCardFooter description="64 characters maximum">
+        </CardContent>
+        <CardFooter>
+          <p className="text-muted-foreground text-sm">64 characters maximum</p>
           <Button disabled={true}>Update Name</Button>
-        </AccountCardFooter>
+        </CardFooter>
       </form>
-    </AccountCard>
+    </Card>
   );
 }

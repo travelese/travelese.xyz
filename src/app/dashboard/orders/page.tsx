@@ -11,7 +11,6 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuItem,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -19,10 +18,8 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardFooter,
   CardContent,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Table,
@@ -33,8 +30,9 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { ListFilterIcon, FileIcon } from "lucide-react";
 
-export default async function OrdersPage() {
+export default async function Orders() {
   await checkAuth();
   const { session } = await getUserAuth();
 
@@ -48,38 +46,8 @@ export default async function OrdersPage() {
     .where(eq(orders.userId, session.user.id));
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+    <main className="flex flex-col gap-4 p-4 md:gap-8 md:p-8 border">
       <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-          <Card x-chunk="dashboard-05-chunk-1">
-            <CardHeader className="pb-2">
-              <CardDescription>This Week</CardDescription>
-              <CardTitle className="text-4xl">$1,329</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xs text-muted-foreground">
-                +25% from last week
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Progress value={25} aria-label="25% increase" />
-            </CardFooter>
-          </Card>
-          <Card x-chunk="dashboard-05-chunk-2">
-            <CardHeader className="pb-2">
-              <CardDescription>This Month</CardDescription>
-              <CardTitle className="text-4xl">$5,329</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xs text-muted-foreground">
-                +10% from last month
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Progress value={12} aria-label="12% increase" />
-            </CardFooter>
-          </Card>
-        </div>
         <Tabs defaultValue="week">
           <div className="flex items-center">
             <TabsList>
@@ -116,51 +84,41 @@ export default async function OrdersPage() {
             </div>
           </div>
           <TabsContent value="week">
-            <Card x-chunk="dashboard-05-chunk-3">
-              <CardHeader className="px-7">
-                <CardTitle>Orders</CardTitle>
-                <CardDescription>
-                  Recent orders from your store.
-                </CardDescription>
+            <Card>
+              <CardHeader>
+                <CardTitle></CardTitle>
+                <CardDescription></CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Traveller</TableHead>
-                      <TableHead className="hidden sm:table-cell">
-                        Status
-                      </TableHead>
-                      <TableHead className="hidden sm:table-cell">
-                        PNR
-                      </TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Date
-                      </TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>PNR</TableHead>
+                      <TableHead>Date</TableHead>
                       <TableHead className="text-right">Amount</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {userOrders.map((booking) => (
-                      <TableRow key={booking.id} className="bg-accent">
+                      <TableRow key={booking.id}>
                         <TableCell>
                           <div className="font-medium">
                             {booking.passengerName}
                           </div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">
+                          <div className="text-sm text-muted-foreground">
                             {booking.passengerEmail}
                           </div>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="secondary">
+                        <TableCell>
+                          <Badge variant="secondary">
                             {booking.paymentStatus}
                           </Badge>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {booking.bookingReference}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {booking.createdAt?.toString()}
+                        <TableCell>{booking.bookingReference}</TableCell>
+                        <TableCell>
+                          {booking.createdAt?.toLocaleDateString()}
                         </TableCell>
                         <TableCell className="text-right">
                           {booking.totalAmount} {booking.currency}
@@ -175,46 +133,5 @@ export default async function OrdersPage() {
         </Tabs>
       </div>
     </main>
-  );
-}
-
-function FileIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-    </svg>
-  );
-}
-
-function ListFilterIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 6h18" />
-      <path d="M7 12h10" />
-      <path d="M10 18h4" />
-    </svg>
   );
 }

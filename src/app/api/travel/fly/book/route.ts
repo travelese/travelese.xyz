@@ -5,14 +5,14 @@ import { DuffelError } from "@duffel/api";
 import { getUserAuth } from "@/lib/auth/utils";
 
 export async function GET(request: NextRequest) {
-  try {
-    const { session } = await getUserAuth();
-    if (!session) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-      });
-    }
+  const { session } = await getUserAuth();
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
 
+  try {
     const { searchParams } = new URL(request.url);
     const offerId = searchParams.get("id");
 
@@ -50,17 +50,15 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const { session } = await getUserAuth();
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
   try {
-    const { session } = await getUserAuth();
-    if (!session) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-      });
-    }
-
     const orderParams = (await request.json()) as CreateOrder;
-
-    console.log("Received order params:", JSON.stringify(orderParams, null, 2));
 
     orderParams.metadata = {
       ...orderParams.metadata,
@@ -85,8 +83,6 @@ export async function POST(request: NextRequest) {
         : `+${passenger.phone_number}`,
     }));
 
-    console.log("Final order params:", JSON.stringify(orderParams, null, 2));
-
     const order = await createOrder(orderParams);
 
     if (!order.booking_reference) {
@@ -95,8 +91,6 @@ export async function POST(request: NextRequest) {
 
     return new Response(JSON.stringify(order));
   } catch (error) {
-    console.error("Error in POST handler:", error);
-
     if (error instanceof DuffelError && error.meta) {
       return new Response(JSON.stringify({ error: error.message }), {
         status: error.meta.status,
@@ -112,7 +106,5 @@ export async function POST(request: NextRequest) {
       }),
       { status: 500 },
     );
-  } finally {
-    console.log("POST request to /api/travel/fly/book completed");
   }
 }

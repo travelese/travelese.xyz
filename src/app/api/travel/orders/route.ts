@@ -8,7 +8,6 @@ import { eq } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   const { session } = await getUserAuth();
-
   if (!session)
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
@@ -31,7 +30,6 @@ export async function GET(request: NextRequest) {
 
     return new Response(JSON.stringify(userOrders));
   } catch (error) {
-    console.error("Failed to fetch orders:", error);
     return new Response(JSON.stringify({ error: "Failed to fetch orders" }), {
       status: 500,
     });
@@ -40,7 +38,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const { session } = await getUserAuth();
-
   if (!session)
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
@@ -176,7 +173,6 @@ export async function POST(request: NextRequest) {
       JSON.stringify({ message: "Order saved successfully" }),
     );
   } catch (error) {
-    console.error("Error saving order:", error);
     return new Response(JSON.stringify({ error: "Failed to save order" }), {
       status: 500,
     });

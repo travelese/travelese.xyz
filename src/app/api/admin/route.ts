@@ -24,7 +24,6 @@ async function isUserAdmin(userId: string) {
 
 export async function GET(request: NextRequest) {
   const { session } = await getUserAuth();
-
   if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
@@ -51,7 +50,6 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const { session } = await getUserAuth();
-
   if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
@@ -89,7 +87,6 @@ export async function PATCH(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const { session } = await getUserAuth();
-
   if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,

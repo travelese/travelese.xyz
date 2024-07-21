@@ -1,3 +1,4 @@
+import * as React from "react";
 import SuccessToast from "./SuccessToast";
 import { ManageUserSubscriptionButton } from "./ManageSubscription";
 import { Button } from "@/components/ui/button";
@@ -24,15 +25,9 @@ export default async function Billing() {
   if (!session) return redirect("/");
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+    <main className="flex flex-col gap-4 p-4 md:gap-8 md:p-8 border">
       <div className="min-h-[calc(100vh-57px)] ">
         <SuccessToast />
-        <Link href="/account">
-          <Button variant={"link"} className="px-0">
-            Back
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-semibold mb-4">Billing</h1>
         <Card className="p-6 mb-2">
           <h3 className="uppercase text-xs font-bold text-muted-foreground">
             Subscription Details
@@ -83,7 +78,7 @@ export default async function Billing() {
                       key={`feature_${i + 1}`}
                       className="flex gap-x-2 text-sm"
                     >
-                      <CheckCircle2Icon className="text-green-400 h-5 w-5" />
+                      <CheckCircle2Icon className="h-5 w-5" />
                       <span>{feature}</span>
                     </li>
                   ))}

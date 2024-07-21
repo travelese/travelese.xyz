@@ -119,7 +119,7 @@ export default function TraveleseAI() {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-4 p-4 md:gap-8 md:p-8 border">
       <header>
         <Drawer>
           <DrawerTrigger asChild>
@@ -269,10 +269,7 @@ export default function TraveleseAI() {
         </Drawer>
       </header>
       <main className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3">
-        <div
-          className="relative hidden flex-col items-start gap-8 md:flex"
-          x-chunk="dashboard-03-chunk-0"
-        >
+        <div className="relative hidden flex-col items-start gap-8 md:flex">
           <form className="grid w-full items-start gap-6">
             <fieldset className="grid gap-6 rounded-lg border p-4">
               <legend className="-ml-1 px-1 text-sm font-medium">
@@ -476,6 +473,6 @@ export default function TraveleseAI() {
           </form>
         </div>
       </main>
-    </>
+    </div>
   );
 }

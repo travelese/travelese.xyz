@@ -1,5 +1,6 @@
 import { stripe } from "@/lib/stripe/index";
 import { absoluteUrl } from "@/lib/utils";
+import { getUserAuth } from "@/lib/auth/utils";
 
 interface ManageStripeSubscriptionActionProps {
   isSubscribed: boolean;
@@ -11,6 +12,13 @@ interface ManageStripeSubscriptionActionProps {
 }
 
 export async function POST(req: Request) {
+  const { session } = await getUserAuth();
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
   const body: ManageStripeSubscriptionActionProps = await req.json();
   const { isSubscribed, stripeCustomerId, userId, stripePriceId, email } = body;
   console.log(body);

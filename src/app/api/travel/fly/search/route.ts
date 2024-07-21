@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { getUserAuth } from "@/lib/auth/utils";
 import { searchFlights } from "@/lib/travel/duffel";
 import type {
   CreateOfferRequest,
@@ -7,6 +8,13 @@ import type {
 import type { Offer } from "@duffel/api/booking/Offers/OfferTypes";
 
 export async function POST(request: NextRequest) {
+  const { session } = await getUserAuth();
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
   try {
     const body: {
       slices: CreateOfferRequest["slices"];
@@ -25,13 +33,22 @@ export async function POST(request: NextRequest) {
       limit,
     );
 
-    return Response.json(offers);
+    return new Response(JSON.stringify(offers));
   } catch (error) {
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+      status: 500,
+    });
   }
 }
 
 export async function GET(request: NextRequest) {
+  const { session } = await getUserAuth();
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
 
@@ -49,9 +66,11 @@ export async function GET(request: NextRequest) {
       : undefined;
 
     if (!origin || !destination || !from || !passengersJson || !cabin) {
-      return Response.json(
-        { error: "Missing required parameters" },
-        { status: 400 },
+      return new Response(
+        JSON.stringify({ error: "Missing required parameters" }),
+        {
+          status: 400,
+        },
       );
     }
 
@@ -74,9 +93,10 @@ export async function GET(request: NextRequest) {
       limit,
     );
 
-    return Response.json(offers);
+    return new Response(JSON.stringify(offers));
   } catch (error) {
-    console.error("Error handling GET request:", error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+      status: 500,
+    });
   }
 }
