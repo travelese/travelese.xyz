@@ -6,7 +6,6 @@ import { getUserAuth } from "@/lib/auth/utils";
 
 export async function POST(request: NextRequest) {
   const { session } = await getUserAuth();
-
   if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
@@ -53,10 +52,8 @@ export async function POST(request: NextRequest) {
       react: OrderConfirmationEmail({ ...emailData }),
     });
 
-    console.log("Order confirmation email sent:", result);
     return new Response(JSON.stringify({ message: "Email sent successfully" }));
   } catch (error) {
-    console.error("Failed to send order confirmation email:", error);
     let errorMessage = "Failed to send confirmation email";
     if (error instanceof Error) {
       errorMessage = error.message;
@@ -64,7 +61,5 @@ export async function POST(request: NextRequest) {
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
     });
-  } finally {
-    console.log("POST request to /api/email completed");
   }
 }

@@ -19,13 +19,13 @@ const SidebarItems = () => {
       <TooltipTrigger asChild>
         <Button
           aria-label={item.label}
-          className={`rounded-lg ${pathname === item.href ? "bg-muted" : ""}`}
+          className={`w-full justify-center ${pathname === item.href ? "bg-muted" : ""}`}
           size="icon"
           variant="ghost"
         >
           <Link href={item.href}>
             <item.icon
-              className={`size-5 ${
+              className={`h-5 w-5 ${
                 pathname === item.href ? "text-primary" : ""
               }`}
             />
@@ -38,18 +38,18 @@ const SidebarItems = () => {
   );
 
   return (
-    <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r">
-      <nav className="grid gap-1 p-2">
+    <div className="flex flex-col h-full py-4">
+      <div className="space-y-2">
         {topNavItems.map((item) => (
           <NavItem key={item.href} item={item} />
         ))}
-      </nav>
-      <nav className="mt-auto grid gap-1 p-2">
+      </div>
+      <div className="mt-auto space-y-2">
         {bottomNavItems.map((item) => (
           <NavItem key={item.href} item={item} />
         ))}
-      </nav>
-    </aside>
+      </div>
+    </div>
   );
 };
 

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useNavbar } from "@/hooks/useNavbar";
-import CurrencySelector from "@/components/travel/CurrencySelector";
 import ModeToggle from "@/components/ModeToggle";
 
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,7 @@ export default function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <header className="sticky top-0 z-10 flex h-[57px] items-center justify-between gap-1 border-b bg-background px-4">
+    <header className="h-[57px] sticky top-0 z-10 flex items-center justify-between gap-1 border-b bg-background px-4">
       <Link
         className="flex items-center gap-2 text-lg font-semibold md:text-base"
         href="/"
@@ -73,10 +72,15 @@ export default function Navbar() {
               className="p-0 overflow-hidden"
             >
               {session ? (
-                <Avatar className="rounded-none">
+                <Avatar className="h-16 w-16 rounded-lg">
                   <AvatarImage src={session.user?.image || undefined} />
-                  <AvatarFallback>
-                    <User className="h-5 w-5" />
+                  <AvatarFallback className="border-border border-2 text-muted-foreground">
+                    {session.user?.name
+                      ? session.user.name
+                          .split(" ")
+                          .map((word) => word[0].toUpperCase())
+                          .join("")
+                      : "~"}
                   </AvatarFallback>
                 </Avatar>
               ) : (

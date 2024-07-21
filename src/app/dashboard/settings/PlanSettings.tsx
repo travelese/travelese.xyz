@@ -1,5 +1,13 @@
 "use client";
-import { AccountCard, AccountCardBody, AccountCardFooter } from "./AccountCard";
+import * as React from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AuthSession } from "@/lib/auth/utils";
@@ -16,6 +24,7 @@ interface PlanSettingsProps {
   stripePriceId?: string | undefined;
   price?: number | undefined;
 }
+
 export default function PlanSettings({
   subscriptionPlan,
   session,
@@ -24,25 +33,26 @@ export default function PlanSettings({
   session: AuthSession["session"];
 }) {
   return (
-    <AccountCard
-      params={{
-        header: "Your Plan",
-        description: subscriptionPlan.isSubscribed
-          ? `You are currently on the ${subscriptionPlan.name} plan.`
-          : `You are not subscribed to any plan.`.concat(
-              !session?.user?.email || session?.user?.email.length < 5
-                ? " Please add your email to upgrade your account."
-                : "",
-            ),
-      }}
-    >
-      <AccountCardBody>
-        {subscriptionPlan.isSubscribed ? (
+    <Card>
+      <CardHeader>
+        <CardTitle>Your Plan</CardTitle>
+        <CardDescription>
+          {subscriptionPlan.isSubscribed
+            ? `You are currently on the ${subscriptionPlan.name} plan.`
+            : `You are not subscribed to any plan.`.concat(
+                !session?.user?.email || session?.user?.email.length < 5
+                  ? " Please add your email to upgrade your account."
+                  : "",
+              )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {subscriptionPlan.isSubscribed && (
           <h3 className="font-semibold text-lg">
             ${subscriptionPlan.price ? subscriptionPlan.price / 100 : 0} / month
           </h3>
-        ) : null}
-        {subscriptionPlan.stripeCurrentPeriodEnd ? (
+        )}
+        {subscriptionPlan.stripeCurrentPeriodEnd && (
           <p className="text-sm mb-4 text-muted-foreground ">
             Your plan will{" "}
             {!subscriptionPlan.isSubscribed
@@ -57,13 +67,16 @@ export default function PlanSettings({
               )}
             </span>
           </p>
-        ) : null}
-      </AccountCardBody>
-      <AccountCardFooter description="Manage your subscription on Stripe.">
-        <Link href="dashboard/account/billing">
+        )}
+      </CardContent>
+      <CardFooter>
+        <p className="text-muted-foreground text-sm">
+          Manage your subscription on Stripe.
+        </p>
+        <Link href="settings/billing">
           <Button variant="outline">Go to billing</Button>
         </Link>
-      </AccountCardFooter>
-    </AccountCard>
+      </CardFooter>
+    </Card>
   );
 }

@@ -10,6 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
@@ -74,43 +81,50 @@ export default function UserManagement() {
   };
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-      <h2 className="text-2xl font-bold mb-4">User Management</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Admin</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>
-                <Switch
-                  checked={user.role === "admin"}
-                  onCheckedChange={(checked) =>
-                    updateUserRole(user.id, checked ? "admin" : "user")
-                  }
-                  disabled={user.role === "admin"}
-                />
-              </TableCell>
-              <TableCell>
-                <Button
-                  onClick={() => syncUserOrders(user.id)}
-                  disabled={syncingUser === user.id}
-                >
-                  {syncingUser === user.id ? "Syncing..." : "Sync Orders"}
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <main className="flex flex-col gap-4 p-4 md:gap-8 md:p-8 border">
+      <Card>
+        <CardHeader>
+          <CardTitle></CardTitle>
+          <CardDescription></CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Admin</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <Switch
+                      checked={user.role === "admin"}
+                      onCheckedChange={(checked) =>
+                        updateUserRole(user.id, checked ? "admin" : "user")
+                      }
+                      disabled={user.role === "admin"}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      onClick={() => syncUserOrders(user.id)}
+                      disabled={syncingUser === user.id}
+                    >
+                      {syncingUser === user.id ? "Syncing..." : "Sync Orders"}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </main>
   );
 }
