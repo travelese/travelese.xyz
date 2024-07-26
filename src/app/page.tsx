@@ -1,3 +1,4 @@
+import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import FlySearchForm from "@/components/travel/fly/FlySearchForm";
+import StaySearchForm from "@/components/travel/stay/StaySearchForm";
 
 export default function LandingPage() {
   return (
@@ -47,7 +49,9 @@ export default function LandingPage() {
                   <TabsContent value="fly" className="overflow-hidden">
                     <FlySearchForm />
                   </TabsContent>
-                  <TabsContent value="stay"></TabsContent>
+                  <TabsContent value="stay">
+                    <StaySearchForm />
+                  </TabsContent>
                 </Tabs>
               </div>
             </div>

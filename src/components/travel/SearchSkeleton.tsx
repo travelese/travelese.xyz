@@ -1,7 +1,8 @@
+import * as React from "react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function FlySkeleton() {
+export default function SearchSkeleton() {
   return (
     <Card>
       <div className="flex w-full items-center justify-between p-6 rounded-lg">

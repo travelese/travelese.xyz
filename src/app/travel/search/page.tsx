@@ -15,25 +15,32 @@ import { Button } from "@/components/ui/button";
 
 import { ListOrderedIcon } from "lucide-react";
 
-import FlySearchFilters from "@/components//travel/fly/FlySearchFilters";
+import SearchFilters from "@/components/travel/SearchFilters";
 import FlyCard from "@/components/travel/fly/FlyCard";
-import { FlySkeleton } from "@/components/travel/fly/FlySkeleton";
+import StayCard from "@/components/travel/stay/StayCard";
+import SearchSkeleton from "@/components/travel/SearchSkeleton";
 import useNavigation from "@/hooks/useNavigation";
-import type { Offer } from "@duffel/api/types";
+import type { Offer, StaysSearchResult } from "@duffel/api/types";
 import { toast } from "sonner";
 import Loading from "@/app/loading";
 
-type SortValues = "total_amount" | "total_duration";
+type FlySortValues = "total_amount" | "total_duration";
+type StaySortValues = "price" | "rating";
+type SortValues = FlySortValues | StaySortValues;
 
-export default function FlySearchResults() {
-  const [offers, setOffers] = useState<Offer[]>([]);
+export default function SearchResults() {
+  const [results, setResults] = useState<Offer[] | StaysSearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<null | Error>(null);
   const { navigateToBookPage } = useNavigation();
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const sortBy = (searchParams.get("sortBy") as SortValues) || "total_amount";
+  const searchType = (searchParams.get("type") as "fly" | "stay") || "fly";
+
+  const sortBy =
+    (searchParams.get("sortBy") as SortValues) ||
+    (searchType === "fly" ? "total_amount" : "price");
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
@@ -49,8 +56,12 @@ export default function FlySearchResults() {
     router.push(`?${current.toString()}`);
   };
 
-  const handleSelectOffer = (offer: Offer) => {
-    navigateToBookPage(offer);
+  const handleSelect = (result: Offer | StaysSearchResult) => {
+    if ("slices" in result) {
+      navigateToBookPage(result);
+    } else {
+      console.log("Navigate to stay booking page");
+    }
   };
 
   useEffect(() => {
@@ -59,31 +70,44 @@ export default function FlySearchResults() {
       return;
     }
 
-    const fetchOffers = async () => {
+    const fetchResults = async () => {
+      console.log("Fetching stay search results");
       try {
         setLoading(true);
         const params = new URLSearchParams(searchParams);
-
+        console.log("Search params:", params.toString());
         params.set("limit", limit.toString());
 
-        const response = await fetch(
-          `/api/travel/fly/search?${params?.toString()}`,
-        );
+        // Only add limit for fly searches
+        if (searchType === "fly") {
+          params.set("limit", limit.toString());
+        } else {
+          // Remove limit parameter for stay searches
+          params.delete("limit");
+        }
+
+        const endpoint =
+          searchType === "fly"
+            ? "/api/travel/fly/search"
+            : "/api/travel/stay/search";
+        const response = await fetch(`${endpoint}?${params?.toString()}`);
+
         if (!response.ok) {
-          throw new Error("Failed to fetch offers");
+          console.error("Failed to fetch stay results:", response.statusText);
+          throw new Error(`Failed to fetch ${searchType} results`);
         }
 
-        const data: Offer[] = (await response.json()) as Offer[];
-
+        const data = await response.json();
+        console.log("Received stay search results:", data);
         if (!Array.isArray(data) || data.length === 0) {
-          throw new Error("No offers found");
+          throw new Error(`No ${searchType} results found`);
         }
 
-        setOffers(data);
+        setResults(data);
       } catch (error: unknown) {
         if (error instanceof Error) {
           setError(error);
-          console.error("Error fetching flight offers:", error.message);
+          console.error(`Error fetching ${searchType} results:`, error.message);
         } else {
           console.error("An unknown error occurred.");
           setError(new Error("An unknown error occurred."));
@@ -93,8 +117,8 @@ export default function FlySearchResults() {
       }
     };
 
-    void fetchOffers();
-  }, [searchParams, limit]);
+    void fetchResults();
+  }, [searchParams, limit, searchType]);
 
   if (loading) {
     const skeletonCount = limit < 10 ? limit : 10;
@@ -123,7 +147,7 @@ export default function FlySearchResults() {
           </div>
           <div className="grid gap-4">
             {Array.from({ length: skeletonCount }).map((_, index) => (
-              <FlySkeleton key={index} />
+              <SearchSkeleton key={index} />
             ))}
           </div>
         </div>
@@ -145,12 +169,12 @@ export default function FlySearchResults() {
       <div className="space-y-6">
         <div className="grid gap-4">
           <h2 className="text-2xl font-bold">Filters</h2>
-          <FlySearchFilters />
+          <SearchFilters />
         </div>
       </div>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Flight Search Results</h1>
+          <h1 className="text-3xl font-bold">Search Results</h1>
           <div className="flex items-center gap-4">
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[180px]">
@@ -158,20 +182,39 @@ export default function FlySearchResults() {
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="total_amount">Total Amount</SelectItem>
-                <SelectItem value="total_duration">Total Duration</SelectItem>
+                {searchType === "fly" ? (
+                  <>
+                    <SelectItem value="total_amount">Total Amount</SelectItem>
+                    <SelectItem value="total_duration">
+                      Total Duration
+                    </SelectItem>
+                  </>
+                ) : (
+                  <>
+                    <SelectItem value="price">Price</SelectItem>
+                    <SelectItem value="rating">Rating</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>
         </div>
         <div className="grid gap-4">
-          {offers.map((offer) => (
-            <FlyCard
-              key={offer.id}
-              offer={offer}
-              onSelect={() => handleSelectOffer(offer)}
-            />
-          ))}
+          {results.map((result) =>
+            searchType === "fly" ? (
+              <FlyCard
+                key={result.id}
+                offer={result as Offer}
+                onSelect={() => handleSelect(result)}
+              />
+            ) : (
+              <StayCard
+                key={result.id}
+                stay={result as StaysSearchResult}
+                onSelect={() => handleSelect(result)}
+              />
+            ),
+          )}
         </div>
         <div className="flex justify-between mt-6">
           <Button

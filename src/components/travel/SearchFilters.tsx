@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
-export default function FlySearchFilters() {
+export default function SearchFilters() {
   return (
     <Accordion collapsible type="single">
       <AccordionItem value="departure">

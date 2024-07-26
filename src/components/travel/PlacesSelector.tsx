@@ -17,25 +17,27 @@ import {
 } from "@/components/ui/popover";
 
 import {
-  ChevronsUpDown,
   PlaneTakeoffIcon,
   PlaneLandingIcon,
   HotelIcon,
+  MapPinIcon,
 } from "lucide-react";
 
-import type { Place } from "@duffel/api/types/shared";
+import type { Places } from "@duffel/api/types";
 
 interface PlacesSelectorProps {
   value: string;
-  onSelect: (iataCode: string, name: string) => void;
+  onSelect: (
+    place: string | { latitude: number | null; longitude: number | null },
+  ) => void;
   placeholder: string;
-  type: "origin" | "destination";
+  type: "origin" | "destination" | "stay";
 }
 
 const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
   ({ value, onSelect, placeholder, type }, ref) => {
     const [query, setQuery] = React.useState("");
-    const [places, setPlaces] = React.useState<Place[]>([]);
+    const [places, setPlaces] = React.useState<Places[]>([]);
     const [open, setOpen] = React.useState(false);
 
     const fetchPlaces = async (query: string) => {
@@ -50,7 +52,6 @@ const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
         const result = await response.json();
         setPlaces(result.data || []);
       } catch (error) {
-        console.error("Error fetching places:", error);
         setPlaces([]);
       }
     };
@@ -63,7 +64,23 @@ const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
     const airports = places.filter((place) => place.type === "airport");
 
     const IconComponent =
-      type === "origin" ? PlaneTakeoffIcon : PlaneLandingIcon;
+      type === "origin"
+        ? PlaneTakeoffIcon
+        : type === "destination"
+          ? PlaneLandingIcon
+          : MapPinIcon;
+
+    const handleSelect = (place: Places) => {
+      if (type === "stay") {
+        onSelect({
+          latitude: place.latitude,
+          longitude: place.longitude,
+        });
+      } else {
+        onSelect(place.iata_code);
+      }
+      setOpen(false);
+    };
 
     return (
       <Popover open={open} onOpenChange={setOpen}>
@@ -95,13 +112,14 @@ const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
                     <CommandItem
                       key={city.id}
                       value={city.id}
-                      onSelect={() => {
-                        onSelect(city.iata_code!, city.name);
-                        setOpen(false);
-                      }}
+                      onSelect={() => handleSelect(city)}
                       className="text-sm"
                     >
-                      <HotelIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                      {type === "stay" ? (
+                        <HotelIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                      ) : (
+                        <IconComponent className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                      )}
                       <span>{city.name}</span>
                       <span className="ml-auto text-xs text-muted-foreground">
                         {city.iata_code}
@@ -116,10 +134,7 @@ const PlacesSelector = React.forwardRef<HTMLButtonElement, PlacesSelectorProps>(
                     <CommandItem
                       key={airport.id}
                       value={airport.id}
-                      onSelect={() => {
-                        onSelect(airport.iata_code!, airport.name);
-                        setOpen(false);
-                      }}
+                      onSelect={() => handleSelect(airport)}
                       className="text-sm"
                     >
                       <IconComponent className="mr-2 h-4 w-4 shrink-0 opacity-50" />
