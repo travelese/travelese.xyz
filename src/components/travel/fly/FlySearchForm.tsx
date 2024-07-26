@@ -23,12 +23,6 @@ export default function FlySearchForm() {
     "fly",
     navigateToSearchPage,
   );
-  console.log("useSearchForm returned values:", {
-    form,
-    date,
-    setDate,
-    onSubmit: !!onSubmit,
-  });
 
   useEffect(() => {
     setIsClient(true);
@@ -46,7 +40,6 @@ export default function FlySearchForm() {
             onSubmit={(e) => {
               e.preventDefault();
               const formData = form.getValues();
-              console.log("Fly form data:", JSON.stringify(formData, null, 2));
               onSubmit(formData);
             }}
             className="flex flex-col sm:flex-row lg:flex-row xl:flex-row gap-2 p-4"

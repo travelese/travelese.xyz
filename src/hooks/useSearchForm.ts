@@ -7,8 +7,8 @@ import { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
 const FlightFormSchema = z.object({
-  origin: z.string().min(3, "Origin must be at least 3 characters"),
-  destination: z.string().min(3, "Destination must be at least 3 characters"),
+  origin: z.string().min(3),
+  destination: z.string().min(3),
   dates: z.object({
     from: z.date(),
     to: z.date(),
@@ -23,10 +23,15 @@ const StayFormSchema = z.object({
   check_out_date: z.string(),
   rooms: z.number().int().positive(),
   guests: z.array(z.enum(["adult", "child"])),
-  location: z.object({
-    latitude: z.number(),
-    longitude: z.number(),
-  }),
+  location: z
+    .object({
+      geographic_coordinates: z.object({
+        latitude: z.number(),
+        longitude: z.number(),
+      }),
+      radius: z.number(),
+    })
+    .optional(),
 });
 
 type SearchType = "fly" | "stay";
@@ -66,8 +71,11 @@ export function useSearchForm(
             rooms: 1,
             guests: ["adult"],
             location: {
-              latitude: 0,
-              longitude: 0,
+              geographic_coordinates: {
+                latitude: 0,
+                longitude: 0,
+              },
+              radius: 5,
             },
           },
   });
@@ -82,13 +90,7 @@ export function useSearchForm(
   const onSubmit = async (
     data: z.infer<typeof FlightFormSchema> | z.infer<typeof StayFormSchema>,
   ) => {
-    console.log("onSubmit called with data:", data);
     if (type === "fly") {
-      console.log(
-        "useSearchForm type fly onSubmit called",
-        JSON.stringify(data, null, 2),
-      );
-      console.log("Search type:", type);
       const { origin, destination, dates, cabin, passengers } = data as z.infer<
         typeof FlightFormSchema
       >;
@@ -120,8 +122,13 @@ export function useSearchForm(
         data as z.infer<typeof StayFormSchema>;
       const formattedGuests = guests.map((type) => ({ type }));
 
-      if (!location.latitude || !location.longitude) {
-        console.error("Location not properly selected");
+      if (
+        !location ||
+        !location.geographic_coordinates ||
+        !location.geographic_coordinates.latitude ||
+        !location.geographic_coordinates.longitude ||
+        !location.radius
+      ) {
         toast.error("Please select a valid location");
         return;
       }
@@ -132,8 +139,9 @@ export function useSearchForm(
         check_out_date,
         rooms: rooms.toString(),
         guests: JSON.stringify(formattedGuests),
-        latitude: location.latitude.toString(),
-        longitude: location.longitude.toString(),
+        latitude: location.geographic_coordinates.latitude.toString(),
+        longitude: location.geographic_coordinates.longitude.toString(),
+        radius: location.radius.toString(),
       };
       try {
         navigateToSearchPage(queryParams);
