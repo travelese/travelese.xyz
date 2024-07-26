@@ -23,11 +23,11 @@ export default function FlyLayout({
   const breadcrumbItems = [
     {
       label: "Search",
-      href: "/travel/fly/search",
+      href: "/travel/search",
     },
     {
       label: "Book",
-      href: "/travel/fly/book",
+      href: "/travel/book",
     },
   ];
 

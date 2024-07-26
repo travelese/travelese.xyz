@@ -7,28 +7,21 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { useSearchForm } from "@/hooks/useSearchForm";
 import {
-  OriginField,
   DestinationField,
   DatesField,
   TravellersField,
-  CabinField,
+  RoomsField,
 } from "@/components/travel/SearchFormFields";
 import Loading from "@/app/loading";
 import useNavigation from "@/hooks/useNavigation";
 
-export default function FlySearchForm() {
+export default function StaySearchForm() {
   const [isClient, setIsClient] = useState(false);
   const { navigateToSearchPage } = useNavigation();
   const { form, date, setDate, onSubmit } = useSearchForm(
-    "fly",
+    "stay",
     navigateToSearchPage,
   );
-  console.log("useSearchForm returned values:", {
-    form,
-    date,
-    setDate,
-    onSubmit: !!onSubmit,
-  });
 
   useEffect(() => {
     setIsClient(true);
@@ -46,14 +39,13 @@ export default function FlySearchForm() {
             onSubmit={(e) => {
               e.preventDefault();
               const formData = form.getValues();
-              console.log("Fly form data:", JSON.stringify(formData, null, 2));
+              console.log("Stay form data:", JSON.stringify(formData, null, 2));
               onSubmit(formData);
             }}
             className="flex flex-col sm:flex-row lg:flex-row xl:flex-row gap-2 p-4"
           >
             <div className="flex flex-col sm:flex-row gap-1 flex-grow">
-              <OriginField control={form.control} />
-              <DestinationField control={form.control} />
+              <DestinationField control={form.control} searchType="stay" />
             </div>
             <div className="flex flex-col sm:flex-row gap-2 flex-grow">
               <DatesField
@@ -61,10 +53,10 @@ export default function FlySearchForm() {
                 date={date}
                 setDate={setDate}
               />
-              <TravellersField control={form.control} />
+              <TravellersField control={form.control} searchType="stay" />
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <CabinField control={form.control} />
+              <RoomsField control={form.control} />
               <div className="flex-1 w-full min-w-[100px]">
                 <Button type="submit" className="w-full h-full">
                   <SearchIcon className="mr-2 h-4 w-4" />

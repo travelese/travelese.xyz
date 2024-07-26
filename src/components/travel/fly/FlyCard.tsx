@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Drawer,
@@ -25,7 +25,7 @@ import {
   DrawerDescription,
 } from "@/components/ui/drawer";
 
-import { BackpackIcon, CloudFogIcon, ShareIcon } from "lucide-react";
+import { BackpackIcon, CloudFogIcon } from "lucide-react";
 
 import FlySegment from "@/components/travel/fly/FlySegment";
 import type { Offer } from "@duffel/api/types";

@@ -1,19 +1,19 @@
 import * as React from "react";
-
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
 import { MinusIcon, PlusIcon, UserIcon } from "lucide-react";
 import { Child } from "@kiwicom/orbit-components/icons";
 import { Infant } from "@kiwicom/orbit-components/icons";
+import type { DuffelPassengerType, Guest } from "@duffel/api/types";
 
-import type { DuffelPassengerType } from "@duffel/api/types";
-
-const pluralize = (type: DuffelPassengerType, count: number): string => {
+const pluralize = (
+  type: DuffelPassengerType | Guest["type"],
+  count: number,
+): string => {
   switch (type) {
     case "child":
       return count === 1 ? "Child" : "Children";
@@ -24,7 +24,7 @@ const pluralize = (type: DuffelPassengerType, count: number): string => {
   }
 };
 
-const getPassengerIcon = (type: DuffelPassengerType) => {
+const getPassengerIcon = (type: DuffelPassengerType | Guest["type"]) => {
   switch (type) {
     case "child":
       return <Child className="h-4 w-4" />;
@@ -35,48 +35,42 @@ const getPassengerIcon = (type: DuffelPassengerType) => {
   }
 };
 
-interface PassengerSelectorProps {
-  value: DuffelPassengerType[];
-  onChange: (passengers: DuffelPassengerType[]) => void;
+type TravellerType = DuffelPassengerType | Guest["type"];
+
+interface TravellerSelectorProps {
+  value: TravellerType[];
+  onChange: (travellers: TravellerType[]) => void;
 }
 
-export default function PassengerSelector({
+export default function TravellerSelector({
   value = [],
   onChange,
-}: PassengerSelectorProps): React.ReactElement {
-  const handlePassengerChange = (type: DuffelPassengerType, change: number) => {
-    const updatedPassengers = [...value];
+}: TravellerSelectorProps): React.ReactElement {
+  const handleTravellerChange = (type: TravellerType, change: number) => {
+    const updatedTravellers = [...value];
 
     if (change > 0) {
-      updatedPassengers.push(type);
+      updatedTravellers.push(type);
     } else {
-      const index = updatedPassengers.indexOf(type);
+      const index = updatedTravellers.indexOf(type);
       if (index !== -1) {
-        updatedPassengers.splice(index, 1);
+        updatedTravellers.splice(index, 1);
       }
     }
 
-    // Ensure at least one adult is always present
-    if (type === "adult" && !updatedPassengers.includes("adult")) {
-      return;
-    }
-
-    onChange(updatedPassengers);
+    onChange(updatedTravellers);
   };
 
-  const passengerCounts = value.reduce<{
-    [key in DuffelPassengerType]: number;
-  }>(
-    (acc, type) => {
-      acc[type] = (acc[type] || 0) + 1;
-      return acc;
-    },
-    {
-      adult: 0,
-      child: 0,
-      infant_without_seat: 0,
-    },
-  );
+  const travellerCounts = value.reduce<Record<string, number>>((acc, p) => {
+    acc[p] = (acc[p] || 0) + 1;
+    return acc;
+  }, {});
+
+  const travellerTypes: TravellerType[] = [
+    "adult",
+    "child",
+    "infant_without_seat",
+  ];
 
   return (
     <Popover>
@@ -85,12 +79,10 @@ export default function PassengerSelector({
           variant="outline"
           className="w-full justify-start text-left font-normal"
         >
-          {(
-            ["adult", "child", "infant_without_seat"] as DuffelPassengerType[]
-          ).map((type) => (
+          {travellerTypes.map((type) => (
             <span key={type} className="flex items-center space-x-2 mx-2">
               {getPassengerIcon(type)}
-              <span className="text-sm">{passengerCounts[type]}</span>
+              <span className="text-sm">{travellerCounts[type] || 0}</span>
             </span>
           ))}
         </Button>
@@ -101,34 +93,32 @@ export default function PassengerSelector({
         side="bottom"
       >
         <div className="space-y-4">
-          {(
-            ["adult", "child", "infant_without_seat"] as DuffelPassengerType[]
-          ).map((type) => (
+          {travellerTypes.map((type) => (
             <div key={type} className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 {getPassengerIcon(type)}
                 <span className="text-sm font-medium">
-                  {pluralize(type, passengerCounts[type])}
+                  {pluralize(type, travellerCounts[type] || 0)}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Button
                   size="icon"
                   variant="outline"
-                  disabled={passengerCounts[type] === 0}
+                  disabled={(travellerCounts[type] || 0) === 0}
                   className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-                  onClick={() => handlePassengerChange(type, -1)}
+                  onClick={() => handleTravellerChange(type, -1)}
                 >
                   <MinusIcon className="h-4 w-4" />
                 </Button>
                 <span className="text-sm w-4 text-center">
-                  {passengerCounts[type]}
+                  {travellerCounts[type] || 0}
                 </span>
                 <Button
                   size="icon"
                   variant="outline"
                   className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-                  onClick={() => handlePassengerChange(type, 1)}
+                  onClick={() => handleTravellerChange(type, 1)}
                 >
                   <PlusIcon className="h-4 w-4" />
                 </Button>
