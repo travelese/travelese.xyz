@@ -39,7 +39,6 @@ export default function StaySearchForm() {
             onSubmit={(e) => {
               e.preventDefault();
               const formData = form.getValues();
-              console.log("Stay form data:", JSON.stringify(formData, null, 2));
               onSubmit(formData);
             }}
             className="flex flex-col sm:flex-row lg:flex-row xl:flex-row gap-2 p-4"

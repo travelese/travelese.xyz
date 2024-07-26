@@ -42,7 +42,7 @@ export const OriginField: React.FC<FieldProps> = ({ control }) => (
     render={({ field }) => (
       <FormItem className="flex-y-1 min-w-[125px]">
         <PlacesSelector
-          value={field.value ? field.value.name : ""}
+          value={field.value || ""}
           onSelect={(place) => {
             field.onChange(place);
           }}
