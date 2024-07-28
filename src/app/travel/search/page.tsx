@@ -71,18 +71,14 @@ export default function SearchResults() {
     }
 
     const fetchResults = async () => {
-      console.log("Fetching stay search results");
       try {
         setLoading(true);
         const params = new URLSearchParams(searchParams);
-        console.log("Search params:", params.toString());
         params.set("limit", limit.toString());
 
-        // Only add limit for fly searches
         if (searchType === "fly") {
           params.set("limit", limit.toString());
         } else {
-          // Remove limit parameter for stay searches
           params.delete("limit");
         }
 

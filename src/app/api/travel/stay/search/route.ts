@@ -25,17 +25,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  console.log("Received stay search request");
-  const { session } = await getUserAuth();
-  if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
-  }
-
   try {
     const { searchParams } = new URL(request.url);
-    console.log("Raw search params:", searchParams.toString());
     const check_in_date = searchParams.get("check_in_date");
     const check_out_date = searchParams.get("check_out_date");
     const rooms = searchParams.get("rooms")
