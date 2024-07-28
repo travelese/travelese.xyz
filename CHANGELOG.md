@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.3](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.4.2...v0.4.3) (2024-07-28)
+
+### Features
+
+- **api:** allow public access to search functionality ([64589c1](https://github.com/arminbabaeistudio/travelese.xyz/commit/64589c18d856ef804f72d873af0834fa7b0b7168))
+
 ### [0.4.2](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.4.1...v0.4.2) (2024-07-26)
 
 ### Bug Fixes
