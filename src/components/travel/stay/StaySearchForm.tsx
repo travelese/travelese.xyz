@@ -50,7 +50,13 @@ export default function StaySearchForm() {
               <DatesField
                 control={form.control}
                 date={date}
-                setDate={setDate}
+                setDate={(newDate) => {
+                  if (newDate instanceof Function) {
+                    setDate(newDate(date));
+                  } else {
+                    setDate(newDate);
+                  }
+                }}
               />
               <TravellersField control={form.control} searchType="stay" />
             </div>

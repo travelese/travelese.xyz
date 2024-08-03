@@ -8,4 +8,6 @@ export const travelAgencies = pgTable("travel_agencies", {
   address: text("address"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
+  syncedAt: timestamp("synced_at"),
 });

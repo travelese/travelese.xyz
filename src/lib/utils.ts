@@ -8,6 +8,6 @@ export function cn(...inputs: ClassValue[]) {
 
 export const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789");
 
-export function absoluteUrl(path: string) {
-  return `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}${path}`;
+export function absoluteurl(path: string) {
+  return `${process.env.next_public_app_url || "http://localhost:3000"}${path}`;
 }

@@ -1,5 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { drizzle } from "drizzle-orm/vercel-postgres";
+import * as schema from "./schema";
 import { env } from "@/lib/env.mjs";
 
 const connectionString = env.POSTGRES_URL;
@@ -10,4 +11,4 @@ if (!connectionString) {
   );
 }
 
-export const db = drizzle(sql);
+export const db = drizzle(sql, { schema });

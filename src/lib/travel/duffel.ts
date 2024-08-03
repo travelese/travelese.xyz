@@ -1,5 +1,6 @@
-import { env } from "@/lib/env.mjs";
-import { Duffel, DuffelError } from "@duffel/api";
+import { duffel } from "./index";
+import { DuffelError } from "@duffel/api";
+
 import type { Places } from "@duffel/api/Places/Suggestions/SuggestionsType";
 import type { Offer } from "@duffel/api/booking/Offers/OfferTypes";
 import type {
@@ -15,10 +16,6 @@ import type {
   StaysBooking,
 } from "@duffel/api/types";
 import type { StaysBookingPayload } from "@duffel/api/Stays/Bookings/Bookings";
-
-const duffel = new Duffel({
-  token: env.DUFFEL_ACCESS_TOKEN!,
-});
 
 export async function searchFlights(
   slices: CreateOfferRequest["slices"],
@@ -78,9 +75,7 @@ export async function createOrder(params: CreateOrder): Promise<Order> {
 export async function getPlaceSuggestions(
   params: Parameters<typeof duffel.suggestions.list>[0],
 ): Promise<Places[]> {
-  console.log("Calling Duffel API for place suggestions with params:", params);
   const response = await duffel.suggestions.list(params);
-  console.log("Duffel API place suggestions response:", response);
   return response.data;
 }
 
@@ -103,14 +98,8 @@ export async function listOrders(params: {
     .filter(([_, value]) => value !== undefined)
     .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
-  console.log(
-    "Requesting orders from Duffel API with params:",
-    JSON.stringify(validParams),
-  );
-
   try {
     const response = await duffel.orders.list(validParams);
-    console.log(`Received ${response.data.length} orders from Duffel API`);
     return response;
   } catch (error) {
     console.error(
@@ -157,7 +146,6 @@ export async function searchAccommodations(
     JSON.stringify(params, null, 2),
   );
   try {
-    console.log("Duffel client:", duffel);
     console.log("Duffel stays search method:", duffel.stays?.search);
     const response: DuffelResponse<StaysSearchResult> =
       await duffel.stays.search(params);

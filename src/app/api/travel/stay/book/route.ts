@@ -1,10 +1,10 @@
-import { NextRequest } from "next/server";
-import { getUserAuth } from "@/lib/auth/utils";
+import { auth } from "@clerk/nextjs/server";
 import { bookAccommodation } from "@/lib/travel/duffel";
 
-export async function POST(request: NextRequest) {
-  const { session } = await getUserAuth();
-  if (!session) {
+export async function POST(request: Request) {
+  const { userId } = auth();
+
+  if (!userId) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });

@@ -1,17 +1,8 @@
-import { NextRequest } from "next/server";
 import { sendEmail } from "@/lib/email/utils";
 import { OrderConfirmationEmail } from "@/components/emails/OrderConfirmation";
 import type { OrderSlice, OrderSliceSegment } from "@duffel/api/types";
-import { getUserAuth } from "@/lib/auth/utils";
 
-export async function POST(request: NextRequest) {
-  const { session } = await getUserAuth();
-  if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
-  }
-
+export async function POST(request: Request) {
   try {
     const order = await request.json();
 

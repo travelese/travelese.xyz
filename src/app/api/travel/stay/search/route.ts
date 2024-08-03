@@ -1,17 +1,8 @@
-import { NextRequest } from "next/server";
-import { getUserAuth } from "@/lib/auth/utils";
 import { searchAccommodations } from "@/lib/travel/duffel";
 import type { StaysSearchParams, StaysSearchResult } from "@duffel/api/types";
 import { DuffelError } from "@duffel/api";
 
-export async function POST(request: NextRequest) {
-  const { session } = await getUserAuth();
-  if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
-  }
-
+export async function POST(request: Request) {
   try {
     const body: StaysSearchParams = await request.json();
     const accommodations: StaysSearchResult = await searchAccommodations(body);
@@ -24,7 +15,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const check_in_date = searchParams.get("check_in_date");

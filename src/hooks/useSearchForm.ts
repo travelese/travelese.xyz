@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { addDays, format } from "date-fns";
+import { addDays, format, startOfTomorrow } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
@@ -18,21 +18,28 @@ const FlightFormSchema = z.object({
   sort: z.enum(["total_amount", "total_duration"]),
 });
 
-const StayFormSchema = z.object({
-  check_in_date: z.string(),
-  check_out_date: z.string(),
-  rooms: z.number().int().positive(),
-  guests: z.array(z.enum(["adult", "child"])),
-  location: z
-    .object({
-      geographic_coordinates: z.object({
-        latitude: z.number(),
-        longitude: z.number(),
-      }),
-      radius: z.number(),
-    })
-    .optional(),
-});
+const StayFormSchema = z
+  .object({
+    check_in_date: z.date().refine((date) => date >= startOfTomorrow(), {
+      message: "Check-in date must be tomorrow or later",
+    }),
+    check_out_date: z.date(),
+    rooms: z.number().int().positive(),
+    guests: z.array(z.enum(["adult", "child"])),
+    location: z
+      .object({
+        geographic_coordinates: z.object({
+          latitude: z.number(),
+          longitude: z.number(),
+        }),
+        radius: z.number(),
+      })
+      .optional(),
+  })
+  .refine((data) => data.check_out_date > data.check_in_date, {
+    message: "Check-out date must be after check-in date",
+    path: ["check_out_date"],
+  });
 
 type SearchType = "fly" | "stay";
 
@@ -40,9 +47,9 @@ export function useSearchForm(
   type: SearchType,
   navigateToSearchPage: (queryParams: Record<string, string>) => void,
 ) {
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 7),
+  const [date, setDateState] = useState<DateRange | undefined>({
+    from: type === "fly" ? new Date() : startOfTomorrow(),
+    to: type === "fly" ? addDays(new Date(), 7) : addDays(startOfTomorrow(), 3),
   });
 
   const form = useForm<
@@ -66,8 +73,8 @@ export function useSearchForm(
             sort: "total_amount",
           }
         : {
-            check_in_date: format(new Date(), "yyyy-MM-dd"),
-            check_out_date: format(addDays(new Date(), 7), "yyyy-MM-dd"),
+            check_in_date: startOfTomorrow(),
+            check_out_date: addDays(startOfTomorrow(), 3),
             rooms: 1,
             guests: ["adult"],
             location: {
@@ -80,12 +87,34 @@ export function useSearchForm(
           },
   });
 
+  const setDate = (newDate: DateRange | undefined) => {
+    setDateState(newDate);
+    if (newDate) {
+      if (type === "fly") {
+        form.setValue("dates", {
+          from: newDate.from || new Date(),
+          to: newDate.to || addDays(newDate.from || new Date(), 7),
+        });
+      } else {
+        form.setValue("check_in_date", newDate.from || startOfTomorrow());
+        form.setValue(
+          "check_out_date",
+          newDate.to || addDays(newDate.from || startOfTomorrow(), 1),
+        );
+      }
+    }
+  };
+
   useEffect(() => {
-    setDate({
-      from: new Date(),
-      to: addDays(new Date(), 7),
-    });
-  }, []);
+    if (type === "fly") {
+      const { from, to } = form.getValues("dates");
+      setDateState({ from, to });
+    } else {
+      const checkIn = form.getValues("check_in_date");
+      const checkOut = form.getValues("check_out_date");
+      setDate({ from: checkIn, to: checkOut });
+    }
+  }, [form, type]);
 
   const onSubmit = async (
     data: z.infer<typeof FlightFormSchema> | z.infer<typeof StayFormSchema>,
@@ -135,8 +164,8 @@ export function useSearchForm(
 
       const queryParams: Record<string, string> = {
         type: "stay",
-        check_in_date,
-        check_out_date,
+        check_in_date: format(check_in_date, "yyyy-MM-dd"),
+        check_out_date: format(check_out_date, "yyyy-MM-dd"),
         rooms: rooms.toString(),
         guests: JSON.stringify(formattedGuests),
         latitude: location.geographic_coordinates.latitude.toString(),
