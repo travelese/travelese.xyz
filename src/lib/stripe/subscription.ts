@@ -3,19 +3,17 @@ import { db } from "@/lib/db/index";
 import { subscriptions } from "@/lib/db/schema/subscriptions";
 import { eq } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/index";
-import { getUserAuth } from "@/lib/auth/utils";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function getUserSubscriptionPlan() {
-  const { session } = await getUserAuth();
+  const user = await currentUser();
 
-  if (!session || !session.user) {
-    throw new Error("User not found.");
-  }
+  if (!user) return null;
 
   const [subscription] = await db
     .select()
     .from(subscriptions)
-    .where(eq(subscriptions.userId, session.user.id));
+    .where(eq(subscriptions.userId, user.id));
 
   if (!subscription)
     return {

@@ -1,5 +1,5 @@
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
-import { users } from "./auth";
+import { users } from "./users";
 
 export const subscriptions = pgTable("subscriptions", {
   userId: varchar("user_id", { length: 255 })

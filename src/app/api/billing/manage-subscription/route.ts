@@ -1,6 +1,4 @@
 import { stripe } from "@/lib/stripe/index";
-import { absoluteUrl } from "@/lib/utils";
-import { getUserAuth } from "@/lib/auth/utils";
 
 interface ManageStripeSubscriptionActionProps {
   isSubscribed: boolean;
@@ -11,18 +9,11 @@ interface ManageStripeSubscriptionActionProps {
   userId: string;
 }
 
-export async function POST(req: Request) {
-  const { session } = await getUserAuth();
-  if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
-  }
-
-  const body: ManageStripeSubscriptionActionProps = await req.json();
+export async function POST(request: Request) {
+  const body: ManageStripeSubscriptionActionProps = await request.json();
   const { isSubscribed, stripeCustomerId, userId, stripePriceId, email } = body;
   console.log(body);
-  const billingUrl = absoluteUrl("/account/billing");
+  const billingUrl = new URL(request.url).origin.concat("/billing");
 
   if (isSubscribed && stripeCustomerId) {
     const stripeSession = await stripe.billingPortal.sessions.create({

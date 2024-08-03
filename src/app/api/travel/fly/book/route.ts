@@ -1,17 +1,9 @@
-import { NextRequest } from "next/server";
 import { getOffer, createOrder } from "@/lib/travel/duffel";
 import type { CreateOrder } from "@duffel/api/booking/Orders/OrdersTypes";
 import { DuffelError } from "@duffel/api";
-import { getUserAuth } from "@/lib/auth/utils";
+import { auth } from "@clerk/nextjs/server";
 
-export async function GET(request: NextRequest) {
-  const { session } = await getUserAuth();
-  if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
-  }
-
+export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const offerId = searchParams.get("id");
@@ -49,9 +41,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  const { session } = await getUserAuth();
-  if (!session) {
+export async function POST(request: Request) {
+  const { userId }: { userId: string | null } = auth();
+
+  if (!userId) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });
@@ -62,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     orderParams.metadata = {
       ...orderParams.metadata,
-      userId: session.user.id,
+      userId,
     };
 
     if (

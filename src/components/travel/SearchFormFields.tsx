@@ -27,6 +27,7 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PlacesSelector from "@/components/travel/PlacesSelector";
 import TravellerSelector from "@/components/travel/TravellerSelector";
+import { DatePickerWithRange } from "@/components/travel/DateSelector";
 
 interface FieldProps {
   control: Control<any>;
@@ -96,47 +97,13 @@ export const DatesField: React.FC<FieldProps> = ({
     name="dates"
     render={({ field, fieldState }) => (
       <FormItem className="flex-y-1 min-w-[150px]">
-        <Popover>
-          <PopoverTrigger asChild>
-            <FormControl>
-              <Button
-                id="date"
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground",
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date?.from ? (
-                  date.to ? (
-                    <>
-                      {format(date.from, "LLL dd, y")} -
-                      {format(date.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(date.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </FormControl>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              initialFocus
-              mode="range"
-              defaultMonth={field.value?.from}
-              selected={date}
-              onSelect={(selected) => {
-                setDate?.(selected as DateRange | undefined);
-                field.onChange(selected);
-              }}
-              numberOfMonths={2}
-            />
-          </PopoverContent>
-        </Popover>
+        <DatePickerWithRange
+          date={date}
+          onDateChange={(newDate) => {
+            setDate?.(newDate);
+            field.onChange(newDate);
+          }}
+        />
         <FormMessage>{fieldState.error?.message}</FormMessage>
       </FormItem>
     )}

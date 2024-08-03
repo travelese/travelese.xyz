@@ -1,21 +1,13 @@
 import * as React from "react";
-import { redirect } from "next/navigation";
-import { checkAuth, getUserAuth } from "@/lib/auth/utils";
 import { Toaster } from "@/components/ui/sonner";
 import Sidebar from "@/components/Sidebar";
-import { DashboardBreadcrumb } from "@/components/DashboardBreadcrumb";
+import { DashboardBreadcrumb } from "@/components/dashboard/DashboardBreadcrumb";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await checkAuth();
-  const { session } = await getUserAuth();
-  if (!session) {
-    redirect("/sign-in");
-  }
-
   return (
     <div className="flex h-[calc(100vh-57px)]">
       <Sidebar />

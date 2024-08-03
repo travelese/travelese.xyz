@@ -1,5 +1,3 @@
-import { NextRequest } from "next/server";
-import { getUserAuth } from "@/lib/auth/utils";
 import { searchFlights } from "@/lib/travel/duffel";
 import type {
   CreateOfferRequest,
@@ -7,14 +5,7 @@ import type {
 } from "@duffel/api/booking/OfferRequests/OfferRequestsTypes";
 import type { Offer } from "@duffel/api/booking/Offers/OfferTypes";
 
-export async function POST(request: NextRequest) {
-  const { session } = await getUserAuth();
-  if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
-  }
-
+export async function POST(request: Request) {
   try {
     const body: {
       slices: CreateOfferRequest["slices"];
@@ -41,7 +32,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
 

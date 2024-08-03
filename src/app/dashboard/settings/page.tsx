@@ -1,19 +1,41 @@
 import * as React from "react";
-import UserSettings from "./UserSettings";
-import PlanSettings from "./PlanSettings";
-import { checkAuth, getUserAuth } from "@/lib/auth/utils";
-import { getUserSubscriptionPlan } from "@/lib/stripe/subscription";
+import { currentUser } from "@clerk/nextjs/server";
+import { UserSettings } from "@/components/settings/UserSettings";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import { CodeSwitcher } from "@/components/settings/CodeSwitcher";
 
-export default async function Settings() {
-  await checkAuth();
-  const { session } = await getUserAuth();
-  const subscriptionPlan = await getUserSubscriptionPlan();
+export default async function Home() {
+  const user = await currentUser();
+
+  if (!user) return <div>Not signed in</div>;
 
   return (
-    <main className="flex flex-col gap-4 p-4 md:gap-8 md:p-8 border">
-      <div className="space-y-4">
-        <PlanSettings subscriptionPlan={subscriptionPlan} session={session} />
-        <UserSettings session={session} />
+    <main className="max-w-[75rem] w-full mx-auto">
+      <div className="grid grid-cols-[1fr_20.5rem] gap-10 pb-10">
+        <div>
+          <header className="flex items-center justify-between w-full h-16 gap-4">
+            <div className="flex items-center gap-2">
+              <OrganizationSwitcher
+                appearance={{
+                  elements: {
+                    organizationPreviewAvatarBox: "size-6",
+                  },
+                }}
+              />
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "size-6",
+                  },
+                }}
+              />
+            </div>
+          </header>
+          <UserSettings />
+        </div>
+        <div className="pt-[3.5rem]">
+          <CodeSwitcher />
+        </div>
       </div>
     </main>
   );

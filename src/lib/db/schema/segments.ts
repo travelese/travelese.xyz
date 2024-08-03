@@ -24,4 +24,8 @@ export const segments = pgTable("segments", {
   originTerminal: text("origin_terminal"),
   passengers: jsonb("passengers").notNull(),
   distance: text("distance"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
+  syncedAt: timestamp("synced_at"),
 });

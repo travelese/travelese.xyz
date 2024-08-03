@@ -1,9 +1,9 @@
 import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
-import { users } from "./auth";
+import { users } from "./users";
 import { travelAgents } from "./travelAgents";
 
 export const orders = pgTable("orders", {
-  id: text("id").primaryKey(),
+  id: text("id").notNull().primaryKey(),
   userId: text("user_id").references(() => users.id),
   bookingReference: text("booking_reference").notNull(),
   passengerId: text("passenger_id"),
@@ -21,5 +21,6 @@ export const orders = pgTable("orders", {
   offerId: text("offer_id"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
   syncedAt: timestamp("synced_at"),
 });

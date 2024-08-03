@@ -1,11 +1,13 @@
 import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { users } from "./auth";
+import { users } from "./users";
 import { orders } from "./orders";
 
 export const travellers = pgTable("travellers", {
-  id: text("id").primaryKey(),
+  id: text("id").notNull().primaryKey(),
   userId: text("user_id").references(() => users.id),
-  orderId: text("order_id").references(() => orders.id),
+  orderId: text("order_id")
+    .references(() => orders.id)
+    .notNull(),
   gender: text("gender").notNull(),
   title: text("title"),
   givenName: text("given_name").notNull(),
@@ -19,4 +21,8 @@ export const travellers = pgTable("travellers", {
   loyaltyProgramme: text("loyalty_programme"),
   companyName: text("company_name"),
   jobTitle: text("job_title"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
+  syncedAt: timestamp("synced_at"),
 });
