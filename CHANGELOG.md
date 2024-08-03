@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.4](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.4.3...v0.4.4) (2024-08-03)
+
+### Features
+
+- **auth and travel:** refactor and update authentication and API routes ([8f1c0c1](https://github.com/arminbabaeistudio/travelese.xyz/commit/8f1c0c156b00163629eddc74779919836d56182b))
+
 ### [0.4.3](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.4.2...v0.4.3) (2024-07-28)
 
 ### Features
