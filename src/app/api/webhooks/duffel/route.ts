@@ -1,5 +1,4 @@
-import { createHmac } from "crypto";
-import { headers } from "next/headers";
+import crypto from "crypto";
 import { db } from "@/lib/db/index";
 import { orders } from "@/lib/db/schema/orders";
 import { travellers } from "@/lib/db/schema/travellers";
@@ -16,8 +15,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const payload = await request.text();
   const signature = request.headers.get("X-Duffel-Signature");
+  const payload = await request.text();
 
   if (!signature) {
     return Response.json(
@@ -27,11 +26,14 @@ export async function POST(request: Request) {
   }
 
   // Verify the webhook signature
-  const computedSignature = createHmac("sha256", WEBHOOK_SECRET)
+  const computedSignature = crypto
+    .createHmac("sha256", WEBHOOK_SECRET)
     .update(payload)
     .digest("hex");
 
   if (computedSignature !== signature) {
+    console.log("Received signature:", signature);
+    console.log("Computed signature:", computedSignature);
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
