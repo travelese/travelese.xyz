@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.5](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.4.4...v0.4.5) (2024-08-04)
+
+### Bug Fixes
+
+- **fix(webhooks):** correct Duffel webhook verification ([1d91ae1](https://github.com/arminbabaeistudio/travelese.xyz/commit/1d91ae169945d41a6b1e0768e54aa11db35eef15))
+- updated DUFFEL_WEBHOOK_SECRET ([14ce181](https://github.com/arminbabaeistudio/travelese.xyz/commit/14ce18128450c28b13d3fb053c7040158ec59030))
+- updated DUFFEL_WEBHOOK_SECRET ([f57c02f](https://github.com/arminbabaeistudio/travelese.xyz/commit/f57c02f5671a6fd7cb410ab970dd6ea6c44ef885))
+- **webhook:** added CLERK_WEBHOOK_SECRET to .env ([4797b78](https://github.com/arminbabaeistudio/travelese.xyz/commit/4797b78fe08319b7197488e6212cbfb74e4ef601))
+
 ### [0.4.4](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.4.3...v0.4.4) (2024-08-03)
 
 ### Features
