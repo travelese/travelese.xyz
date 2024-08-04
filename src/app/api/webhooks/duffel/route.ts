@@ -15,24 +15,25 @@ export async function POST(request: Request) {
     );
   }
 
-  const signature = request.headers.get("X-Duffel-Signature");
-  const payload = await request.text();
-
+  const signature = request.headers.get("Duffel-Signature");
   if (!signature) {
     return Response.json(
-      { error: "No X-Duffel-Signature header" },
+      { error: "No Duffel-Signature header" },
       { status: 400 },
     );
   }
 
-  // Verify the webhook signature
+  const [timestamp, receivedSignature] = signature.split(",");
+  const payload = await request.text();
+
+  const signedPayload = `${timestamp}.${payload}`;
   const computedSignature = crypto
     .createHmac("sha256", WEBHOOK_SECRET)
-    .update(payload)
+    .update(signedPayload)
     .digest("hex");
 
-  if (computedSignature !== signature) {
-    console.log("Received signature:", signature);
+  if (computedSignature !== receivedSignature) {
+    console.log("Received signature:", receivedSignature);
     console.log("Computed signature:", computedSignature);
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
