@@ -18,14 +18,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const signature = request.headers.get("Duffel-Signature");
+  const signature = request.headers.get("x-duffel-signature");
   if (!signature) {
-    console.log("No Duffel-Signature header found");
+    console.log("No x-duffel-signature header found");
     return Response.json(
-      { error: "No Duffel-Signature header" },
+      { error: "No x-duffel-signature header" },
       { status: 400 },
     );
   }
+
+  console.log("Webhook event ID:", request.headers.get("x-duffel-event"));
+  console.log("Webhook delivery ID:", request.headers.get("x-duffel-delivery"));
 
   const [timestamp, receivedSignature] = signature.split(",");
   const payload = await request.text();
@@ -37,7 +40,8 @@ export async function POST(request: Request) {
     .update(signedPayload)
     .digest("hex");
 
-  if (computedSignature !== receivedSignature) {
+  if (computedSignature !== receivedSignature.slice(3)) {
+    // Remove 'v1=' prefix
     console.log("Signature verification failed");
     console.log("Received signature:", receivedSignature);
     console.log("Computed signature:", computedSignature);
