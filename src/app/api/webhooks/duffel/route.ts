@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import crypto from "crypto";
 import { db } from "@/lib/db/index";
 import { orders } from "@/lib/db/schema/orders";
@@ -6,65 +7,74 @@ import { segments } from "@/lib/db/schema/segments";
 import { eq } from "drizzle-orm";
 import { env } from "@/lib/env.mjs";
 
+const WEBHOOK_SECRET = env.DUFFEL_WEBHOOK_SECRET!;
+
+if (!WEBHOOK_SECRET) {
+  throw new Error(
+    "Please add DUFFEL_WEBHOOK_SECRET from Duffel Dashboard to .env",
+  );
+}
+
 export async function POST(request: Request) {
-  const WEBHOOK_SECRET = env.DUFFEL_WEBHOOK_SECRET!;
-
-  if (!WEBHOOK_SECRET) {
-    throw new Error(
-      "Please add DUFFEL_WEBHOOK_SECRET from Duffel Dashboard to .env",
-    );
-  }
-
-  const signature = request.headers.get("X-Duffel-Signature");
-  const payload = await request.text();
-
+  const signature = headers().get("X-Duffel-Signature");
   if (!signature) {
-    return Response.json(
-      { error: "No X-Duffel-Signature header" },
-      { status: 400 },
-    );
+    return new Response(JSON.stringify({ error: "Missing signature" }), {
+      status: 400,
+    });
   }
-
-  // Verify the webhook signature
-  const computedSignature = crypto
-    .createHmac("sha256", WEBHOOK_SECRET)
-    .update(payload)
-    .digest("hex");
-
-  if (computedSignature !== signature) {
-    console.log("Received signature:", signature);
-    console.log("Computed signature:", computedSignature);
-    return Response.json({ error: "Invalid signature" }, { status: 401 });
+  const body = await request.text();
+  if (!verifySignature(signature, body)) {
+    return new Response(JSON.stringify({ error: "Invalid signature" }), {
+      status: 401,
+    });
   }
-
-  // Parse the payload
-  const event = JSON.parse(payload);
-
-  // Handle the webhook
   try {
-    switch (event.type) {
+    const event = JSON.parse(body);
+    await processEvent(event);
+    return new Response(null, { status: 200 });
+  } catch (error) {
+    console.error("Error processing webhook:", error);
+    return new Response(JSON.stringify({ error: "Error processing webhook" }), {
+      status: 500,
+    });
+  }
+}
+
+function verifySignature(signature: string, payload: string): boolean {
+  const [timestamp, hash] = signature.split(",");
+  const [, timestampValue] = timestamp.split("=");
+  const [, hashValue] = hash.split("=");
+  const expectedSignature = crypto
+    .createHmac("sha256", WEBHOOK_SECRET)
+    .update(`${timestampValue}.${payload}`)
+    .digest("hex");
+  return crypto.timingSafeEqual(
+    Buffer.from(hashValue),
+    Buffer.from(expectedSignature),
+  );
+}
+
+async function processEvent(event: any) {
+  const { type, data } = event;
+  try {
+    switch (type) {
       case "order.created":
       case "order.updated":
-        await handleOrderCreatedOrUpdated(event.data);
+        await handleOrderCreatedOrUpdated(data);
         break;
       case "order.cancelled":
-        await handleOrderCancelled(event.data.id);
+        await handleOrderCancelled(data.id);
         break;
-      case "ping":
+      case "ping.triggered":
         console.log("Received ping event");
         break;
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`Unhandled event type: ${type}`);
     }
   } catch (error) {
-    console.error(`Error processing event type ${event.type}:`, error);
-    return Response.json(
-      { error: "Error processing webhook" },
-      { status: 500 },
-    );
+    console.error(`Error processing event type ${type}:`, error);
+    throw error;
   }
-
-  return Response.json({ received: true }, { status: 200 });
 }
 
 async function handleOrderCreatedOrUpdated(orderData: any) {
