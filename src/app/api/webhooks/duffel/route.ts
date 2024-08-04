@@ -7,6 +7,9 @@ import { eq } from "drizzle-orm";
 import { env } from "@/lib/env.mjs";
 
 export async function POST(request: Request) {
+  console.log("Received webhook request");
+  console.log("Headers:", Object.fromEntries(request.headers));
+
   const WEBHOOK_SECRET = env.DUFFEL_WEBHOOK_SECRET!;
 
   if (!WEBHOOK_SECRET) {
@@ -17,6 +20,7 @@ export async function POST(request: Request) {
 
   const signature = request.headers.get("Duffel-Signature");
   if (!signature) {
+    console.log("No Duffel-Signature header found");
     return Response.json(
       { error: "No Duffel-Signature header" },
       { status: 400 },
@@ -25,6 +29,7 @@ export async function POST(request: Request) {
 
   const [timestamp, receivedSignature] = signature.split(",");
   const payload = await request.text();
+  console.log("Received payload:", payload);
 
   const signedPayload = `${timestamp}.${payload}`;
   const computedSignature = crypto
@@ -33,26 +38,33 @@ export async function POST(request: Request) {
     .digest("hex");
 
   if (computedSignature !== receivedSignature) {
+    console.log("Signature verification failed");
     console.log("Received signature:", receivedSignature);
     console.log("Computed signature:", computedSignature);
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
+  console.log("Signature verification successful");
+
   // Parse the payload
   const event = JSON.parse(payload);
+  console.log("Event type:", event.type);
 
   // Handle the webhook
   try {
     switch (event.type) {
       case "order.created":
       case "order.updated":
+        console.log("Handling order created/updated event");
         await handleOrderCreatedOrUpdated(event.data);
         break;
       case "order.cancelled":
+        console.log("Handling order cancelled event");
         await handleOrderCancelled(event.data.id);
         break;
       case "ping":
         console.log("Received ping event");
+        console.log("Ping payload:", JSON.stringify(event, null, 2));
         break;
       default:
         console.log(`Unhandled event type: ${event.type}`);
@@ -65,6 +77,7 @@ export async function POST(request: Request) {
     );
   }
 
+  console.log("Webhook processed successfully");
   return Response.json({ received: true }, { status: 200 });
 }
 
