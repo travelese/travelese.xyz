@@ -1,4 +1,4 @@
-import { Webhook } from "svix";
+import { createHmac } from "crypto";
 import { headers } from "next/headers";
 import { db } from "@/lib/db/index";
 import { orders } from "@/lib/db/schema/orders";
@@ -16,65 +16,53 @@ export async function POST(request: Request) {
     );
   }
 
-  // Get the headers
-  const headerPayload = headers();
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
+  const payload = await request.text();
+  const signature = request.headers.get("Duffel-Signature");
 
-  // If there are no headers, error out
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response("Error occurred -- no svix headers", {
-      status: 400,
-    });
+  if (!signature) {
+    return Response.json(
+      { error: "No Duffel-Signature header" },
+      { status: 400 },
+    );
   }
 
-  // Get the body
-  const payload = await request.json();
-  const body = JSON.stringify(payload);
+  // Verify the webhook signature
+  const computedSignature = createHmac("sha256", WEBHOOK_SECRET)
+    .update(payload)
+    .digest("hex");
 
-  // Create a new Svix instance with your secret.
-  const wh = new Webhook(WEBHOOK_SECRET);
-
-  let evt: any;
-
-  // Verify the payload with the headers
-  try {
-    evt = wh.verify(body, {
-      "svix-id": svix_id,
-      "svix-timestamp": svix_timestamp,
-      "svix-signature": svix_signature,
-    });
-  } catch (err) {
-    console.error("Error verifying webhook:", err);
-    return new Response("Error occurred", {
-      status: 400,
-    });
+  if (computedSignature !== signature) {
+    return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
+
+  // Parse the payload
+  const event = JSON.parse(payload);
+
   // Handle the webhook
-  const { type: eventType, data } = evt;
-
   try {
-    switch (eventType) {
+    switch (event.type) {
       case "order.created":
       case "order.updated":
-        await handleOrderCreatedOrUpdated(data);
+        await handleOrderCreatedOrUpdated(event.data);
         break;
       case "order.cancelled":
-        await handleOrderCancelled(data.id);
+        await handleOrderCancelled(event.data.id);
         break;
-      case "ping.triggered":
+      case "ping":
         console.log("Received ping event");
         break;
       default:
-        console.log(`Unhandled event type: ${eventType}`);
+        console.log(`Unhandled event type: ${event.type}`);
     }
   } catch (error) {
-    console.error(`Error processing event type ${eventType}:`, error);
-    return new Response("Error processing webhook", { status: 500 });
+    console.error(`Error processing event type ${event.type}:`, error);
+    return Response.json(
+      { error: "Error processing webhook" },
+      { status: 500 },
+    );
   }
 
-  return new Response("", { status: 200 });
+  return Response.json({ received: true }, { status: 200 });
 }
 
 async function handleOrderCreatedOrUpdated(orderData: any) {
