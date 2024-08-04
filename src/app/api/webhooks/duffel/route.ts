@@ -30,21 +30,23 @@ export async function POST(request: Request) {
   console.log("Webhook event ID:", request.headers.get("x-duffel-event"));
   console.log("Webhook delivery ID:", request.headers.get("x-duffel-delivery"));
 
-  const [timestamp, receivedSignature] = signature.split(",");
   const payload = await request.text();
   console.log("Received payload:", payload);
 
+  const [t, v1] = signature.split(",");
+  const timestamp = t.split("=")[1];
+
   const signedPayload = `${timestamp}.${payload}`;
-  const computedSignature = crypto
+  const computedSignature = `v1=${crypto
     .createHmac("sha256", WEBHOOK_SECRET)
     .update(signedPayload)
-    .digest("hex");
+    .digest("hex")}`;
 
-  if (computedSignature !== receivedSignature.slice(3)) {
-    // Remove 'v1=' prefix
+  console.log("Received signature:", v1);
+  console.log("Computed signature:", computedSignature);
+
+  if (computedSignature !== v1) {
     console.log("Signature verification failed");
-    console.log("Received signature:", receivedSignature);
-    console.log("Computed signature:", computedSignature);
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
