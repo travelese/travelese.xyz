@@ -17,11 +17,11 @@ export async function POST(request: Request) {
   }
 
   const payload = await request.text();
-  const signature = request.headers.get("Duffel-Signature");
+  const signature = request.headers.get("X-Duffel-Signature");
 
   if (!signature) {
     return Response.json(
-      { error: "No Duffel-Signature header" },
+      { error: "No X-Duffel-Signature header" },
       { status: 400 },
     );
   }
