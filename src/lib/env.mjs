@@ -18,7 +18,7 @@ export const env = createEnv({
     STRIPE_WEBHOOK_SECRET: z.string().min(1),
     DUFFEL_ABS_ACCESS_TOKEN: z.string().min(1),
     DUFFEL_ABS_WEBHOOK_SECRET: z.string().min(1),
-    DUFFEL_ACCESS_TOKEN: z.string().min(1),
+    DUFFEL_WEBHOOK_SECRET: z.string().min(1),
     DUFFEL_TRAVELESE_ACCESS_TOKEN: z.string().min(1),
     DUFFEL_TRAVELESE_WEBHOOK_SECRET: z.string().min(1),
     DUFFEL_TRAVELESE_PRO_ACCESS_TOKEN: z.string().min(1),
