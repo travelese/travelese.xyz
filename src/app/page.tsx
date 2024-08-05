@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 
 import FlySearchForm from "@/components/travel/fly/FlySearchForm";
 import StaySearchForm from "@/components/travel/stay/StaySearchForm";
+import Subscriptions from "@/components/stripe/Subscriptions";
 
 export default function LandingPage() {
   return (
@@ -211,7 +212,10 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 border-t">
+        <section id="subscriptions" className="w-full py-12 md:py-24 lg:py-32">
+          <Subscriptions />
+        </section>
+        <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-muted">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
