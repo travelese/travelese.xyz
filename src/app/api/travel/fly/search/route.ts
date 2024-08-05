@@ -24,6 +24,11 @@ export async function POST(request: Request) {
       limit,
     );
 
+    console.log(
+      "Flight search raw response (first 5 offers):",
+      JSON.stringify(offers.slice(0, 5), null, 2),
+    );
+
     return new Response(JSON.stringify(offers));
   } catch (error) {
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {

@@ -1,5 +1,4 @@
 import React from "react";
-import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Control } from "react-hook-form";
 import {
@@ -14,7 +13,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Command,
   CommandGroup,
@@ -23,11 +21,11 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Seat, Accommodation } from "@kiwicom/orbit-components/icons";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import PlacesSelector from "@/components/travel/PlacesSelector";
 import TravellerSelector from "@/components/travel/TravellerSelector";
 import { DatePickerWithRange } from "@/components/travel/DateSelector";
+import * as Sentry from "@sentry/nextjs";
+import { posthog } from "posthog-js";
 
 interface FieldProps {
   control: Control<any>;

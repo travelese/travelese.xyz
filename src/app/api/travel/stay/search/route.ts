@@ -1,19 +1,8 @@
-import { searchAccommodations } from "@/lib/travel/duffel";
-import type { StaysSearchParams, StaysSearchResult } from "@duffel/api/types";
+import { searchStays } from "@/lib/travel/duffel";
+import type { StaysSearchParams } from "@duffel/api/types";
 import { DuffelError } from "@duffel/api";
 
-export async function POST(request: Request) {
-  try {
-    const body: StaysSearchParams = await request.json();
-    const accommodations: StaysSearchResult = await searchAccommodations(body);
-
-    return new Response(JSON.stringify(accommodations));
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
-      status: 500,
-    });
-  }
-}
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
@@ -21,16 +10,16 @@ export async function GET(request: Request) {
     const check_in_date = searchParams.get("check_in_date");
     const check_out_date = searchParams.get("check_out_date");
     const rooms = searchParams.get("rooms")
-      ? parseInt(searchParams.get("rooms")!, 10)
+      ? parseInt(searchParams.get("rooms") || "", 10)
       : undefined;
     const guests = searchParams.get("guests")
-      ? JSON.parse(searchParams.get("guests")!)
+      ? JSON.parse(searchParams.get("guests") || "")
       : undefined;
     const latitude = searchParams.get("latitude")
-      ? parseFloat(searchParams.get("latitude")!)
+      ? parseFloat(searchParams.get("latitude") || "")
       : undefined;
     const longitude = searchParams.get("longitude")
-      ? parseFloat(searchParams.get("longitude")!)
+      ? parseFloat(searchParams.get("longitude") || "")
       : undefined;
 
     if (
@@ -63,12 +52,9 @@ export async function GET(request: Request) {
       },
     };
 
-    console.log(
-      "Parsed params for Duffel API:",
-      JSON.stringify(params, null, 2),
-    );
+    const accommodations = await searchStays(params);
 
-    const accommodations = await searchAccommodations(params);
+    // Return the filtered and expanded accommodations
     return new Response(JSON.stringify(accommodations));
   } catch (error) {
     console.error("Error in stay search:", error);
