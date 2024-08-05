@@ -20,7 +20,12 @@ import FlyCard from "@/components/travel/fly/FlyCard";
 import StayCard from "@/components/travel/stay/StayCard";
 import SearchSkeleton from "@/components/travel/SearchSkeleton";
 import useNavigation from "@/hooks/useNavigation";
-import type { Offer, StaysSearchResult } from "@duffel/api/types";
+import type {
+  Offer,
+  StaysAccommodation,
+  Guest,
+  StaysSearchResult,
+} from "@duffel/api/types";
 import { toast } from "sonner";
 import Loading from "@/app/loading";
 
@@ -28,8 +33,10 @@ type FlySortValues = "total_amount" | "total_duration";
 type StaySortValues = "price" | "rating";
 type SortValues = FlySortValues | StaySortValues;
 
-export default function SearchResults() {
-  const [results, setResults] = useState<Offer[] | StaysSearchResult[]>([]);
+type SearchResult = Offer | StaysSearchResult;
+
+export default function SearchResult() {
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<null | Error>(null);
   const { navigateToBookPage } = useNavigation();
@@ -56,7 +63,7 @@ export default function SearchResults() {
     router.push(`?${current.toString()}`);
   };
 
-  const handleSelect = (result: Offer | StaysSearchResult) => {
+  const handleSelect = (result: Offer | StaysAccommodation) => {
     if ("slices" in result) {
       navigateToBookPage(result);
     } else {
@@ -74,7 +81,6 @@ export default function SearchResults() {
       try {
         setLoading(true);
         const params = new URLSearchParams(searchParams);
-        params.set("limit", limit.toString());
 
         // Only add limit for fly searches
         if (searchType === "fly") {
@@ -96,12 +102,12 @@ export default function SearchResults() {
         }
 
         const data = await response.json();
-        console.log("Received stay search results:", data);
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error(`No ${searchType} results found`);
+        if (searchType === "fly") {
+          setResults(data);
+        } else {
+          // For stays, ensure we're setting an array
+          setResults(Array.isArray(data) ? data : data.results || []);
         }
-
-        setResults(data);
       } catch (error: unknown) {
         if (error instanceof Error) {
           setError(error);
@@ -198,21 +204,26 @@ export default function SearchResults() {
           </div>
         </div>
         <div className="grid gap-4">
-          {results.map((result) =>
-            searchType === "fly" ? (
-              <FlyCard
-                key={result.id}
-                offer={result as Offer}
-                onSelect={() => handleSelect(result)}
-              />
-            ) : (
-              <StayCard
-                key={result.id}
-                stay={result as StaysSearchResult}
-                onSelect={() => handleSelect(result)}
-              />
-            ),
-          )}
+          {results.map((result) => {
+            if (searchType === "fly" && "slices" in result) {
+              return (
+                <FlyCard
+                  key={result.id}
+                  offer={result}
+                  onSelect={() => handleSelect(result)}
+                />
+              );
+            } else if (searchType === "stay" && "accommodation" in result) {
+              return (
+                <StayCard
+                  key={result.id}
+                  stay={result}
+                  onSelect={() => handleSelect(result.accommodation)}
+                />
+              );
+            }
+            return null; // Handle any unexpected cases
+          })}{" "}
         </div>
         <div className="flex justify-between mt-6">
           <Button

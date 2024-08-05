@@ -5,6 +5,8 @@ import { z } from "zod";
 import { addDays, format, startOfTomorrow } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { toast } from "sonner";
+import * as Sentry from "@sentry/nextjs";
+import { posthog } from "posthog-js";
 
 const FlightFormSchema = z.object({
   origin: z.string().min(3),
@@ -119,64 +121,68 @@ export function useSearchForm(
   const onSubmit = async (
     data: z.infer<typeof FlightFormSchema> | z.infer<typeof StayFormSchema>,
   ) => {
-    if (type === "fly") {
-      const { origin, destination, dates, cabin, passengers } = data as z.infer<
-        typeof FlightFormSchema
-      >;
-      const formattedPassengers = passengers.map((type) => ({ type }));
+    try {
+      if (type === "fly") {
+        const { origin, destination, dates, cabin, passengers } =
+          data as z.infer<typeof FlightFormSchema>;
+        const formattedPassengers = passengers.map((type) => ({ type }));
 
-      if (!origin || !destination) {
-        toast.error("Please provide origin and destination");
-        return;
-      }
+        if (!origin || !destination) {
+          toast.error("Please provide origin and destination");
+          return;
+        }
 
-      const queryParams: Record<string, string> = {
-        type: "fly",
-        origin,
-        destination,
-        from: format(dates.from, "yyyy-MM-dd"),
-        to: format(dates.to, "yyyy-MM-dd"),
-        passengers: JSON.stringify(formattedPassengers),
-        cabin,
-      };
+        const queryParams: Record<string, string> = {
+          type: "fly",
+          origin,
+          destination,
+          from: format(dates.from, "yyyy-MM-dd"),
+          to: format(dates.to, "yyyy-MM-dd"),
+          passengers: JSON.stringify(formattedPassengers),
+          cabin,
+        };
 
-      try {
+        posthog.capture("search_initiated", {
+          searchType: "fly",
+          searchParams: queryParams,
+        });
         navigateToSearchPage(queryParams);
-      } catch (error) {
-        handleError(error, "fly");
-      }
-    } else {
-      console.log("useSearchForm type stay onSubmit called'", data);
-      const { check_in_date, check_out_date, rooms, guests, location } =
-        data as z.infer<typeof StayFormSchema>;
-      const formattedGuests = guests.map((type) => ({ type }));
+      } else {
+        const { check_in_date, check_out_date, rooms, guests, location } =
+          data as z.infer<typeof StayFormSchema>;
+        const formattedGuests = guests.map((type) => ({ type }));
+        if (
+          !location ||
+          !location.geographic_coordinates ||
+          !location.geographic_coordinates.latitude ||
+          !location.geographic_coordinates.longitude ||
+          !location.radius
+        ) {
+          toast.error("Please select a valid location");
+          return;
+        }
 
-      if (
-        !location ||
-        !location.geographic_coordinates ||
-        !location.geographic_coordinates.latitude ||
-        !location.geographic_coordinates.longitude ||
-        !location.radius
-      ) {
-        toast.error("Please select a valid location");
-        return;
-      }
+        const queryParams: Record<string, string> = {
+          type: "stay",
+          check_in_date: format(check_in_date, "yyyy-MM-dd"),
+          check_out_date: format(check_out_date, "yyyy-MM-dd"),
+          rooms: rooms.toString(),
+          guests: JSON.stringify(formattedGuests),
+          latitude: location.geographic_coordinates.latitude.toString(),
+          longitude: location.geographic_coordinates.longitude.toString(),
+          radius: location.radius.toString(),
+        };
 
-      const queryParams: Record<string, string> = {
-        type: "stay",
-        check_in_date: format(check_in_date, "yyyy-MM-dd"),
-        check_out_date: format(check_out_date, "yyyy-MM-dd"),
-        rooms: rooms.toString(),
-        guests: JSON.stringify(formattedGuests),
-        latitude: location.geographic_coordinates.latitude.toString(),
-        longitude: location.geographic_coordinates.longitude.toString(),
-        radius: location.radius.toString(),
-      };
-      try {
+        posthog.capture("search_initiated", {
+          searchType: "stay",
+          searchParams: queryParams,
+        });
+
         navigateToSearchPage(queryParams);
-      } catch (error) {
-        handleError(error, "stay");
       }
+    } catch (error) {
+      Sentry.captureException(error);
+      handleError(error, type);
     }
   };
 

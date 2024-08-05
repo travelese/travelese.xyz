@@ -34,7 +34,7 @@ import { toast } from "sonner";
 import type { Offer } from "@duffel/api/types";
 import Loading from "@/app/loading";
 
-interface FlyBookFormProps {
+interface BookFormProps {
   selectedOffer: Offer;
 }
 
@@ -62,7 +62,7 @@ const FormSchema = z.object({
   selected_offers: z.array(z.string().min(1, "Offer ID is required")),
 });
 
-export default function FlyBookForm({ selectedOffer }: FlyBookFormProps) {
+export default function BookForm({ selectedOffer }: BookFormProps) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

@@ -8,10 +8,10 @@ import type {
   CreateOfferRequestPassenger,
 } from "@duffel/api/booking/OfferRequests/OfferRequestsTypes";
 import type { Order } from "@duffel/api/booking/Orders/OrdersTypes";
-import type { CreateOrder, ListOffersParams } from "@duffel/api/types";
 import type {
+  CreateOrder,
+  ListOffersParams,
   StaysSearchParams,
-  DuffelResponse,
   StaysSearchResult,
   StaysBooking,
 } from "@duffel/api/types";
@@ -79,80 +79,12 @@ export async function getPlaceSuggestions(
   return response.data;
 }
 
-export async function listOrders(params: {
-  limit?: number;
-  after?: string;
-  before?: string;
-  sort?:
-    | "payment_required_by"
-    | "created_at"
-    | "departing_at"
-    | "booking_reference";
-  booking_reference?: string;
-  awaiting_payment?: boolean;
-  passenger_name?: string[];
-  origin_iata_code?: string;
-  destination_iata_code?: string;
-}) {
-  const validParams = Object.entries(params)
-    .filter(([_, value]) => value !== undefined)
-    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
-  try {
-    const response = await duffel.orders.list(validParams);
-    return response;
-  } catch (error) {
-    console.error(
-      "Error in Duffel API request:",
-      error instanceof Error ? error.message : String(error),
-    );
-    throw error;
-  }
-}
-
-export async function* syncUserOrders(userId: string): AsyncGenerator<Order> {
-  let after: string | undefined;
-  const batchSize = 50;
-
-  while (true) {
-    const response = await listOrders({
-      limit: batchSize,
-      after,
-      sort: "created_at",
-    });
-
-    if (!response || !response.data) {
-      throw new Error("Invalid response from Duffel API");
-    }
-
-    for (const order of response.data) {
-      if (order.metadata?.userId === userId) {
-        yield order;
-      }
-    }
-
-    if (response.data.length < batchSize || !response.meta?.after) {
-      break;
-    }
-    after = response.meta.after;
-  }
-}
-
-export async function searchAccommodations(
+export async function searchStays(
   params: StaysSearchParams,
 ): Promise<StaysSearchResult> {
-  console.log(
-    "Calling Duffel API for accommodation search with params:",
-    JSON.stringify(params, null, 2),
-  );
   try {
-    console.log("Duffel stays search method:", duffel.stays?.search);
-    const response: DuffelResponse<StaysSearchResult> =
-      await duffel.stays.search(params);
-    console.log(
-      "Duffel API accommodation search response:",
-      JSON.stringify(response.data, null, 2),
-    );
+    const response = await duffel.stays.search(params);
+
     return response.data;
   } catch (error) {
     console.error("Detailed error in searchAccommodations:", error);
@@ -167,7 +99,7 @@ export async function searchAccommodations(
   }
 }
 
-export async function bookAccommodation(
+export async function bookStays(
   params: StaysBookingPayload,
 ): Promise<StaysBooking> {
   console.log(

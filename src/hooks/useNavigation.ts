@@ -1,5 +1,5 @@
 import { useRouter, useSearchParams } from "next/navigation";
-import type { Offer } from "@duffel/api/types";
+import type { Offer, StaysSearchResult } from "@duffel/api/types";
 
 export default function useNavigation() {
   const router = useRouter();
@@ -19,8 +19,12 @@ export default function useNavigation() {
     router.push(path);
   }
 
-  const navigateToBookPage = (offer: Offer) => {
-    router.push(`/travel/book?id=${offer.id}`);
+  const navigateToBookPage = (result: Offer | StaysSearchResult) => {
+    if ("slices" in result) {
+      router.push(`/travel/book?id=${result.id}`);
+    } else {
+      router.push(`/travel/stay/book?id=${result.id}`);
+    }
   };
 
   return {

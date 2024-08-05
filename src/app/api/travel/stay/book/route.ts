@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { bookAccommodation } from "@/lib/travel/duffel";
+import { bookStays } from "@/lib/travel/duffel";
 
 export async function POST(request: Request) {
   const { userId } = auth();
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
   try {
     const bookingDetails = await request.json();
-    const booking = await bookAccommodation(bookingDetails);
+    const booking = await bookStays(bookingDetails);
 
     return new Response(JSON.stringify(booking));
   } catch (error) {

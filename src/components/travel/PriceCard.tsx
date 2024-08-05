@@ -35,11 +35,11 @@ import {
 
 import { Offer } from "@duffel/api/types";
 
-interface FlyPriceCardProps {
+interface PriceCardProps {
   selectedOffer: Offer;
 }
 
-export default function FlyPriceCard({ selectedOffer }: FlyPriceCardProps) {
+export default function PriceCard({ selectedOffer }: PriceCardProps) {
   const baseAmount = selectedOffer.base_amount;
   const taxAmount = selectedOffer.tax_amount;
   const totalAmount = selectedOffer.total_amount;
