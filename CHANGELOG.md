@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.2](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.5.1...v0.5.2) (2024-08-07)
+
+### Features
+
+- **search:** refactor search functionality and update travel components ([c167991](https://github.com/arminbabaeistudio/travelese.xyz/commit/c16799115397cc24036508418843f9511f342489))
+
 ### [0.5.1](https://github.com/arminbabaeistudio/travelese.xyz/compare/v0.5.0...v0.5.1) (2024-08-05)
 
 ### Features
