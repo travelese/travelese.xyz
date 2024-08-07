@@ -13,7 +13,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
-import { ListOrderedIcon } from "lucide-react";
+import { ListOrderedIcon, FilterIcon } from "lucide-react";
 
 import SearchFilters from "@/components/travel/SearchFilters";
 import FlyCard from "@/components/travel/fly/FlyCard";
@@ -40,6 +40,9 @@ export default function SearchResult() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<null | Error>(null);
   const { navigateToBookPage } = useNavigation();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -49,17 +52,10 @@ export default function SearchResult() {
     (searchParams.get("sortBy") as SortValues) ||
     (searchType === "fly" ? "total_amount" : "price");
   const limit = parseInt(searchParams.get("limit") || "10", 10);
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   const setSortBy = (value: SortValues) => {
     const current = new URLSearchParams(searchParams);
     current.set("sortBy", value);
-    router.push(`?${current.toString()}`);
-  };
-
-  const setPage = (page: number) => {
-    const current = new URLSearchParams(searchParams);
-    current.set("page", page.toString());
     router.push(`?${current.toString()}`);
   };
 
@@ -82,11 +78,9 @@ export default function SearchResult() {
         setLoading(true);
         const params = new URLSearchParams(searchParams);
 
-        // Only add limit for fly searches
         if (searchType === "fly") {
           params.set("limit", limit.toString());
         } else {
-          // Remove limit parameter for stay searches
           params.delete("limit");
         }
 
@@ -97,7 +91,7 @@ export default function SearchResult() {
         const response = await fetch(`${endpoint}?${params?.toString()}`);
 
         if (!response.ok) {
-          console.error("Failed to fetch stay results:", response.statusText);
+          console.error("Failed to fetch results:", response.statusText);
           throw new Error(`Failed to fetch ${searchType} results`);
         }
 
@@ -105,7 +99,6 @@ export default function SearchResult() {
         if (searchType === "fly") {
           setResults(data);
         } else {
-          // For stays, ensure we're setting an array
           setResults(Array.isArray(data) ? data : data.results || []);
         }
       } catch (error: unknown) {
@@ -124,10 +117,15 @@ export default function SearchResult() {
     void fetchResults();
   }, [searchParams, limit, searchType]);
 
+  const paginatedResults = results.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
   if (loading) {
     const skeletonCount = limit < 10 ? limit : 10;
     return (
-      <div className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">
+      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-8 min-h-screen p-4 md:p-6 lg:p-10 border">
         <div className="space-y-6">
           <div className="grid gap-4">
             <div>
@@ -169,13 +167,21 @@ export default function SearchResult() {
   }
 
   return (
-    <main className="grid grid-cols-[240px_1fr] gap-8 min-h-screen p-6 md:p-10 border">
-      <div className="space-y-6">
-        <div className="grid gap-4">
-          <h2 className="text-2xl font-bold">Filters</h2>
-          <SearchFilters />
-        </div>
+    <main className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-8 min-h-screen p-4 md:p-6 lg:p-10 border">
+      <div className="md:hidden mb-4">
+        <Button onClick={() => setIsFilterOpen(!isFilterOpen)}>
+          <FilterIcon className="w-4 h-4 mr-2" />
+          {isFilterOpen ? "Hide Filters" : "Show Filters"}
+        </Button>
       </div>
+      {(isFilterOpen || window.innerWidth >= 768) && (
+        <div className="space-y-6">
+          <div className="grid gap-4">
+            <h2 className="text-2xl font-bold">Filters</h2>
+            <SearchFilters results={results} />
+          </div>
+        </div>
+      )}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Search Results</h1>
@@ -204,7 +210,7 @@ export default function SearchResult() {
           </div>
         </div>
         <div className="grid gap-4">
-          {results.map((result) => {
+          {paginatedResults.map((result) => {
             if (searchType === "fly" && "slices" in result) {
               return (
                 <FlyCard
@@ -222,22 +228,19 @@ export default function SearchResult() {
                 />
               );
             }
-            return null; // Handle any unexpected cases
-          })}{" "}
+            return null;
+          })}
         </div>
         <div className="flex justify-between mt-6">
           <Button
-            type="submit"
             disabled={currentPage === 1}
-            onClick={() => setPage(currentPage - 1)}
-            className="px-4 py-2"
+            onClick={() => setCurrentPage(currentPage - 1)}
           >
             Previous
           </Button>
           <Button
-            type="submit"
-            onClick={() => setPage(currentPage + 1)}
-            className="px-4 py-2"
+            disabled={currentPage * itemsPerPage >= results.length}
+            onClick={() => setCurrentPage(currentPage + 1)}
           >
             Next
           </Button>
