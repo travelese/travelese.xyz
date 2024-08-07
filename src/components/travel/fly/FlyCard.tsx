@@ -20,6 +20,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerDescription,
+  DrawerClose,
 } from "@/components/ui/drawer";
 import {
   Tooltip,
@@ -50,6 +51,7 @@ import {
   BatteryChargingIcon,
   ArrowUpDownIcon,
   ArmchairIcon,
+  PersonStanding,
 } from "lucide-react";
 import type { Offer, OfferSlice } from "@duffel/api/types";
 import type {
@@ -59,6 +61,7 @@ import type {
   BaggageType,
 } from "@duffel/api/booking/Offers/OfferTypes";
 import { Airport } from "@duffel/api/supportingResources/Airports/AirportsTypes";
+import { segments } from "@/src/lib/db/schema";
 
 interface FlyCardProps {
   offer: Offer;
@@ -154,7 +157,7 @@ const FlightSummary: React.FC<FlightSummaryProps> = React.memo(
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="cursor-help underline underline-offset-2">
+              <span className="cursor-help">
                 {stopCount} stop{stopCount > 1 ? "s" : ""}
               </span>
             </TooltipTrigger>
@@ -163,14 +166,34 @@ const FlightSummary: React.FC<FlightSummaryProps> = React.memo(
                 {slice.segments.slice(0, -1).map((segment, index) => (
                   <div key={index} className="text-sm">
                     <div>
-                      {segment.destination.iata_code} -{" "}
-                      {formatDuration(segment.duration)}
+                      {segment.destination.city?.name} (
+                      {segment.destination.iata_code})
                     </div>
-                    <div className="text-xs text-gray-500">
-                      Arrival: {new Date(segment.arriving_at).toLocaleString()}
+                    <div className="text-xs text-muted-foreground">
+                      Duration: {formatDuration(segment.duration)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Arrival:{" "}
+                      {new Intl.DateTimeFormat("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      }).format(new Date(segment.arriving_at))}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Departure:{" "}
+                      {new Intl.DateTimeFormat("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      }).format(new Date(segment.departing_at))}
                     </div>
                     {index < stopCount - 1 && (
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-muted-foreground">
                         Layover:{" "}
                         {formatDuration(
                           calculateLayoverDuration(
@@ -191,17 +214,16 @@ const FlightSummary: React.FC<FlightSummaryProps> = React.memo(
 
     return (
       <div>
-        <h3 className="text-sm font-medium mb-2">{label}</h3>
-        <div className="flex items-center space-x-2">
-          <div className="text-center">
-            <div className="font-bold text-lg">{slice.origin.iata_code}</div>
-            <div className="text-xs">{slice.origin.name}</div>
+        <h3 className="text-sm font-medium mb-1">{label}</h3>
+        <div className="flex items-center justify-between">
+          <div className="text-left pr-2">
+            <div className="font-bold text-2xl">{slice.origin.iata_code}</div>
           </div>
           <Separator className="flex-1 sm:block" aria-hidden="true" />
-          <div className="text-sm">
+          <div className="items-center text-sm p-2">
             <span className="sr-only">Number of stops: </span>
             <StopInfo />
-          </div>
+          </div>{" "}
           <Avatar className="text-muted-foreground">
             <AvatarImage
               alt={`${slice.segments[0]?.operating_carrier.name || ""} Logo`}
@@ -216,23 +238,30 @@ const FlightSummary: React.FC<FlightSummaryProps> = React.memo(
             </AvatarFallback>
           </Avatar>
           <Separator className="flex-1 sm:block" aria-hidden="true" />
-          <div className="text-center">
-            <div className="font-bold text-lg">
+          <div className="text-right pl-2">
+            <div className="font-bold text-2xl">
               {slice.destination.iata_code}
             </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="text-left">
+            <div className="text-xs">{slice.origin.name}</div>
+          </div>
+          <div className="text-right">
             <div className="text-xs">{slice.destination.name}</div>
           </div>
         </div>
         <div className="flex justify-between mt-2">
           <time
-            className="text-xl font-bold"
+            className="text-2xl font-bold"
             dateTime={slice.segments[0]?.departing_at}
           >
             {formatTime(slice.segments[0]?.departing_at)}
           </time>
           <Badge variant="outline">{formatDuration(slice.duration)}</Badge>
           <time
-            className="relative text-xl font-bold"
+            className="relative text-2xl font-bold"
             dateTime={slice.segments[slice.segments.length - 1]?.arriving_at}
           >
             {formatTime(slice.segments[slice.segments.length - 1]?.arriving_at)}
@@ -254,72 +283,109 @@ const FlightSummary: React.FC<FlightSummaryProps> = React.memo(
 
 FlightSummary.displayName = "FlightSummary";
 
-const AirportInfoComponent: React.FC<{
-  icon: React.ElementType;
-  code: string;
-  name: string;
-  terminal: string | null;
-}> = ({ icon: Icon, code, name, terminal }) => (
-  <div>
-    <div className="flex items-center">
-      <Icon className="w-5 h-5" />
-      <div className="ml-2 text-sm font-medium">{code}</div>
-    </div>
-    <div className="text-xs">{name}</div>
-    {terminal && <div className="text-xs">Terminal: {terminal}</div>}
-  </div>
-);
-
-interface BaggageInfoProps {
+interface IncludedItemsProps {
   segments: OfferSliceSegment[];
 }
 
-const BaggageInfo: React.FC<BaggageInfoProps> = React.memo(({ segments }) => {
-  const baggageIcons: Record<
-    BaggageType,
-    { icon: React.ElementType; label: string }
-  > = {
-    carry_on: { icon: BackpackIcon, label: "Carry-on Bag" },
-    checked: { icon: BriefcaseIcon, label: "Checked Bag" },
-  };
+const IncludedItems: React.FC<IncludedItemsProps> = React.memo(
+  ({ segments }) => {
+    const baggageIcons: Record<
+      BaggageType,
+      { icon: React.ElementType; label: string }
+    > = {
+      carry_on: { icon: BackpackIcon, label: "Carry-on Bag" },
+      checked: { icon: BriefcaseIcon, label: "Checked Bag" },
+    };
 
-  return (
-    <div className="flex flex-wrap items-center gap-2 mt-4">
-      <div className="text-sm font-medium">Included:</div>
-      <TooltipProvider>
-        {(
-          Object.entries(baggageIcons) as [
-            BaggageType,
-            { icon: React.ElementType; label: string },
-          ][]
-        ).map(([type, { icon: Icon, label }]) => {
-          const count = countBagType(type, segments);
-          if (count > 0) {
-            return (
-              <Tooltip key={type}>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center space-x-1 rounded-full p-1">
-                    <span className="text-sm">{count}</span>
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                    <span className="sr-only">{`${count} ${label}${
-                      count > 1 ? "s" : ""
-                    }`}</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{`${count} ${label}${count > 1 ? "s" : ""}`}</p>
-                </TooltipContent>
-              </Tooltip>
-            );
-          }
-          return null;
-        })}
-      </TooltipProvider>
-    </div>
-  );
-});
+    const amenityIcons: Record<string, React.ElementType> = {
+      seat_pitch: ArrowUpDownIcon,
+      seat_type: ArmchairIcon,
+      wifi: WifiIcon,
+      power: BatteryChargingIcon,
+    };
 
-BaggageInfo.displayName = "BaggageInfo";
+    const amenities = segments[0].passengers[0]?.cabin?.amenities;
+
+    return (
+      <div className="flex flex-wrap items-center gap-2 mt-4">
+        <div className="text-sm font-medium">Included:</div>
+        <TooltipProvider>
+          {/* Baggage Information */}
+          {(
+            Object.entries(baggageIcons) as [
+              BaggageType,
+              { icon: React.ElementType; label: string },
+            ][]
+          ).map(([type, { icon: Icon, label }]) => {
+            const count = countBagType(type, segments);
+            if (count > 0) {
+              return (
+                <Tooltip key={type}>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center space-x-1 rounded-full p-1 cursor-help">
+                      <span className="text-sm">{count}</span>
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                      <span className="sr-only">{`${count} ${label}${
+                        count > 1 ? "s" : ""
+                      }`}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{`${count} ${label}${count > 1 ? "s" : ""}`}</p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            }
+            return null;
+          })}
+
+          {/* Amenities Information */}
+          {amenities &&
+            Object.entries(amenityIcons).map(([type, Icon]) => {
+              const available =
+                type === "wifi"
+                  ? amenities.wifi?.available
+                  : type === "power"
+                    ? amenities.power?.available
+                    : type === "seat_pitch"
+                      ? !!amenities.seat?.pitch
+                      : type === "seat_type"
+                        ? !!amenities.seat?.type
+                        : false;
+
+              if (available) {
+                return (
+                  <Tooltip key={type}>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center space-x-1 rounded-full p-1 cursor-help">
+                        <Icon className="h-4 w-4" aria-hidden="true" />
+                        <span className="sr-only">{type}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{type.replace("_", " ")}</p>
+                      {type === "wifi" && amenities.wifi?.cost && (
+                        <p>Cost: {amenities.wifi.cost}</p>
+                      )}
+                      {type === "seat_pitch" && amenities.seat?.pitch && (
+                        <p>Pitch: {amenities.seat.pitch}</p>
+                      )}
+                      {type === "seat_type" && amenities.seat?.type && (
+                        <p>Type: {amenities.seat.type}</p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              }
+              return null;
+            })}
+        </TooltipProvider>
+      </div>
+    );
+  },
+);
+
+IncludedItems.displayName = "IncludedItems";
 
 const FlyCard: React.FC<FlyCardProps> = ({ offer, onSelect }) => {
   if (!offer || !Array.isArray(offer.slices) || offer.slices.length === 0)
@@ -338,36 +404,44 @@ const FlyCard: React.FC<FlyCardProps> = ({ offer, onSelect }) => {
           <div className="flex flex-col sm:flex-row w-full items-start sm:items-center justify-between p-4 sm:p-6 rounded-lg cursor-pointer">
             <div className="w-full sm:w-2/3 space-y-4 sm:pr-5 sm:border-r sm:border-dashed">
               <FlightSummary slice={outbound} label="Outbound" />
-              {inbound && <FlightSummary slice={inbound} label="Inbound" />}
-              <BaggageInfo segments={outbound.segments} />
+              <IncludedItems segments={outbound.segments} />
+
+              {inbound && (
+                <>
+                  <FlightSummary slice={inbound} label="Inbound" />
+                  <IncludedItems segments={inbound.segments} />
+                </>
+              )}
             </div>
-            <div className="flex flex-col items-start sm:items-center justify-center w-full sm:w-1/3 mt-4 sm:mt-0">
-              <Alert className="w-full sm:w-auto">
-                <CloudFogIcon className="h-4 w-4" aria-hidden="true" />
-                <AlertTitle>Emission</AlertTitle>
-                <AlertDescription>
-                  {emission} kg CO<sub>2</sub>
-                </AlertDescription>
+            <div className="flex flex-col items-center justify-center w-full sm:w-1/3 mt-4 sm:mt-0 space-y-3">
+              <Alert className="w-full sm:w-auto text-center">
+                <div className="flex flex-col items-center">
+                  <CloudFogIcon className="h-4 w-4 mb-1" aria-hidden="true" />
+                  <AlertTitle>Emission</AlertTitle>
+                  <AlertDescription>
+                    {emission} kg CO<sub>2</sub>
+                  </AlertDescription>
+                </div>
               </Alert>
-              <div className="text-sm m-3" aria-live="polite">
+              <div className="text-sm text-center" aria-live="polite">
                 {remainingSeats} seat(s) left at this price
               </div>
               <div
-                className="text-2xl font-bold"
+                className="text-2xl font-bold text-center"
                 aria-label={`Price: ${currency} ${price}`}
               >
                 {currency} {price}
               </div>
-              <Button className="mt-2 w-full sm:w-auto" variant="outline">
+              <Button className="w-full sm:w-auto" variant="outline">
                 Lock price for {currency} {(Number(price) * 0.1).toFixed(2)}
               </Button>
-              <Button onClick={onSelect} className="mt-2 w-full sm:w-auto">
+              <Button onClick={onSelect} className="w-full sm:w-auto">
                 Select this flight
               </Button>
             </div>
           </div>
         </Card>
-      </DrawerTrigger>
+      </DrawerTrigger>{" "}
       <DrawerContent className="w-full max-w-full">
         <DrawerHeader>
           <DrawerTitle>Flight Details</DrawerTitle>
@@ -384,7 +458,7 @@ const FlyCard: React.FC<FlyCardProps> = ({ offer, onSelect }) => {
                   Details of your outbound flight
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-2">
                 {outbound.segments.map((segment, index) => (
                   <FlySegment key={index} segment={segment} />
                 ))}
@@ -400,7 +474,7 @@ const FlyCard: React.FC<FlyCardProps> = ({ offer, onSelect }) => {
                     Details of your inbound flight
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4 pt-2">
                   {inbound.segments.map((segment, index) => (
                     <FlySegment key={index} segment={segment} />
                   ))}
@@ -410,7 +484,9 @@ const FlyCard: React.FC<FlyCardProps> = ({ offer, onSelect }) => {
           )}
         </div>
         <DrawerFooter>
-          <Button onClick={onSelect}>Confirm Selection</Button>
+          <DrawerClose>
+            <Button onClick={onSelect}>Confirm Selection</Button>
+          </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -454,7 +530,7 @@ const FlySegment: React.FC<{ segment: OfferSliceSegment }> = ({ segment }) => {
         distance={distance}
         dayDifference={dayDifference}
       />
-      <CarrierInfo carrier={operating_carrier} />
+
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1">
           <AccordionTrigger>
@@ -472,9 +548,29 @@ const FlySegment: React.FC<{ segment: OfferSliceSegment }> = ({ segment }) => {
                 operatingFlightNumber={operating_carrier_flight_number}
                 aircraft={aircraft}
               />
-              <PassengerInformation passengers={passengers} />
-              <StopInformation stops={stops} />
             </div>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>
+            <div className="flex items-center">
+              <PersonStanding className="w-5 h-5 mr-2" />
+              <span>Passenger information</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <PassengerInformation passengers={passengers} />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-3">
+          <AccordionTrigger>
+            <div className="flex items-center">
+              <ClockIcon className="w-5 h-5 mr-2" />
+              <span>Stop Information</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <StopInformation stops={stops} />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -488,18 +584,20 @@ const FlightHeader: React.FC<{
   originTerminal: string | null;
   destinationTerminal: string | null;
 }> = ({ origin, destination, originTerminal, destinationTerminal }) => (
-  <div className="flex items-center justify-between">
-    <AirportInfoComponent
+  <div className="flex items-center justify-between w-full">
+    <AirportInfo
       icon={PlaneTakeoffIcon}
       code={origin.iata_code ?? "UNKNOWN"}
       name={origin.name}
       terminal={originTerminal}
+      align="left"
     />
-    <AirportInfoComponent
+    <AirportInfo
       icon={PlaneLandingIcon}
       code={destination.iata_code ?? "UNKNOWN"}
       name={destination.name}
       terminal={destinationTerminal}
+      align="right"
     />
   </div>
 );
@@ -509,13 +607,22 @@ const AirportInfo: React.FC<{
   code: string;
   name: string;
   terminal: string | null;
-}> = ({ icon: Icon, code, name, terminal }) => (
-  <div>
-    <div className="flex items-center">
+  align: "left" | "right";
+}> = ({ icon: Icon, code, name, terminal, align }) => (
+  <div
+    className={`flex flex-col ${align === "left" ? "items-start" : "items-end"}`}
+  >
+    <div
+      className={`flex items-center ${align === "right" ? "flex-row-reverse" : ""}`}
+    >
       <Icon className="w-5 h-5" />
-      <div className="ml-2 text-sm font-medium">{code}</div>
+      <div
+        className={`text-sm font-medium ${align === "left" ? "ml-2" : "mr-2"}`}
+      >
+        {code}
+      </div>
     </div>
-    <div className="text-xs">{name}</div>
+    <div className="text-xs pt-1">{name}</div>
     {terminal && <div className="text-xs">Terminal: {terminal}</div>}
   </div>
 );
@@ -536,7 +643,15 @@ const FlightTimes: React.FC<{
     </time>
     <div className="flex flex-col items-center">
       <Badge variant="secondary">{formatDuration(duration)}</Badge>
-      {distance && <div className="text-xs mt-1">{distance} km</div>}
+      {distance && (
+        <div className="text-xs mt-1">
+          {parseFloat(distance).toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+          })}{" "}
+          km
+        </div>
+      )}
     </div>
     <time className="relative text-xl font-bold">
       {new Date(arrivingAt).toLocaleTimeString([], {
@@ -613,44 +728,6 @@ const PassengerInformation: React.FC<{
           <div>Fare Basis Code:</div>
           <div>{passenger.fare_basis_code}</div>
         </div>
-        <h6 className="font-medium mt-2">Baggage Allowance:</h6>
-        <ul className="list-disc list-inside">
-          {passenger.baggages.map((baggage, bIndex) => (
-            <li key={bIndex}>
-              {baggage.quantity} x {baggage.type}
-            </li>
-          ))}
-        </ul>
-        {passenger.cabin?.amenities && (
-          <div className="mt-2">
-            <h6 className="font-medium">Cabin Amenities:</h6>
-            <div className="flex space-x-4 mt-2">
-              <AmenityIcon
-                icon={ArrowUpDownIcon}
-                available={!!passenger.cabin.amenities.seat?.pitch}
-                label="Seat Pitch"
-                detail={passenger.cabin.amenities.seat?.pitch}
-              />
-              <AmenityIcon
-                icon={ArmchairIcon}
-                available={!!passenger.cabin.amenities.seat?.type}
-                label="Seat Type"
-                detail={passenger.cabin.amenities.seat?.type}
-              />
-              <AmenityIcon
-                icon={WifiIcon}
-                available={passenger.cabin.amenities.wifi?.available || false}
-                label="Wi-Fi"
-                detail={passenger.cabin.amenities.wifi?.cost}
-              />
-              <AmenityIcon
-                icon={BatteryChargingIcon}
-                available={passenger.cabin.amenities.power?.available || false}
-                label="Power"
-              />
-            </div>
-          </div>
-        )}
       </div>
     ))}
   </div>
@@ -680,40 +757,6 @@ const StopInformation: React.FC<{ stops: OfferSliceSegment["stops"] }> = ({
       ))}
     </div>
   );
-
-interface AmenityIconProps {
-  icon: React.ElementType;
-  available: boolean;
-  label: string;
-  detail?: string;
-}
-
-const AmenityIcon: React.FC<AmenityIconProps> = ({
-  icon: Icon,
-  available,
-  label,
-  detail,
-}) => (
-  <TooltipProvider>
-    <Tooltip>
-      <TooltipTrigger>
-        <div
-          className={`p-2 rounded-full ${available ? "bg-green-100" : "bg-gray-100"}`}
-        >
-          <Icon
-            className={`w-5 h-5 ${available ? "text-green-600" : "text-gray-400"}`}
-          />
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>
-          {label}: {available ? "Available" : "Not available"}
-        </p>
-        {detail && <p>{detail}</p>}
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-);
 
 FlyCard.displayName = "FlyCard";
 
